@@ -1,8 +1,10 @@
-package com.example.eventplanner.dto.user;
+package com.example.eventplanner.dto.user.auth;
 
 import com.example.eventplanner.model.user.Address;
 
-public class RegisterEoDTO {
+import java.util.List;
+
+public class RegisterSpRequestDTO {
     private String name;
     private String surname;
     private String phoneNumber;
@@ -11,6 +13,9 @@ public class RegisterEoDTO {
     private String password;
     private String photo;
 
+    private String company;
+    private String description;
+    private List<String> photos;
 
     public String getSurname() {
         return surname;
@@ -66,5 +71,29 @@ public class RegisterEoDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<String> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<String> photos) {
+        this.photos = photos;
     }
 }

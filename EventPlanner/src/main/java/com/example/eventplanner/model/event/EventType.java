@@ -1,5 +1,6 @@
 package com.example.eventplanner.model.event;
 
+import com.example.eventplanner.model.merchandise.Merchandise;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -12,6 +13,14 @@ public class EventType {
     private String title;
     private String description;
     private boolean isActive;
+
+    @ManyToMany
+    @JoinTable(
+            name = "eventtype_merchandise",
+            joinColumns = @JoinColumn(name = "eventtype_id"),
+            inverseJoinColumns = @JoinColumn(name = "merchandise_id")
+    )
+    private List<Merchandise> merchandise;
 
     @OneToMany(mappedBy = "eventType")
     private List<Category> categories;

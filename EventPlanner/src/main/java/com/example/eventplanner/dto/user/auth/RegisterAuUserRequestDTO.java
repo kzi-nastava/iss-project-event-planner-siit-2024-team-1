@@ -1,6 +1,6 @@
-package com.example.eventplanner.dto.user;
+package com.example.eventplanner.dto.user.auth;
 
-public class RegisterAuUserDTO {
+public class RegisterAuUserRequestDTO {
     private String email;
 
     public String getEmail() {

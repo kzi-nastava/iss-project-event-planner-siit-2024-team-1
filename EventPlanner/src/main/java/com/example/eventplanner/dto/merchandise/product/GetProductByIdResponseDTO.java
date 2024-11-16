@@ -1,19 +1,16 @@
-package com.example.eventplanner.model.merchandise;
+package com.example.eventplanner.dto.merchandise.product;
 
 import com.example.eventplanner.model.event.Category;
-import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
+import com.example.eventplanner.model.merchandise.MerchandisePhoto;
 import com.example.eventplanner.model.user.Address;
 import com.example.eventplanner.model.user.ServiceProvider;
-import jakarta.persistence.*;
+import jakarta.persistence.ManyToOne;
+
 import java.util.List;
 
-@Entity
-public class Merchandise {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class GetProductByIdResponseDTO {
     private int id;
-
     private String title;
     private String description;
     private String specificity;
@@ -28,20 +25,11 @@ public class Merchandise {
     private boolean automaticReservation;
     private boolean deleted;
 
-    @ManyToOne
-    @JoinColumn(name = "service_provider_id")
+
     private ServiceProvider serviceProvider;
 
-    @OneToMany(mappedBy = "merchandise")
     private List<MerchandisePhoto> photos;
 
-    @OneToMany(mappedBy = "merchandise")
-    private List<Review> reviews;
-
-    @ManyToMany(mappedBy = "merchandise")
-    private List<Event> events;
-
-    @ManyToMany(mappedBy = "merchandise")
     private List<EventType> eventTypes;
 
     @ManyToOne
@@ -56,15 +44,6 @@ public class Merchandise {
 
     public void setServiceProvider(ServiceProvider serviceProvider) {
         this.serviceProvider = serviceProvider;
-    }
-
-    // Getters and Setters
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getTitle() {
@@ -163,36 +142,12 @@ public class Merchandise {
         this.automaticReservation = automaticReservation;
     }
 
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
     public List<MerchandisePhoto> getPhotos() {
         return photos;
     }
 
     public void setPhotos(List<MerchandisePhoto> photos) {
         this.photos = photos;
-    }
-
-    public List<Review> getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(List<Review> reviews) {
-        this.reviews = reviews;
-    }
-
-    public List<Event> getEvents() {
-        return events;
-    }
-
-    public void setEvents(List<Event> events) {
-        this.events = events;
     }
 
     public Address getAddress() {
@@ -217,5 +172,21 @@ public class Merchandise {
 
     public void setEventTypes(List<EventType> eventTypes) {
         this.eventTypes = eventTypes;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
