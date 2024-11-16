@@ -9,6 +9,7 @@ import java.util.List;
 @DiscriminatorValue("ServiceProvider")
 public class ServiceProvider extends User {
     private String company;
+    private String description;
 
     @OneToMany(mappedBy = "serviceProvider")
     private List<BusinessPhoto> photos;
@@ -39,5 +40,13 @@ public class ServiceProvider extends User {
 
     public void setMerchandise(List<Merchandise> merchandise) {
         this.merchandise = merchandise;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
