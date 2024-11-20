@@ -1,6 +1,6 @@
 package com.example.eventplanner.dto.user.auth;
 
-import com.example.eventplanner.model.user.Address;
+import com.example.eventplanner.model.common.Address;
 
 import java.util.List;
 

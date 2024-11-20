@@ -3,7 +3,7 @@ package com.example.eventplanner.dto.merchandise.product;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.MerchandisePhoto;
-import com.example.eventplanner.model.user.Address;
+import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.user.ServiceProvider;
 import jakarta.persistence.ManyToOne;
 

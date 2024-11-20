@@ -1,6 +1,6 @@
 package com.example.eventplanner.dto.user.update;
 
-import com.example.eventplanner.model.user.Address;
+import com.example.eventplanner.model.common.Address;
 
 public class UpdateEoRequestDTO {
     private int id;

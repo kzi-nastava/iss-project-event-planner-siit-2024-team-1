@@ -1,12 +1,9 @@
-package com.example.eventplanner.model.user;
+package com.example.eventplanner.model.common;
 
 import jakarta.persistence.*;
 
-@Entity
+@Embeddable
 public class Address {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
 
     private String streetName;
     private String city;
@@ -14,14 +11,6 @@ public class Address {
     private double longitude;
     private double latitude;
 
-    // Getters and Setters
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getStreetName() {
         return streetName;

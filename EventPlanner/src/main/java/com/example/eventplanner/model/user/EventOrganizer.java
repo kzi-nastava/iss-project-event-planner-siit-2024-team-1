@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 @DiscriminatorValue("EventOrganizer")
 public class EventOrganizer extends User {
-    @OneToMany(mappedBy = "organizer")
+    @OneToMany
     private List<Event> organizingEvents;
 
     // Getters and Setters

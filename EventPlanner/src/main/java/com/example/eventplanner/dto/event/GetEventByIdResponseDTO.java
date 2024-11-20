@@ -4,11 +4,10 @@ import com.example.eventplanner.model.event.Activity;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.Review;
-import com.example.eventplanner.model.user.Address;
+import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.Notification;
 import com.example.eventplanner.model.user.User;
-import jakarta.persistence.*;
 
 import java.util.Date;
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.example.eventplanner.dto.user;
 
-import com.example.eventplanner.model.user.Address;
+import com.example.eventplanner.model.common.Address;
 
 public class GetEoByIdResponseDTO {
     private String name;
