@@ -14,7 +14,7 @@ public class ServiceProvider extends User {
     @OneToMany(mappedBy = "serviceProvider")
     private List<BusinessPhoto> photos;
 
-    @OneToMany(mappedBy = "serviceProvider", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany
     private List<Merchandise> merchandise;
 
     // Getters and Setters

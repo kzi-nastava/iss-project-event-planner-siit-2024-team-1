@@ -10,9 +10,6 @@ public class MerchandisePhoto {
 
     private String photo;
 
-    @ManyToOne
-    private Merchandise merchandise;
-
     // Getters and Setters
     public int getId() {
         return id;
@@ -30,12 +27,5 @@ public class MerchandisePhoto {
         this.photo = photo;
     }
 
-    public Merchandise getMerchandise() {
-        return merchandise;
-    }
-
-    public void setMerchandise(Merchandise merchandise) {
-        this.merchandise = merchandise;
-    }
 }
 

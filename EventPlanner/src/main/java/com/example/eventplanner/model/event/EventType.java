@@ -2,9 +2,16 @@ package com.example.eventplanner.model.event;
 
 import com.example.eventplanner.model.merchandise.Merchandise;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class EventType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,53 +23,10 @@ public class EventType {
 
     @ManyToMany
     @JoinTable(
-            name = "eventtype_merchandise",
+            name = "eventtype_category",
             joinColumns = @JoinColumn(name = "eventtype_id"),
-            inverseJoinColumns = @JoinColumn(name = "merchandise_id")
+            inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private List<Merchandise> merchandise;
-
-    @OneToMany(mappedBy = "eventType")
     private List<Category> categories;
 
-    // Getters and Setters
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
-    public List<Category> getCategories() {
-        return categories;
-    }
-
-    public void setCategories(List<Category> categories) {
-        this.categories = categories;
-    }
 }
