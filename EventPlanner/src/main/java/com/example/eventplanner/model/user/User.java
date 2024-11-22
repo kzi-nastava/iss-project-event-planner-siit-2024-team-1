@@ -17,7 +17,13 @@ import java.util.List;
 @AllArgsConstructor
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @TableGenerator(
+            name = "user_gen",
+            table = "id_generator",
+            pkColumnName = "sequence_name",
+            valueColumnName = "next_val"
+    )
+    @GeneratedValue(strategy = GenerationType.TABLE,generator = "user_gen")
     private int id;
 
     private String name;
