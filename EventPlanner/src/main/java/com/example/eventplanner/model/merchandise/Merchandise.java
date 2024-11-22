@@ -19,7 +19,13 @@ import java.util.List;
 @AllArgsConstructor
 public class Merchandise {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @TableGenerator(
+            name = "merchandise_gen",
+            table = "id_generator",
+            pkColumnName = "sequence_name",
+            valueColumnName = "next_val"
+    )
+    @GeneratedValue(strategy = GenerationType.TABLE,generator = "merchandise_gen")
     private int id;
 
     private String title;
@@ -38,6 +44,7 @@ public class Merchandise {
 
 
     @OneToMany
+    @JoinTable(inverseJoinColumns = @JoinColumn(name = "photo_id"))
     private List<MerchandisePhoto> photos;
 
     @OneToMany
