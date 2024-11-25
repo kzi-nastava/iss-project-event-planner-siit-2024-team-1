@@ -9,6 +9,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 public class EventOverviewDTO {
+    private int id;
     private String type;
     private String title;
     private Date date;

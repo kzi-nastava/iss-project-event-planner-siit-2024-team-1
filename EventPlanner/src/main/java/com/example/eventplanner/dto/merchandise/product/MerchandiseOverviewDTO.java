@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class MerchandiseOverviewDTO {
+    private int id;
     private String category;
     private String type;
     private byte[] photo;
