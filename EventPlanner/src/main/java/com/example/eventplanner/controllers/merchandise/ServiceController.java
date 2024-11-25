@@ -1,5 +1,7 @@
 package com.example.eventplanner.controllers.merchandise;
 
+import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
+import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.GetAllServicesResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.GetServiceByIdResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.FilterServiceRequestDTO;
@@ -7,6 +9,7 @@ import com.example.eventplanner.dto.merchandise.service.create.CreateServiceRequ
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceResponseDTO;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -51,5 +54,10 @@ public class ServiceController {
     @DeleteMapping("/{id}")
     public String Delete(@PathVariable int id) {
         return "success";
+    }
+
+    @PostMapping("/{id}/review")
+    public ResponseEntity<ReviewMerchandiseResponseDTO> addReview(@RequestBody ReviewMerchandiseRequestDTO request, @PathVariable int id) {
+        return ResponseEntity.ok(new ReviewMerchandiseResponseDTO());
     }
 }

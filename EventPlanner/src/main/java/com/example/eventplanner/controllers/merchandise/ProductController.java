@@ -6,8 +6,11 @@ import com.example.eventplanner.dto.merchandise.product.create.CreateProductRequ
 import com.example.eventplanner.dto.merchandise.product.create.CreateProductResponseDTO;
 import com.example.eventplanner.dto.merchandise.product.update.UpdateProductRequestDTO;
 import com.example.eventplanner.dto.merchandise.product.update.UpdateProductResponseDTO;
+import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
+import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.EventType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -53,5 +56,10 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public String Delete(@PathVariable int id){
         return "success";
+    }
+
+    @PostMapping("/{id}/review")
+    public ResponseEntity<ReviewMerchandiseResponseDTO> addReview(@RequestBody ReviewMerchandiseRequestDTO request, @PathVariable int id) {
+        return ResponseEntity.ok(new ReviewMerchandiseResponseDTO());
     }
 }
