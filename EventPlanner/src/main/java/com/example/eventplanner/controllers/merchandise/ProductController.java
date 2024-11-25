@@ -1,5 +1,6 @@
 package com.example.eventplanner.controllers.merchandise;
 
+import com.example.eventplanner.dto.merchandise.product.BuyProductResponseDTO;
 import com.example.eventplanner.dto.merchandise.product.GetAllProductsResponseDTO;
 import com.example.eventplanner.dto.merchandise.product.GetProductByIdResponseDTO;
 import com.example.eventplanner.dto.merchandise.product.create.CreateProductRequestDTO;
@@ -8,6 +9,7 @@ import com.example.eventplanner.dto.merchandise.product.update.UpdateProductRequ
 import com.example.eventplanner.dto.merchandise.product.update.UpdateProductResponseDTO;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.EventType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -53,5 +55,10 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public String Delete(@PathVariable int id){
         return "success";
+    }
+
+    @PostMapping("/{id}/buy")
+    public ResponseEntity<BuyProductResponseDTO> buyProduct(@PathVariable( value = "id") int id) {
+        return ResponseEntity.ok(new BuyProductResponseDTO());
     }
 }
