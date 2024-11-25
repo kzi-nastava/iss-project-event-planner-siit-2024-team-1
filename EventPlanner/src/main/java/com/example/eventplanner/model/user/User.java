@@ -1,6 +1,7 @@
 package com.example.eventplanner.model.user;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.event.Event;
+import com.example.eventplanner.model.merchandise.Merchandise;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -76,4 +77,10 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"))
     private List<Event> followedEvents;
+
+    @ManyToMany
+    @JoinTable(name= "user_favorite_merchandises",
+            joinColumns =  @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "merchandise_id"))
+    private List<Merchandise> favoriteMerchandises;
 }
