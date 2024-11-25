@@ -1,7 +1,7 @@
 package com.example.eventplanner.dto.filter;
 
 import com.example.eventplanner.dto.event.EventOverviewDTO;
-import com.example.eventplanner.dto.merchandise.product.MerchandiseOverviewDTO;
+import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import lombok.Data;
 
 import java.util.List;

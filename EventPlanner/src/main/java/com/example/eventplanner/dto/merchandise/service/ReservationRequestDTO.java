@@ -1,4 +1,4 @@
-package com.example.eventplanner.dto.service;
+package com.example.eventplanner.dto.merchandise.service;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;

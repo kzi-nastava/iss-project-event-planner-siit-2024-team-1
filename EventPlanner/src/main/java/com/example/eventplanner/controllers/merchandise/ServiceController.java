@@ -1,8 +1,8 @@
 package com.example.eventplanner.controllers.merchandise;
 
 
-import com.example.eventplanner.dto.service.ReservationRequestDTO;
-import com.example.eventplanner.dto.service.ReservationResponseDTO;
+import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
+import com.example.eventplanner.dto.merchandise.service.ReservationResponseDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

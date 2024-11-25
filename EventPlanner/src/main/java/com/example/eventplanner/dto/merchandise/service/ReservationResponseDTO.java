@@ -1,4 +1,4 @@
-package com.example.eventplanner.dto.service;
+package com.example.eventplanner.dto.merchandise.service;
 
 import lombok.Data;
 
