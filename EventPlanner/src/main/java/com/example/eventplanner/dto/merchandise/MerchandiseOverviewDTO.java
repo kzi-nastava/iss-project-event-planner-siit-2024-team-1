@@ -1,4 +1,4 @@
-package com.example.eventplanner.dto.merchandise.product;
+package com.example.eventplanner.dto.merchandise;
 
 import com.example.eventplanner.model.common.Address;
 import lombok.Data;
@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class MerchandiseOverviewDTO {
+    private int id;
     private String category;
     private String type;
     private byte[] photo;

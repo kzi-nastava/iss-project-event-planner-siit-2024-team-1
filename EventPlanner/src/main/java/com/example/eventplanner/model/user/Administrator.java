@@ -1,12 +1,17 @@
 package com.example.eventplanner.model.user;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
+import lombok.Data;
+
+import java.util.List;
 
 @Entity
 @DiscriminatorValue("Administrator")
+@Data
 public class Administrator extends User {
-    // Additional properties specific to Administrator
-
-    // Getters and Setters
+    @OneToMany
+    @JoinTable(
+            inverseJoinColumns = @JoinColumn(name = "report_id")
+    )
+    List<UserReport> reports;
 }
