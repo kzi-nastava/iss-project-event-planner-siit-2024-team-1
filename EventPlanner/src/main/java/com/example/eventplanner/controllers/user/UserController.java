@@ -1,5 +1,6 @@
 package com.example.eventplanner.controllers.user;
 
+import com.example.eventplanner.dto.merchandise.FavoriteResponseDTO;
 import com.example.eventplanner.dto.user.GetEoByIdResponseDTO;
 import com.example.eventplanner.dto.user.GetSpByIdResponseDTO;
 import com.example.eventplanner.dto.user.auth.*;
@@ -69,4 +70,10 @@ public class UserController {
     public UpdateSpResponseDTO UpdateEo(@RequestBody UpdateSpRequestDTO user) {
         return  new UpdateSpResponseDTO();
     }
+
+    @PostMapping("favorite-merchandise/{id}")
+    public FavoriteResponseDTO AddToFavorites(@PathVariable( value = "id") int id){
+        return new FavoriteResponseDTO();
+    }
+
 }
