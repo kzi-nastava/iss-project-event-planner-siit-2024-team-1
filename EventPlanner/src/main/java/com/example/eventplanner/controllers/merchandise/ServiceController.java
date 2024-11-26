@@ -1,6 +1,7 @@
 package com.example.eventplanner.controllers.merchandise;
 
-
+import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
+import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.ReservationResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.GetAllServicesResponseDTO;
@@ -65,4 +66,8 @@ public class ServiceController {
         return "success";
     }
 
+    @PostMapping("/{id}/review")
+    public ResponseEntity<ReviewMerchandiseResponseDTO> addReview(@RequestBody ReviewMerchandiseRequestDTO request, @PathVariable int id) {
+        return ResponseEntity.ok(new ReviewMerchandiseResponseDTO());
+    }
 }

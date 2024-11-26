@@ -4,8 +4,8 @@ import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.MerchandisePhoto;
+import com.example.eventplanner.model.merchandise.Review;
 import com.example.eventplanner.model.merchandise.Timeslot;
-import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 import java.util.List;
@@ -28,8 +28,8 @@ public class CreateServiceResponseDTO {
     private List<Timeslot> timeslot;
     private List<MerchandisePhoto> photos;
     private List<EventType> eventTypes;
-    @ManyToOne
     private Address address;
-    @ManyToOne
     private Category category;
+    private List<Review> reviews;
+
 }
