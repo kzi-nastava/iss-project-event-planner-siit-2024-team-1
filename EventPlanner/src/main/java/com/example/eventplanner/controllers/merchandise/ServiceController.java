@@ -31,7 +31,7 @@ public class ServiceController {
         return new GetServiceByIdResponseDTO();
     }
 
-    @GetMapping()
+    @GetMapping("/filter")
     public GetAllServicesResponseDTO GetFiltered(@RequestBody FilterServiceRequestDTO filterRequest) {
         return new GetAllServicesResponseDTO();
     }
