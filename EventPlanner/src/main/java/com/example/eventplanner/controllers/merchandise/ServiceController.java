@@ -62,8 +62,8 @@ public class ServiceController {
     }
 
     @DeleteMapping("/{id}")
-    public String Delete(@PathVariable int id) {
-        return "success";
+    public ResponseEntity<String> delete(@PathVariable int id) {
+        return ResponseEntity.ok("success");
     }
 
     @PostMapping("/{id}/review")

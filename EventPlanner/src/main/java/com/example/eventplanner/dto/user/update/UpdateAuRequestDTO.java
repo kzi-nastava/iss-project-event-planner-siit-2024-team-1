@@ -2,7 +2,7 @@ package com.example.eventplanner.dto.user.update;
 
 import com.example.eventplanner.model.common.Address;
 
-public class UpdateEoRequestDTO {
+public class UpdateAuRequestDTO {
     private int id;
     private String name;
     private String surname;
