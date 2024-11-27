@@ -1,5 +1,7 @@
 package com.example.eventplanner.controllers.merchandise;
 
+import com.example.eventplanner.dto.filter.ServiceFiltersDTO;
+import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
@@ -12,8 +14,15 @@ import com.example.eventplanner.dto.merchandise.service.create.CreateServiceResp
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceResponseDTO;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/services")
@@ -21,7 +30,7 @@ public class ServiceController {
 
     @PostMapping("/{serviceId}/reserve")
     public ResponseEntity<ReservationResponseDTO> reserveService(
-            @PathVariable Long serviceId,
+            @PathVariable int serviceId,
             @Valid @RequestBody ReservationRequestDTO request) {
         return ResponseEntity.ok(new ReservationResponseDTO());
     }
@@ -70,4 +79,18 @@ public class ServiceController {
     public ResponseEntity<ReviewMerchandiseResponseDTO> addReview(@RequestBody ReviewMerchandiseRequestDTO request, @PathVariable int id) {
         return ResponseEntity.ok(new ReviewMerchandiseResponseDTO());
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<MerchandiseOverviewDTO>> filterServices(
+            @RequestBody ServiceFiltersDTO serviceFilters,
+            @RequestParam(required = false) String search,
+            @PageableDefault(size = 10) Pageable pageable) {
+
+        // Apply service-specific filters and search
+        List<MerchandiseOverviewDTO> emptyDTOs = Collections.nCopies(pageable.getPageSize(), new MerchandiseOverviewDTO());
+        Page<MerchandiseOverviewDTO> merchandiseDTOs = new PageImpl<>(emptyDTOs, pageable, 0);
+
+        return ResponseEntity.ok(merchandiseDTOs);
+    }
+
 }

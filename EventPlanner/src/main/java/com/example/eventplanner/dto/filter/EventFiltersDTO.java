@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-class EventFiltersDTO {
+public class EventFiltersDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private String type;

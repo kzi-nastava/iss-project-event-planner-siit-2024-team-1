@@ -3,7 +3,7 @@ package com.example.eventplanner.dto.filter;
 import lombok.Data;
 
 @Data
-class ProductFiltersDTO {
+public class ProductFiltersDTO {
     private Double priceMin;
     private Double priceMax;
     private String category;
