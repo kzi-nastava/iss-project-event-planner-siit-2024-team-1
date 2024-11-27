@@ -1,8 +1,14 @@
 package com.example.eventplanner.model.user;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class BusinessPhoto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,29 +20,5 @@ public class BusinessPhoto {
     @JoinColumn(name = "serviceProvider")
     private ServiceProvider serviceProvider;
 
-    // Getters and Setters
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
-
-    public ServiceProvider getServiceProvider() {
-        return serviceProvider;
-    }
-
-    public void setServiceProvider(ServiceProvider serviceProvider) {
-        this.serviceProvider = serviceProvider;
-    }
 }
 
