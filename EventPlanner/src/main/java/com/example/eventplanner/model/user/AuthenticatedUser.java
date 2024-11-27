@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @DiscriminatorValue("AuthenticatedUser")
 public class AuthenticatedUser extends User {
     // Additional properties specific to AuthenticatedUser
