@@ -10,11 +10,10 @@ public class UpdateSpRequestDTO {
     private String surname;
     private String phoneNumber;
     private Address address;
-    private String email;
     private String password;
     private String photo;
+    private boolean active;
 
-    private String company;
     private String description;
     private List<String> photos;
 
@@ -32,14 +31,6 @@ public class UpdateSpRequestDTO {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public Address getAddress() {
@@ -74,14 +65,6 @@ public class UpdateSpRequestDTO {
         this.name = name;
     }
 
-    public String getCompany() {
-        return company;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -104,5 +87,13 @@ public class UpdateSpRequestDTO {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public boolean getActive() {
+        return active;
+    }
+
+    public void setActive(boolean id) {
+        this.active = active;
     }
 }
