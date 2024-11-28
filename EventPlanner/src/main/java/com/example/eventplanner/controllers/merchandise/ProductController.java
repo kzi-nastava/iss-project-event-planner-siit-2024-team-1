@@ -5,6 +5,8 @@ import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.product.BuyProductResponseDTO;
 import com.example.eventplanner.dto.merchandise.product.GetProductByIdResponseDTO;
+import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
+import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -71,5 +73,10 @@ public class ProductController {
     @PostMapping("/{id}/buy")
     public ResponseEntity<BuyProductResponseDTO> buyProduct(@PathVariable(value = "id") int id) {
         return ResponseEntity.ok(new BuyProductResponseDTO());
+    }
+
+    @PostMapping("/{id}/review")
+    public ResponseEntity<ReviewMerchandiseResponseDTO> addReview(@RequestBody ReviewMerchandiseRequestDTO request, @PathVariable int id) {
+        return ResponseEntity.ok(new ReviewMerchandiseResponseDTO());
     }
 }
