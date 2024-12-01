@@ -14,7 +14,8 @@ public class MerchandisePhoto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String photo;
-
+    @Lob
+    @Column(columnDefinition = "BYTEA")
+    private byte[] photo;
 }
 
