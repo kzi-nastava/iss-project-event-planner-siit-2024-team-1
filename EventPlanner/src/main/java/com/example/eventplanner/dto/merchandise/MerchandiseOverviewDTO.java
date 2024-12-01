@@ -18,5 +18,6 @@ public class MerchandiseOverviewDTO {
     private String title;
     private double rating;
     private Address address;
+    private double price;
     private String description;
 }

@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 import java.util.List;
 
@@ -20,12 +21,12 @@ import java.util.List;
 public class Merchandise {
     @Id
     @TableGenerator(
-            name = "merchandise_gen",
+            name = "merchandise",
             table = "id_generator",
             pkColumnName = "sequence_name",
             valueColumnName = "next_val"
     )
-    @GeneratedValue(strategy = GenerationType.TABLE,generator = "merchandise_gen")
+    @GeneratedValue(strategy = GenerationType.TABLE,generator = "merchandise")
     private int id;
 
     private String title;
@@ -63,6 +64,18 @@ public class Merchandise {
     @ManyToOne
     private Category category;
 
+    @Transient
+    private double rating;
+
+    public double getRating() {
+        if (this.reviews != null) {
+            return this.reviews.stream()
+                    .mapToDouble(Review::getRating)
+                    .average()
+                    .orElse(0.0);
+        }
+        return 0.0;
+    }
 
     public Merchandise(String description, String title, String specificity, double price, int discount, boolean visible, boolean available, int minDuration, int maxDuration, int reservationDeadline, int cancellationDeadline, boolean automaticReservation, boolean deleted, List<MerchandisePhoto> photos, List<Review> reviews, List<Event> events, Address address, Category category) {
         this.description = description;
