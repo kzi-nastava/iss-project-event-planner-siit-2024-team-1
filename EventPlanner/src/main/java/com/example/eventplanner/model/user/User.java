@@ -1,4 +1,5 @@
 package com.example.eventplanner.model.user;
+import com.example.eventplanner.model.auth.Role;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.merchandise.Merchandise;
@@ -38,6 +39,7 @@ public class User {
     private String password;
     private String photo;
     private boolean active;
+    private Role role;
 
     @OneToMany(mappedBy = "recipient")
     private List<Message> receivedMessages;
