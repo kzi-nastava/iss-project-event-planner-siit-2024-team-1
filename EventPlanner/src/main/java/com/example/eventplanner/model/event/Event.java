@@ -2,7 +2,6 @@ package com.example.eventplanner.model.event;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.Review;
 import com.example.eventplanner.model.common.Address;
-import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.Notification;
 import com.example.eventplanner.model.user.User;
 import jakarta.persistence.*;
@@ -25,7 +24,7 @@ public class Event {
     private String description;
     private int maxParticipants;
     private boolean isPublic;
-    private Date eventDate;
+    private Date date;
     private double maxBudget;
 
     @OneToMany

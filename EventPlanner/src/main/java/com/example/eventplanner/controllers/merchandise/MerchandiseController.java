@@ -2,6 +2,8 @@ package com.example.eventplanner.controllers.merchandise;
 
 import com.example.eventplanner.dto.event.EventOverviewDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
+import com.example.eventplanner.services.merchandise.MerchandiseService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -17,25 +19,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/merchandise")
+@RequiredArgsConstructor
 public class MerchandiseController {
-    @GetMapping("/top")
-    public ResponseEntity<Page<MerchandiseOverviewDTO>> getTopMerchandise(
-            @PageableDefault(size = 10, sort = "popularity", direction = Sort.Direction.DESC) Pageable merchandisePage
-    ) {
-        // Get paginated merchandise from repository
-        List<MerchandiseOverviewDTO> emptyDTOs = Collections.nCopies(merchandisePage.getPageSize(), new MerchandiseOverviewDTO());
-        Page<MerchandiseOverviewDTO> merchandiseDTOs = new PageImpl<>(emptyDTOs, merchandisePage, 0);
+    private final MerchandiseService merchandiseService;
 
-        return ResponseEntity.ok(merchandiseDTOs);
+    @GetMapping("/top")
+    public ResponseEntity<List<MerchandiseOverviewDTO>> getTopMerchandise() {
+        return ResponseEntity.ok(merchandiseService.getTop());
     }
     @GetMapping("/all")
     public ResponseEntity<Page<MerchandiseOverviewDTO>> getAllMerchandise(
-            @PageableDefault(size = 10, sort = "popularity", direction = Sort.Direction.DESC) Pageable merchandisePage
+            @PageableDefault(size = 10, sort = "price", direction = Sort.Direction.DESC) Pageable merchandisePage
     ) {
-        // Get paginated merchandise from repository
-        List<MerchandiseOverviewDTO> emptyDTOs = Collections.nCopies(merchandisePage.getPageSize(), new MerchandiseOverviewDTO());
-        Page<MerchandiseOverviewDTO> merchandiseDTOs = new PageImpl<>(emptyDTOs, merchandisePage, 0);
-
-        return ResponseEntity.ok(merchandiseDTOs);
+        return ResponseEntity.ok(merchandiseService.getAll(merchandisePage));
     }
 }

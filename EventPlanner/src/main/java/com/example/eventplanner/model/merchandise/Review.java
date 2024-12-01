@@ -19,9 +19,10 @@ public class Review {
     private int rating;
     private boolean status;
 
-    public Review(String comment, int rating, boolean status, Event event, Merchandise merchandise) {
+    public Review(String comment, int rating, boolean status) {
         this.comment = comment;
         this.rating = rating;
         this.status = status;
     }
+
 }
