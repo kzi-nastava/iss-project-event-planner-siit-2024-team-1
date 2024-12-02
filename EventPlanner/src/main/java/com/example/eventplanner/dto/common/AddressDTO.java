@@ -1,12 +1,11 @@
-package com.example.eventplanner.model.common;
+package com.example.eventplanner.dto.common;
 
-import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Embeddable
 @Data
-public class Address {
-
+@NoArgsConstructor
+public class AddressDTO {
     private String street;
     private String city;
     private int number;
