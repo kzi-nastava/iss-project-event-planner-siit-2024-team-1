@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="efa383db-b020-44fc-9f26-85e79b460f28" name="Changes" comment="" />
+    <list default="true" id="c926865d-9c32-4da2-9c25-fa67dbb51f8a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/iss-project-event-planner-siit-2024-team-1.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -11,9 +17,10 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
   "associatedIndex": 0
 }]]></component>
-  <component name="ProjectId" id="2p7WW835a27FkI5e3hRMd9opjNa" />
+  <component name="ProjectId" id="2pUdVCuSXr36ihHu89EO5r4r7Vj" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -21,12 +28,10 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
-    "go.import.settings.migrated": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Mihajlo/Desktop/Faks/III godina/I semestar/Inzenjerstvo serverskog sloja/projekat/iss-project-event-planner-siit-2024-team-1/EventPlanner",
+    "last_opened_file_path": "C:/Fakultet/Peti semestar/Projekat/iss-project-event-planner-siit-2024-team-1/EventPlanner",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   }
@@ -34,27 +39,24 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23339.11" />
-        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23339.11" />
+        <option value="bundled-jdk-9823dce3aa75-fdfe4dae3a2d-intellij.indexing.shared.core-IU-243.21565.193" />
+        <option value="bundled-js-predefined-d6986cc7102b-e768b9ed790e-JavaScript-IU-243.21565.193" />
       </set>
     </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="efa383db-b020-44fc-9f26-85e79b460f28" name="Changes" comment="" />
-      <created>1732117622217</created>
+      <changelist id="c926865d-9c32-4da2-9c25-fa67dbb51f8a" name="Changes" comment="" />
+      <created>1732824611728</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1732117622217</updated>
-      <workItem from="1732117623263" duration="11000" />
+      <updated>1732824611728</updated>
+      <workItem from="1732824612722" duration="10000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="VgoProject">
-    <settings-migrated>true</settings-migrated>
   </component>
 </project>

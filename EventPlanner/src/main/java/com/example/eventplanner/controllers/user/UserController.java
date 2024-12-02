@@ -28,25 +28,22 @@ public class UserController {
         return ResponseEntity.ok(new GetEoByIdResponseDTO());
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO login) {
-        return ResponseEntity.ok(new LoginResponseDTO());
-    }
 
-    @PostMapping("/register")
-    public ResponseEntity<RegisterAuUserResponseRequestDTO> register(@RequestBody RegisterAuUserRequestDTO user) {
-        return ResponseEntity.ok(new RegisterAuUserResponseRequestDTO());
-    }
 
-    @PostMapping("/register-eo")
-    public ResponseEntity<RegisterEoRequestResponseDTO> registerEo(@RequestBody RegisterEoRequestDTO user) {
-        return ResponseEntity.ok(new RegisterEoRequestResponseDTO());
-    }
-
-    @PostMapping("/register-sp")
-    public ResponseEntity<RegisterSpRequestResponseDTO> registerSp(@RequestBody RegisterSpRequestDTO user) {
-        return ResponseEntity.ok(new RegisterSpRequestResponseDTO());
-    }
+//    @PostMapping("/register")
+//    public ResponseEntity<RegisterAuUserResponseRequestDTO> register(@RequestBody RegisterAuUserRequestDTO user) {
+//        return ResponseEntity.ok(new RegisterAuUserResponseRequestDTO());
+//    }
+//
+//    @PostMapping("/register-eo")
+//    public ResponseEntity<RegisterEoRequestResponseDTO> registerEo(@RequestBody RegisterEoRequestDTO user) {
+//        return ResponseEntity.ok(new RegisterEoRequestResponseDTO());
+//    }
+//
+//    @PostMapping("/register-sp")
+//    public ResponseEntity<RegisterSpRequestResponseDTO> registerSp(@RequestBody RegisterSpRequestDTO user) {
+//        return ResponseEntity.ok(new RegisterSpRequestResponseDTO());
+//    }
 
     @PutMapping("/update")
     public ResponseEntity<UpdateAuResponseDTO> update(@RequestBody UpdateAuRequestDTO user) {
