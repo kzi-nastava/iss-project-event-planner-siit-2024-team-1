@@ -1,10 +1,12 @@
 package com.example.eventplanner.dto.user.auth;
 
+import com.example.eventplanner.model.auth.Role;
 import com.example.eventplanner.model.common.Address;
 
 import java.util.List;
 
 public class RegisterSpRequestDTO {
+    private int id;
     private String name;
     private String surname;
     private String phoneNumber;
@@ -12,6 +14,7 @@ public class RegisterSpRequestDTO {
     private String email;
     private String password;
     private String photo;
+    private Role role;
 
     private String company;
     private String description;
@@ -95,5 +98,20 @@ public class RegisterSpRequestDTO {
 
     public void setPhotos(List<String> photos) {
         this.photos = photos;
+    }
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

@@ -42,11 +42,11 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        req->req.requestMatchers("/login/**","/register/**", "/refresh_token/**")
-                                .permitAll()
-                                .requestMatchers("/admin_only/**").hasAuthority("ADMIN")
-                                .anyRequest()
-                                .authenticated()
+                        req->req//.requestMatchers("/login/**","/register-eo/**", "/refresh_token/**")
+                                //.permitAll()
+                                //.requestMatchers("/admin_only/**").hasAuthority("ADMIN")
+                                .anyRequest().permitAll()
+                                //.authenticated()
                 ).userDetailsService(userDetailsServiceImp)
                 .sessionManagement(session->session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

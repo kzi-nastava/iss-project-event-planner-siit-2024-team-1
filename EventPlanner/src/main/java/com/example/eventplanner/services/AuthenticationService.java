@@ -1,5 +1,6 @@
 package com.example.eventplanner.services;
 
+import com.example.eventplanner.dto.user.auth.*;
 import com.example.eventplanner.model.auth.AuthenticationResponse;
 import com.example.eventplanner.model.auth.Token;
 import com.example.eventplanner.model.user.User;
@@ -40,17 +41,73 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthenticationResponse register(User request) {
+//    public RegisterAuUserResponseRequestDTO registerAu(RegisterAuUserRequestDTO request) {
+//
+//        // check if user already exist. if exist than authenticate the user
+//        if(repository.findByUsername(request.getUsername()).isPresent()) {
+//            return new RegisterAuUserResponseRequestDTO(null, null,"User already exist");
+//        }
+//
+//        User user = new User();
+//        user.setName(request.getName());
+//        user.setSurname(request.getSurname());
+//        user.setUsername(request.getUsername());
+//        user.setPassword(passwordEncoder.encode(request.getPassword()));
+//
+//
+//        user.setRole(request.getRole());
+//
+//        user = repository.save(user);
+//
+//        String accessToken = jwtService.generateAccessToken(user);
+//        String refreshToken = jwtService.generateRefreshToken(user);
+//
+//        saveUserToken(accessToken, refreshToken, user);
+//
+//        return new RegisterAuUserResponseRequestDTO(accessToken, refreshToken,"User registration was successful");
+//
+//    }
+
+    public RegisterEoRequestResponseDTO registerEo(RegisterEoRequestDTO request) {
 
         // check if user already exist. if exist than authenticate the user
-        if(repository.findByEmail(request.getEmail()).isPresent()) {
-            return new AuthenticationResponse(null, null,"User already exist");
+        if(repository.findByUsername(request.getEmail()).isPresent()) {
+            return new RegisterEoRequestResponseDTO(1, "User Already Exists", null,null, null,null, null,null, null, null);
         }
 
         User user = new User();
         user.setName(request.getName());
         user.setSurname(request.getSurname());
-        user.setEmail(request.getEmail());
+        user.setUsername(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setAddress(request.getAddress());
+        user.setPhoto(request.getPhoto());
+        user.setRole(request.getRole());
+        user.setAuthorities("ahahah");
+
+        user = repository.save(user);
+
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        saveUserToken(accessToken, refreshToken, user);
+
+        return new RegisterEoRequestResponseDTO(1, "User Created Successfully", null,null, null,null, null, null, accessToken, refreshToken);
+
+    }
+
+    public RegisterSpRequestResponseDTO registerSp(RegisterSpRequestDTO request) {
+
+        // check if user already exist. if exist than authenticate the user
+        if(repository.findByUsername(request.getEmail()).isPresent()) {
+            return new RegisterSpRequestResponseDTO(1, "User Already Exists", null,null, null,null, null, null,null, null, null, null, null);
+        }
+
+        User user = new User();
+        user.setName(request.getName());
+        user.setSurname(request.getSurname());
+        user.setUsername(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
 
@@ -63,11 +120,11 @@ public class AuthenticationService {
 
         saveUserToken(accessToken, refreshToken, user);
 
-        return new AuthenticationResponse(accessToken, refreshToken,"User registration was successful");
+        return new RegisterSpRequestResponseDTO(1, "User Created Successfully", null,null, null,null, null,null, null,null, null, accessToken, refreshToken);
 
     }
 
-    public AuthenticationResponse authenticate(User request) {
+    public LoginResponseDTO authenticate(LoginRequestDTO request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -75,21 +132,22 @@ public class AuthenticationService {
                 )
         );
 
-        User user = repository.findByEmail(request.getEmail()).orElseThrow();
+        User user = repository.findByUsername(request.getEmail()).orElseThrow();
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
         revokeAllTokenByUser(user);
+
         saveUserToken(accessToken, refreshToken, user);
 
-        return new AuthenticationResponse(accessToken, refreshToken, "User login was successful");
+        return new LoginResponseDTO(user.getUsername(), accessToken, refreshToken);
 
     }
     private void revokeAllTokenByUser(User user) {
         List<Token> validTokens = tokenRepository.findAllAccessTokensByUser(user.getId());
         if(validTokens.isEmpty()) {
             return;
-        }
+        }  
 
         validTokens.forEach(t-> {
             t.setLoggedOut(true);
@@ -122,7 +180,7 @@ public class AuthenticationService {
         String username = jwtService.extractUsername(token);
 
         // check if the user exist in database
-        User user = repository.findByEmail(username)
+        User user = repository.findByUsername(username)
                 .orElseThrow(()->new RuntimeException("No user found"));
 
         // check if the token is valid

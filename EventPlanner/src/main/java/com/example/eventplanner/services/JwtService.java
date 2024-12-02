@@ -57,7 +57,7 @@ public class JwtService {
                 .map(t -> !t.isLoggedOut())
                 .orElse(false);
 
-        return (username.equals(user.getEmail())) && !isTokenExpired(token) && validRefreshToken;
+        return (username.equals(user.getUsername())) && !isTokenExpired(token) && validRefreshToken;
     }
 
     private boolean isTokenExpired(String token) {
@@ -94,7 +94,7 @@ public class JwtService {
     private String generateToken(User user, long expireTime) {
         String token = Jwts
                 .builder()
-                .subject(user.getEmail())
+                .subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expireTime ))
                 .signWith(getSigninKey())

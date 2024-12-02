@@ -35,11 +35,12 @@ public class User {
     @Embedded
     private Address address;
 
-    private String email;
+    private String username;
     private String password;
     private String photo;
     private boolean active;
     private Role role;
+    private String authorities;
 
     @OneToMany(mappedBy = "recipient")
     private List<Message> receivedMessages;

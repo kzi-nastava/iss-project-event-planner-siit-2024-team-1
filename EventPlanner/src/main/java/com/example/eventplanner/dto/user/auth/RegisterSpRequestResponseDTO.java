@@ -5,17 +5,37 @@ import com.example.eventplanner.model.common.Address;
 import java.util.List;
 
 public class RegisterSpRequestResponseDTO {
+    private int id;
+    private String message;
     private String name;
     private String surname;
     private String phoneNumber;
     private Address address;
     private String email;
-    private String password;
     private String photo;
 
     private String company;
     private String description;
     private List<String> photos;
+
+    private String accessToken;
+    private String refreshToken;
+
+    public RegisterSpRequestResponseDTO(int id, String message, String name, String surname, String phoneNumber, Address address, String email, String photo, String company, String description, List<String> photos, String accessToken, String refreshToken) {
+        this.id = id;
+        this.message = message;
+        this.name = name;
+        this.surname = surname;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.email = email;
+        this.photo = photo;
+        this.company = company;
+        this.description = description;
+        this.photos = photos;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+    }
 
     public String getSurname() {
         return surname;
@@ -49,14 +69,6 @@ public class RegisterSpRequestResponseDTO {
         this.address = address;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getPhoto() {
         return photo;
     }
@@ -72,7 +84,13 @@ public class RegisterSpRequestResponseDTO {
     public void setName(String name) {
         this.name = name;
     }
+    public int getId() {
+        return id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
     public String getCompany() {
         return company;
     }
@@ -95,5 +113,29 @@ public class RegisterSpRequestResponseDTO {
 
     public void setPhotos(List<String> photos) {
         this.photos = photos;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.eventplanner.services;
 
+import com.example.eventplanner.config.UserFactory;
 import com.example.eventplanner.repositories.user.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,7 +18,7 @@ public class UserDetailsServiceImp implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return (UserDetails) repository.findByEmail(username)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found"));
+        return UserFactory.create(repository.findByUsername(username)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found")));
     }
 }
