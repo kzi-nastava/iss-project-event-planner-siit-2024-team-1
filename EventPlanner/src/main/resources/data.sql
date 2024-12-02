@@ -234,7 +234,7 @@ INSERT INTO merchandise (
     category_id
 ) VALUES
 -- DJ Service
-('Service',1,  'Professional DJ Services',
+('Product',1,  'Professional DJ Services',
  'Experienced DJ for your events',
  'Top-quality sound equipment included',
  500.00, 0, true, true,
@@ -246,7 +246,7 @@ INSERT INTO merchandise (
  38.9072, 1),
 
 -- Photography Service
-('Service', 2, 'Event Photography',
+('Product', 2, 'Event Photography',
  'Professional event photography service',
  'High-resolution photos, digital delivery within 1 week',
  800.00, 10, true, true,
@@ -258,7 +258,7 @@ INSERT INTO merchandise (
  38.9072, 1),
 
 -- Catering Service
-('Service', 3,'Gourmet Catering',
+('Product', 3,'Gourmet Catering',
  'Premium catering service for all events',
  'Custom menu options available, includes staff',
  1200.00, 5, true, true,

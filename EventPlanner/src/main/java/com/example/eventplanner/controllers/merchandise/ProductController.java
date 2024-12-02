@@ -7,6 +7,8 @@ import com.example.eventplanner.dto.merchandise.product.BuyProductResponseDTO;
 import com.example.eventplanner.dto.merchandise.product.GetProductByIdResponseDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
+import com.example.eventplanner.services.merchandise.ProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -23,9 +25,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("api/v1/products")
+@RequiredArgsConstructor
 public class ProductController {
+
+    private final ProductService productService;
 
     @GetMapping()
     public ResponseEntity<GetAllProductsResponseDTO> getAll() {
@@ -50,14 +56,18 @@ public class ProductController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<MerchandiseOverviewDTO>> filterProducts(
-            @RequestBody ProductFiltersDTO productFilters,
+            @RequestParam(required = false) Double priceMin,
+            @RequestParam(required = false) Double priceMax,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Integer durationMin,
+            @RequestParam(required = false) Integer durationMax,
+            @RequestParam(required = false) String city,
             @RequestParam(required = false) String search,
             @PageableDefault(size = 10) Pageable pageable) {
 
-        List<MerchandiseOverviewDTO> emptyDTOs = Collections.nCopies(pageable.getPageSize(), new MerchandiseOverviewDTO());
-        Page<MerchandiseOverviewDTO> merchandiseDTOs = new PageImpl<>(emptyDTOs, pageable, 0);
+        ProductFiltersDTO productFiltersDTO=new ProductFiltersDTO(priceMin,priceMax,category,durationMin,durationMax,city);
 
-        return ResponseEntity.ok(merchandiseDTOs);
+        return ResponseEntity.ok(productService.search(productFiltersDTO,search,pageable));
     }
 
     @PutMapping()

@@ -9,6 +9,7 @@ import com.example.eventplanner.dto.user.update.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin
 @RestController
 @RequestMapping("api/users")
 public class UserController {
