@@ -207,7 +207,10 @@ INSERT INTO event (
       );
 
 -- First, ensure we have a category
-INSERT INTO category (title,description,pending) VALUES ('Entertainment','Entertainment description',false);
+INSERT INTO category (title,description,pending) VALUES ('Entertainment','Entertainment description',false),
+                                                        ('Funerality','Entertainment description',false),
+                                                        ('Suicidabiliyu','Entertainment description',false),
+                                                        ('Protest','Entertainment description',false);
 -- First, ensure we have the id generator table and category
 -- Insert into merchandise table (using SINGLE_TABLE inheritance)
 INSERT INTO merchandise (
