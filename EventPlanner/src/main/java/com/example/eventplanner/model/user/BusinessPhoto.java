@@ -14,7 +14,7 @@ public class BusinessPhoto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String photo;
+    private byte[] photo;
 
     @ManyToOne
     @JoinColumn(name = "serviceProvider")

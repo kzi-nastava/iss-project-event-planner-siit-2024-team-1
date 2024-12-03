@@ -3,8 +3,13 @@ package com.example.eventplanner.services;
 import com.example.eventplanner.dto.user.auth.*;
 import com.example.eventplanner.model.auth.AuthenticationResponse;
 import com.example.eventplanner.model.auth.Token;
+import com.example.eventplanner.model.user.BusinessPhoto;
+import com.example.eventplanner.model.user.EventOrganizer;
+import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.auth.TokenRepository;
+import com.example.eventplanner.repositories.user.EventOrganizerRepository;
+import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +27,8 @@ import java.util.List;
 public class AuthenticationService {
 
     private final UserRepository repository;
+    private final ServiceProviderRepository serviceProviderRepository;
+    private final EventOrganizerRepository eventOrganizerRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -33,12 +40,16 @@ public class AuthenticationService {
                                  PasswordEncoder passwordEncoder,
                                  JwtService jwtService,
                                  TokenRepository tokenRepository,
-                                 AuthenticationManager authenticationManager) {
+                                 AuthenticationManager authenticationManager,
+                                 ServiceProviderRepository serviceProviderRepository,
+                                 EventOrganizerRepository eventOrganizerRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.tokenRepository = tokenRepository;
         this.authenticationManager = authenticationManager;
+        this.serviceProviderRepository = serviceProviderRepository;
+        this.eventOrganizerRepository = eventOrganizerRepository;
     }
 
 //    public RegisterAuUserResponseRequestDTO registerAu(RegisterAuUserRequestDTO request) {
@@ -75,7 +86,7 @@ public class AuthenticationService {
             return new RegisterEoRequestResponseDTO(1, "User Already Exists", null,null, null,null, null,null, null, null);
         }
 
-        User user = new User();
+        EventOrganizer user = new EventOrganizer();
         user.setName(request.getName());
         user.setSurname(request.getSurname());
         user.setUsername(request.getEmail());
@@ -104,14 +115,21 @@ public class AuthenticationService {
             return new RegisterSpRequestResponseDTO(1, "User Already Exists", null,null, null,null, null, null,null, null, null, null, null);
         }
 
-        User user = new User();
+        ServiceProvider user = new ServiceProvider();
         user.setName(request.getName());
         user.setSurname(request.getSurname());
         user.setUsername(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setAddress(request.getAddress());
+        user.setPhoto(request.getPhoto());
         user.setRole(request.getRole());
+        user.setAuthorities("ahahah");
+
+        user.setCompany(request.getCompany());
+        user.setDescription(request.getDescription());
+
+
 
         user = repository.save(user);
 
