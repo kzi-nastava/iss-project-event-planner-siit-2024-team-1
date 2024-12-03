@@ -1,17 +1,24 @@
 package com.example.eventplanner.controllers.user;
 
+import com.example.eventplanner.dto.event.EventOverviewDTO;
 import com.example.eventplanner.dto.merchandise.FavoriteResponseDTO;
 import com.example.eventplanner.dto.user.GetAuByIdResponseDTO;
 import com.example.eventplanner.dto.user.GetEoByIdResponseDTO;
 import com.example.eventplanner.dto.user.GetSpByIdResponseDTO;
 import com.example.eventplanner.dto.user.auth.*;
 import com.example.eventplanner.dto.user.update.*;
+import com.example.eventplanner.services.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/users")
 public class UserController {
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<GetAuByIdResponseDTO> getAuById(@PathVariable(value = "id") int id) {
@@ -46,8 +53,8 @@ public class UserController {
 //    }
 
     @PutMapping("/{userId}/favorite-events/{eventId}")
-    public ResponseEntity<UpdateAuResponseDTO> addEventToFavorites(@PathVariable int userId, @PathVariable int eventId) {
-        return ResponseEntity.ok(new UpdateAuResponseDTO());
+    public ResponseEntity<EventOverviewDTO> addEventToFavorites(@PathVariable int userId, @PathVariable int eventId) {
+        return ResponseEntity.ok(userService.addEventToFavorites(userId, eventId));
     }
 
     @PutMapping("/update")
