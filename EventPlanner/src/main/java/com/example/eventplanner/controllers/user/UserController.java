@@ -45,6 +45,11 @@ public class UserController {
 //        return ResponseEntity.ok(new RegisterSpRequestResponseDTO());
 //    }
 
+    @PutMapping("/{userId}/favorite-events/{eventId}")
+    public ResponseEntity<UpdateAuResponseDTO> addEventToFavorites(@PathVariable int userId, @PathVariable int eventId) {
+        return ResponseEntity.ok(new UpdateAuResponseDTO());
+    }
+
     @PutMapping("/update")
     public ResponseEntity<UpdateAuResponseDTO> update(@RequestBody UpdateAuRequestDTO user) {
         return ResponseEntity.ok(new UpdateAuResponseDTO());

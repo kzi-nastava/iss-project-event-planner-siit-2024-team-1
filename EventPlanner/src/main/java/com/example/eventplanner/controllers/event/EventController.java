@@ -1,8 +1,6 @@
 package com.example.eventplanner.controllers.event;
 
-import com.example.eventplanner.dto.event.CreateEventDTO;
-import com.example.eventplanner.dto.event.CreatedEventOverviewDTO;
-import com.example.eventplanner.dto.event.EventOverviewDTO;
+import com.example.eventplanner.dto.event.*;
 import com.example.eventplanner.dto.eventType.CreateEventTypeDTO;
 import com.example.eventplanner.dto.filter.EventFiltersDTO;
 import com.example.eventplanner.services.event.EventService;
@@ -49,6 +47,16 @@ public class EventController {
         return ResponseEntity.ok(eventDTOs);
     }
 
+    @GetMapping("/{id}/agenda")
+    public ResponseEntity<List<ActivityOverviewDTO>> getAgenda(@PathVariable int id) {
+        return ResponseEntity.ok(eventService.getAgenda(id));
+    }
+
+    @GetMapping("/{id}/details")
+    public ResponseEntity<EventDetailsDTO> getDetails(@PathVariable int id) {
+        return ResponseEntity.ok(eventService.getDetails(id));
+    }
+
     @PostMapping
     public ResponseEntity<CreatedEventOverviewDTO> createEvent(@RequestBody CreateEventDTO dto) {
         // Call the service to create the event
@@ -56,5 +64,32 @@ public class EventController {
 
         // Return the created event DTO
         return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CreatedEventOverviewDTO> updateEvent(@PathVariable int id, @RequestBody UpdateEventDTO dto) {
+        // Call the service to create the event
+        CreatedEventOverviewDTO updatedEvent = eventService.updateEvent(id, dto);
+
+        // Return the created event DTO
+        return ResponseEntity.ok(updatedEvent);
+    }
+
+    @PutMapping("/{id}/agenda")
+    public ResponseEntity<CreatedActivityDTO> updateAgenda(@PathVariable int id, @RequestBody CreateActivityDTO dto) {
+        // Call the service to create the event
+        CreatedActivityDTO activityDTO = eventService.updateAgenda(id, dto);
+
+        // Return the created event DTO
+        return new ResponseEntity<>(activityDTO, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("{eventId}/agenda/{activityId}")
+    public ResponseEntity<List<ActivityOverviewDTO>> deleteAgenda(@PathVariable int eventId, @PathVariable int activityId) {
+        // Call the service to create the event
+        List<ActivityOverviewDTO> activityDTOs = eventService.deleteActivity(eventId, activityId);
+
+        // Return the created event DTO
+        return ResponseEntity.ok(activityDTOs);
     }
 }
