@@ -1,19 +1,19 @@
-package com.example.eventplanner.dto.merchandise.product.update;
+package com.example.eventplanner.dto.merchandise.product;
 
 import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.merchandise.CreateMerchandisePhotoDTO;
+import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.EventType;
-import com.example.eventplanner.model.merchandise.MerchandisePhoto;
-import com.example.eventplanner.model.common.Address;
-import com.example.eventplanner.model.user.ServiceProvider;
+import com.example.eventplanner.model.user.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+
 @Data
 @NoArgsConstructor
-public class UpdateProductRequestDTO {
+public class ProductOverviewDTO {
     private String title;
     private String description;
     private String specificity;
@@ -27,8 +27,9 @@ public class UpdateProductRequestDTO {
     private int cancellationDeadline;
     private boolean automaticReservation;
 
-    private int serviceProviderId;
-    private List<CreateMerchandisePhotoDTO> merchandisePhotos;
-    private List<Integer> eventTypesIds;
+    private User serviceProvider;
+    private List<MerchandisePhotoDTO> merchandisePhotos;
+    private List<EventType> eventTypes;
     private AddressDTO address;
+    private Category category;
 }
