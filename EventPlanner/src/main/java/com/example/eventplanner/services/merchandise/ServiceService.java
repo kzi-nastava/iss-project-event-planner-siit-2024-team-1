@@ -3,18 +3,31 @@ package com.example.eventplanner.services.merchandise;
 import com.example.eventplanner.dto.filter.ServiceFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 
+import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
+import com.example.eventplanner.dto.merchandise.service.ReservationResponseDTO;
+import com.example.eventplanner.model.event.Event;
+import com.example.eventplanner.model.merchandise.Timeslot;
+import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.merchandise.ServiceRepository;
+import com.example.eventplanner.repositories.merchandise.TimeslotRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class ServiceService {
     private final ServiceRepository serviceRepository;
+    private final EventRepository eventRepository;
+    private final TimeslotRepository timeslotRepository;
 
     public Page<MerchandiseOverviewDTO> search(ServiceFiltersDTO ServiceFiltersDTO, String search, Pageable pageable) {
         Specification<com.example.eventplanner.model.merchandise.Service> spec = createSpecification(ServiceFiltersDTO, search);
@@ -96,4 +109,121 @@ public class ServiceService {
         dto.setPrice(service.getPrice());
         return dto;
     }
+
+    @Transactional
+    public ReservationResponseDTO reserveService(int serviceId, ReservationRequestDTO request) {
+        // Fetch the service
+        com.example.eventplanner.model.merchandise.Service service = serviceRepository.findAvailableServiceById(serviceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Service not found or unavailable"));
+
+        // Fetch the event
+        Event event = eventRepository.findById(request.getEventId())
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
+
+        // Validate reservation timing
+        try {
+            validateReservationTiming(service, event, request);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+        // Check time slot availability
+        try {
+            checkTimeSlotAvailability(service, request);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+        // Calculate end time if not provided
+        LocalDateTime endTime = calculateEndTime(service, request);
+
+        // Create and save time slot
+        Timeslot timeslot = new Timeslot(request.getStartTime(), endTime);
+
+        service.getTimeslots().add(timeslot);
+
+        event.getMerchandise().add(service);
+
+        // Save changes
+        timeslotRepository.save(timeslot);
+        serviceRepository.save(service);
+        eventRepository.save(event);
+
+        // Send notifications
+        sendReservationNotifications(service, event);
+
+        return mapToReservationResponse(service,event,request);
+    }
+
+    private void validateReservationTiming(com.example.eventplanner.model.merchandise.Service service, Event event, ReservationRequestDTO request) throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime reservationDeadline = event.getDate().minusMinutes(service.getReservationDeadline());
+        LocalDateTime cancellationDeadline = event.getDate().minusMinutes(service.getCancellationDeadline());
+
+        // Validate start time is within reservation deadline
+        if (request.getStartTime().isAfter(event.getDate()) ||
+                request.getStartTime().isBefore(reservationDeadline)) {
+            throw new Exception("Reservation is outside allowed time frame");
+        }
+
+        // Validate duration constraints
+        validateDurationConstraints(service, request);
+    }
+
+    private void validateDurationConstraints(com.example.eventplanner.model.merchandise.Service service, ReservationRequestDTO request) throws Exception {
+        // Calculate duration
+        long durationMinutes = Duration.between(
+                request.getStartTime(),
+                request.getEndTime() != null ? request.getEndTime() : request.getStartTime().plusMinutes(service.getMinDuration())
+        ).toMinutes();
+
+        if (durationMinutes < service.getMinDuration() ||
+                (service.getMaxDuration() > 0 && durationMinutes > service.getMaxDuration())) {
+            throw new Exception("Service duration does not meet constraints");
+        }
+    }
+
+    private void checkTimeSlotAvailability(com.example.eventplanner.model.merchandise.Service service, ReservationRequestDTO request) throws Exception {
+        LocalDateTime startTime = request.getStartTime();
+        LocalDateTime endTime = request.getEndTime() != null
+                ? request.getEndTime()
+                : startTime.plusMinutes(service.getMinDuration());
+
+        // Check for overlapping time slots within the service
+        boolean isTimeSlotAvailable = service.getTimeslots().stream()
+                .allMatch(existingSlot ->
+                        endTime.isBefore(existingSlot.getStartTime()) ||
+                                startTime.isAfter(existingSlot.getEndTime())
+                );
+
+        if (!isTimeSlotAvailable) {
+            throw new Exception("Selected time slot is already booked");
+        }
+    }
+
+    private LocalDateTime calculateEndTime(com.example.eventplanner.model.merchandise.Service service, ReservationRequestDTO request) {
+        if (request.getEndTime() != null) {
+            return request.getEndTime();
+        }
+
+        // If end time not provided, calculate based on service duration
+        return request.getStartTime().plusMinutes(service.getMinDuration());
+    }
+
+    private void sendReservationNotifications(com.example.eventplanner.model.merchandise.Service service, Event event) {
+
+    }
+    private ReservationResponseDTO mapToReservationResponse(com.example.eventplanner.model.merchandise.Service service,Event event,ReservationRequestDTO request) {
+        ReservationResponseDTO response = new ReservationResponseDTO();
+        response.setServiceId(service.getId());
+        response.setEventId(event.getId());
+        response.setProviderId(request.getProviderId());
+        response.setStartTime(request.getStartTime());
+        response.setEndTime(request.getEndTime());
+        response.setProviderEmail(request.getProviderEmail());
+        return response;
+    }
+
 }

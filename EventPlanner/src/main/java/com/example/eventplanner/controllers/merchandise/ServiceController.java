@@ -41,7 +41,8 @@ public class ServiceController {
     public ResponseEntity<ReservationResponseDTO> reserveService(
             @PathVariable int serviceId,
             @Valid @RequestBody ReservationRequestDTO request) {
-        return ResponseEntity.ok(new ReservationResponseDTO());
+        ReservationResponseDTO response = serviceService.reserveService(serviceId, request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping()

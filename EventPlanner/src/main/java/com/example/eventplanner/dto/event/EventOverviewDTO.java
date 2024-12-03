@@ -4,6 +4,7 @@ import com.example.eventplanner.model.common.Address;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -12,7 +13,7 @@ public class EventOverviewDTO {
     private int id;
     private String type;
     private String title;
-    private Date date;
+    private LocalDateTime date;
     private Address address;
     private String description;
 }
