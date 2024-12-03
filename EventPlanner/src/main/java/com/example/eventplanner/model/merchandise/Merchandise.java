@@ -64,8 +64,17 @@ public class Merchandise {
     @ManyToOne
     private Category category;
 
+    @ManyToMany  // Many-to-many with EventType
+    @JoinTable(
+            name = "merchandise_eventtype",
+            joinColumns = @JoinColumn(name = "merchandise_id"),
+            inverseJoinColumns = @JoinColumn(name = "eventtype_id")
+    )
+    private List<EventType> eventTypes;
+
     @Transient
     private double rating;
+
 
     public double getRating() {
         if (this.reviews != null) {

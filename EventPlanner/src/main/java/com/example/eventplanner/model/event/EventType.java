@@ -28,5 +28,4 @@ public class EventType {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private List<Category> categories;
-
 }

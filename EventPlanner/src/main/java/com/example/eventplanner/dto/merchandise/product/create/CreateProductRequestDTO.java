@@ -1,13 +1,18 @@
 package com.example.eventplanner.dto.merchandise.product.create;
 
+import com.example.eventplanner.dto.common.AddressDTO;
+import com.example.eventplanner.dto.merchandise.CreateMerchandisePhotoDTO;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.MerchandisePhoto;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.user.ServiceProvider;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
-
+@Data
+@NoArgsConstructor
 public class CreateProductRequestDTO {
     private String title;
     private String description;
@@ -22,149 +27,9 @@ public class CreateProductRequestDTO {
     private int cancellationDeadline;
     private boolean automaticReservation;
 
-    private ServiceProvider serviceProvider;
-
-    private List<MerchandisePhoto> photos;
-
-    private List<EventType> eventTypes;
-
-    private Address address;
-
-    private Category category;
-
-    public ServiceProvider getServiceProvider() {
-        return serviceProvider;
-    }
-
-    public void setServiceProvider(ServiceProvider serviceProvider) {
-        this.serviceProvider = serviceProvider;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getSpecificity() {
-        return specificity;
-    }
-
-    public void setSpecificity(String specificity) {
-        this.specificity = specificity;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public int getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(int discount) {
-        this.discount = discount;
-    }
-
-    public boolean isVisible() {
-        return visible;
-    }
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
-    public boolean isAvailable() {
-        return available;
-    }
-
-    public void setAvailable(boolean available) {
-        this.available = available;
-    }
-
-    public int getMinDuration() {
-        return minDuration;
-    }
-
-    public void setMinDuration(int minDuration) {
-        this.minDuration = minDuration;
-    }
-
-    public int getMaxDuration() {
-        return maxDuration;
-    }
-
-    public void setMaxDuration(int maxDuration) {
-        this.maxDuration = maxDuration;
-    }
-
-    public int getReservationDeadline() {
-        return reservationDeadline;
-    }
-
-    public void setReservationDeadline(int reservationDeadline) {
-        this.reservationDeadline = reservationDeadline;
-    }
-
-    public int getCancellationDeadline() {
-        return cancellationDeadline;
-    }
-
-    public void setCancellationDeadline(int cancellationDeadline) {
-        this.cancellationDeadline = cancellationDeadline;
-    }
-
-    public boolean isAutomaticReservation() {
-        return automaticReservation;
-    }
-
-    public void setAutomaticReservation(boolean automaticReservation) {
-        this.automaticReservation = automaticReservation;
-    }
-
-    public List<MerchandisePhoto> getPhotos() {
-        return photos;
-    }
-
-    public void setPhotos(List<MerchandisePhoto> photos) {
-        this.photos = photos;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
-        this.address = address;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public List<EventType> getEventTypes() {
-        return eventTypes;
-    }
-
-    public void setEventTypes(List<EventType> eventTypes) {
-        this.eventTypes = eventTypes;
-    }
+    private int serviceProviderId;
+    private List<CreateMerchandisePhotoDTO> merchandisePhotos;
+    private List<Integer> eventTypesIds;
+    private AddressDTO address;
+    private int categoryId;
 }
