@@ -13,3 +13,4 @@ public interface ServiceRepository extends JpaRepository<Service, Integer>, JpaS
     @Query("SELECT s FROM Service s WHERE s.id = :serviceId AND s.available = true AND s.deleted = false")
     Optional<Service> findAvailableServiceById(@Param("serviceId") int serviceId);
 }
+

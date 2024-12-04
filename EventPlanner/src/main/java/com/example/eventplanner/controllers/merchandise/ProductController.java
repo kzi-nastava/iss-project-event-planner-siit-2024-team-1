@@ -7,6 +7,8 @@ import com.example.eventplanner.dto.merchandise.product.BuyProductResponseDTO;
 import com.example.eventplanner.dto.merchandise.product.GetProductByIdResponseDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
+
+import com.example.eventplanner.services.event.EventService;
 import com.example.eventplanner.services.merchandise.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,9 +21,11 @@ import com.example.eventplanner.dto.merchandise.product.create.CreateProductRequ
 import com.example.eventplanner.dto.merchandise.product.create.CreateProductResponseDTO;
 import com.example.eventplanner.dto.merchandise.product.update.UpdateProductRequestDTO;
 import com.example.eventplanner.dto.merchandise.product.update.UpdateProductResponseDTO;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.http.HttpResponse;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +34,6 @@ import java.util.List;
 @RequestMapping("api/v1/products")
 @RequiredArgsConstructor
 public class ProductController {
-
     private final ProductService productService;
 
     @GetMapping()
@@ -39,8 +42,8 @@ public class ProductController {
     }
 
     @GetMapping("/sp/{id}")
-    public ResponseEntity<GetAllProductsResponseDTO> getAllBySpId(@PathVariable(value = "id") int id) {
-        return ResponseEntity.ok(new GetAllProductsResponseDTO());
+    public ResponseEntity<List<ProductOverviewDTO>> getAllBySpId(@PathVariable(value = "id") int id) {
+        return ResponseEntity.ok(productService.getAllBySpId(id));
     }
 
     @GetMapping("/{id}")
@@ -50,7 +53,7 @@ public class ProductController {
 
     @PostMapping()
     public ResponseEntity<CreateProductResponseDTO> create(@RequestBody CreateProductRequestDTO request) {
-        return ResponseEntity.ok(new CreateProductResponseDTO());
+        return new ResponseEntity<>(productService.createProduct(request), HttpStatus.CREATED);
     }
 
 
@@ -70,14 +73,14 @@ public class ProductController {
         return ResponseEntity.ok(productService.search(productFiltersDTO,search,pageable));
     }
 
-    @PutMapping()
-    public ResponseEntity<UpdateProductResponseDTO> update(@RequestBody UpdateProductRequestDTO request) {
-        return ResponseEntity.ok(new UpdateProductResponseDTO());
+    @PutMapping("/{id}")
+    public ResponseEntity<CreateProductResponseDTO> update(@PathVariable int id, @RequestBody UpdateProductRequestDTO request) {
+        return ResponseEntity.ok(productService.updateProduct(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable int id) {
-        return ResponseEntity.ok("success");
+    public ResponseEntity<Boolean> delete(@PathVariable int id) {
+        return ResponseEntity.ok(productService.deleteProduct(id));
     }
 
     @PostMapping("/{id}/buy")

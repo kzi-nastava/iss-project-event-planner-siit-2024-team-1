@@ -12,7 +12,4 @@ public class Address {
     private int number;
     private double longitude;
     private double latitude;
-
-
-
 }

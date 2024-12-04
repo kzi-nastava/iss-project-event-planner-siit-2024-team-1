@@ -1,8 +1,10 @@
 package com.example.eventplanner.dto.user.auth;
 
+import com.example.eventplanner.model.auth.Role;
 import com.example.eventplanner.model.common.Address;
 
 public class RegisterEoRequestDTO {
+    private int id;
     private String name;
     private String surname;
     private String phoneNumber;
@@ -10,7 +12,7 @@ public class RegisterEoRequestDTO {
     private String email;
     private String password;
     private String photo;
-
+    private Role role;
 
     public String getSurname() {
         return surname;
@@ -66,5 +68,21 @@ public class RegisterEoRequestDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

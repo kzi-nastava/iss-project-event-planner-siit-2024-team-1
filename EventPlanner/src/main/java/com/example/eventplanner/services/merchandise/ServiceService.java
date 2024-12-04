@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -113,12 +112,22 @@ public class ServiceService {
     @Transactional
     public ReservationResponseDTO reserveService(int serviceId, ReservationRequestDTO request) {
         // Fetch the service
-        com.example.eventplanner.model.merchandise.Service service = serviceRepository.findAvailableServiceById(serviceId)
-                .orElseThrow(() -> new ResourceNotFoundException("Service not found or unavailable"));
+        com.example.eventplanner.model.merchandise.Service service = null;
+        try {
+            service = serviceRepository.findAvailableServiceById(serviceId)
+                    .orElseThrow(() -> new Exception("Service not found or unavailable"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         // Fetch the event
-        Event event = eventRepository.findById(request.getEventId())
-                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
+        Event event = null;
+        try {
+            event = eventRepository.findById(request.getEventId())
+                    .orElseThrow(() -> new Exception("Event not found"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         // Validate reservation timing
         try {
