@@ -7,9 +7,15 @@ import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.ReservationResponseDTO;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.merchandise.Timeslot;
+import com.example.eventplanner.model.user.EventOrganizer;
+import com.example.eventplanner.model.user.ServiceProvider;
+import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.merchandise.ServiceRepository;
 import com.example.eventplanner.repositories.merchandise.TimeslotRepository;
+import com.example.eventplanner.repositories.user.ServiceProviderRepository;
+import com.example.eventplanner.repositories.user.UserRepository;
+import com.example.eventplanner.services.email.EmailService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +26,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +34,9 @@ public class ServiceService {
     private final ServiceRepository serviceRepository;
     private final EventRepository eventRepository;
     private final TimeslotRepository timeslotRepository;
+    private final EmailService emailService;
+    private final UserRepository userRepository;
+    private final ServiceProviderRepository serviceProviderRepository;
 
     public Page<MerchandiseOverviewDTO> search(ServiceFiltersDTO ServiceFiltersDTO, String search, Pageable pageable) {
         Specification<com.example.eventplanner.model.merchandise.Service> spec = createSpecification(ServiceFiltersDTO, search);
@@ -162,6 +172,7 @@ public class ServiceService {
 
         // Send notifications
         sendReservationNotifications(service, event);
+        sendReservationEmail(request,serviceId);
 
         return mapToReservationResponse(service,event,request);
     }
@@ -224,14 +235,39 @@ public class ServiceService {
     private void sendReservationNotifications(com.example.eventplanner.model.merchandise.Service service, Event event) {
 
     }
+
+    private void sendReservationEmail(ReservationRequestDTO request,int serviceId) {
+        Optional<User> eventOrganizer=userRepository.findById(request.getOrganizerId());
+        if (eventOrganizer.isEmpty()) {
+            throw new RuntimeException("Organizer not found");
+        }
+        Optional<ServiceProvider> serviceProvider=serviceProviderRepository.findByMerchandiseId(serviceId);
+        if (serviceProvider.isEmpty()) {
+            throw new RuntimeException("provider not found");
+        }
+        emailService.sendMail(
+            "system@eventplanner.com",
+                serviceProvider.get().getUsername(),
+                "Reservation for event "+ request.getEventId(),
+                "Reservation successful"
+
+        );
+        emailService.sendMail(
+                "system@eventplanner.com",
+                eventOrganizer.get().getUsername(),
+                "Reservation for event "+ request.getEventId(),
+                "Reservation successful"
+
+        );
+    }
+
     private ReservationResponseDTO mapToReservationResponse(com.example.eventplanner.model.merchandise.Service service,Event event,ReservationRequestDTO request) {
         ReservationResponseDTO response = new ReservationResponseDTO();
         response.setServiceId(service.getId());
         response.setEventId(event.getId());
-        response.setProviderId(request.getProviderId());
+        response.setProviderId(request.getOrganizerId());
         response.setStartTime(request.getStartTime());
         response.setEndTime(request.getEndTime());
-        response.setProviderEmail(request.getProviderEmail());
         return response;
     }
 

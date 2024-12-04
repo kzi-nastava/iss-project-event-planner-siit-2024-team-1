@@ -12,10 +12,9 @@ public class ReservationRequestDTO {
     @NotNull
     private int eventId;
     @NotNull
-    private int providerId;
+    private int organizerId;
     @NotNull
     @FutureOrPresent
     private LocalDateTime startTime;
-    private String providerEmail;
     private LocalDateTime endTime;  // Optional for fixed duration services
 }
