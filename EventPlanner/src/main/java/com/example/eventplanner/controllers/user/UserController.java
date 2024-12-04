@@ -7,6 +7,7 @@ import com.example.eventplanner.dto.user.GetEoByIdResponseDTO;
 import com.example.eventplanner.dto.user.GetSpByIdResponseDTO;
 import com.example.eventplanner.dto.user.auth.*;
 import com.example.eventplanner.dto.user.update.*;
+import com.example.eventplanner.services.event.EventService;
 import com.example.eventplanner.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final EventService eventService;
 
     @GetMapping("/{id}")
     public ResponseEntity<GetAuByIdResponseDTO> getAuById(@PathVariable(value = "id") int id) {
@@ -33,41 +35,29 @@ public class UserController {
         return ResponseEntity.ok(new GetEoByIdResponseDTO());
     }
 
-
-
-//    @PostMapping("/register")
-//    public ResponseEntity<RegisterAuUserResponseRequestDTO> register(@RequestBody RegisterAuUserRequestDTO user) {
-//        return ResponseEntity.ok(new RegisterAuUserResponseRequestDTO());
-//    }
-//
-//    @PostMapping("/register-eo")
-//    public ResponseEntity<RegisterEoRequestResponseDTO> registerEo(@RequestBody RegisterEoRequestDTO user) {
-//        return ResponseEntity.ok(new RegisterEoRequestResponseDTO());
-//    }
-//
-//    @PostMapping("/register-sp")
-//    public ResponseEntity<RegisterSpRequestResponseDTO> registerSp(@RequestBody RegisterSpRequestDTO user) {
-//        return ResponseEntity.ok(new RegisterSpRequestResponseDTO());
-//    }
-
     @PutMapping("/{userId}/favorite-events/{eventId}")
     public ResponseEntity<EventOverviewDTO> addEventToFavorites(@PathVariable int userId, @PathVariable int eventId) {
         return ResponseEntity.ok(userService.addEventToFavorites(userId, eventId));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<UpdateAuResponseDTO> update(@RequestBody UpdateAuRequestDTO user) {
+    @PutMapping("/update-au/{id}")
+    public ResponseEntity<UpdateAuResponseDTO> update(@PathVariable int id, @RequestBody UpdateAuRequestDTO user) {
         return ResponseEntity.ok(new UpdateAuResponseDTO());
     }
 
-    @PutMapping("/update-eo")
-    public ResponseEntity<UpdateEoResponseDTO> updateEo(@RequestBody UpdateEoRequestDTO user) {
-        return ResponseEntity.ok(new UpdateEoResponseDTO());
+    @PutMapping("/update-eo/{id}")
+    public ResponseEntity<UpdateEoResponseDTO> updateEo(@PathVariable int id, @RequestBody UpdateEoRequestDTO user) {
+        return ResponseEntity.ok(userService.updateEo(id, user));
     }
 
-    @PutMapping("/update-sp")
-    public ResponseEntity<UpdateSpResponseDTO> updateSp(@RequestBody UpdateSpRequestDTO user) {
-        return ResponseEntity.ok(new UpdateSpResponseDTO());
+    @PutMapping("/update-sp/{id}")
+    public ResponseEntity<UpdateSpResponseDTO> updateSp(@PathVariable int id, @RequestBody UpdateSpRequestDTO user) {
+        return ResponseEntity.ok(userService.updateSp(id, user));
+    }
+
+    @PutMapping("/change-password/{id}")
+    public ResponseEntity<ChangePasswordResponseDTO> changePassword(@PathVariable int id, @RequestBody ChangePasswordRequestDTO dto) {
+        return ResponseEntity.ok(userService.changePassword(id, dto));
     }
 
     @PostMapping("/favorite-merchandise/{id}")

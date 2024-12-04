@@ -1,8 +1,10 @@
 package com.example.eventplanner.services;
 
+import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.user.auth.*;
 import com.example.eventplanner.model.auth.AuthenticationResponse;
 import com.example.eventplanner.model.auth.Token;
+import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.user.BusinessPhoto;
 import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.ServiceProvider;
@@ -27,8 +29,6 @@ import java.util.List;
 public class AuthenticationService {
 
     private final UserRepository repository;
-    private final ServiceProviderRepository serviceProviderRepository;
-    private final EventOrganizerRepository eventOrganizerRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -40,16 +40,12 @@ public class AuthenticationService {
                                  PasswordEncoder passwordEncoder,
                                  JwtService jwtService,
                                  TokenRepository tokenRepository,
-                                 AuthenticationManager authenticationManager,
-                                 ServiceProviderRepository serviceProviderRepository,
-                                 EventOrganizerRepository eventOrganizerRepository) {
+                                 AuthenticationManager authenticationManager) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.tokenRepository = tokenRepository;
         this.authenticationManager = authenticationManager;
-        this.serviceProviderRepository = serviceProviderRepository;
-        this.eventOrganizerRepository = eventOrganizerRepository;
     }
 
 //    public RegisterAuUserResponseRequestDTO registerAu(RegisterAuUserRequestDTO request) {
@@ -83,7 +79,7 @@ public class AuthenticationService {
 
         // check if user already exist. if exist than authenticate the user
         if(repository.findByUsername(request.getEmail()).isPresent()) {
-            return new RegisterEoRequestResponseDTO(1, "User Already Exists", null,null, null,null, null,null, null, null);
+            return new RegisterEoRequestResponseDTO(-1, "User Already Exists", null,null, null,null, null,null, null, null);
         }
 
         EventOrganizer user = new EventOrganizer();
@@ -92,7 +88,7 @@ public class AuthenticationService {
         user.setUsername(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhoneNumber(request.getPhoneNumber());
-        user.setAddress(request.getAddress());
+        user.setAddress(mapToAddress(request.getAddress()));
         user.setPhoto(request.getPhoto());
         user.setRole(request.getRole());
         user.setAuthorities("ahahah");
@@ -104,15 +100,27 @@ public class AuthenticationService {
 
         saveUserToken(accessToken, refreshToken, user);
 
-        return new RegisterEoRequestResponseDTO(1, "User Created Successfully", null,null, null,null, null, null, accessToken, refreshToken);
+        return new RegisterEoRequestResponseDTO(user.getId(), "User Created Successfully", user.getName(), user.getSurname(), user.getPhoneNumber(),request.getAddress(), user.getUsername(), user.getPhoto(), accessToken, refreshToken);
 
+    }
+
+    public Address mapToAddress(AddressDTO dto){
+        Address address = new Address();
+
+        address.setCity(dto.getCity());
+        address.setNumber(dto.getNumber());
+        address.setStreet(dto.getStreet());
+        address.setLatitude(dto.getLatitude());
+        address.setLongitude(dto.getLongitude());
+
+        return address;
     }
 
     public RegisterSpRequestResponseDTO registerSp(RegisterSpRequestDTO request) {
 
         // check if user already exist. if exist than authenticate the user
         if(repository.findByUsername(request.getEmail()).isPresent()) {
-            return new RegisterSpRequestResponseDTO(1, "User Already Exists", null,null, null,null, null, null,null, null, null, null, null);
+            return new RegisterSpRequestResponseDTO(-1, "User Already Exists", null,null, null,null, null, null,null, null, null, null, null);
         }
 
         ServiceProvider user = new ServiceProvider();
@@ -121,7 +129,7 @@ public class AuthenticationService {
         user.setUsername(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhoneNumber(request.getPhoneNumber());
-        user.setAddress(request.getAddress());
+        user.setAddress(mapToAddress(request.getAddress()));
         user.setPhoto(request.getPhoto());
         user.setRole(request.getRole());
         user.setAuthorities("ahahah");
@@ -138,7 +146,7 @@ public class AuthenticationService {
 
         saveUserToken(accessToken, refreshToken, user);
 
-        return new RegisterSpRequestResponseDTO(1, "User Created Successfully", null,null, null,null, null,null, null,null, null, accessToken, refreshToken);
+        return new RegisterSpRequestResponseDTO(user.getId(), "User Created Successfully", user.getName(), user.getSurname(), user.getPhoneNumber(),request.getAddress(), user.getUsername(), user.getPhoto(), user.getCompany(),user.getDescription(), null, accessToken, refreshToken);
 
     }
 
