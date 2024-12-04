@@ -168,7 +168,7 @@ INSERT INTO event (
           'Pitch competition for new startups',
           150,
           true,
-          '2024-10-18 18:00:00',
+          '2024-12-18 18:00:00',
           20000.00,
           3,
           'Venture Avenue',
@@ -237,7 +237,7 @@ INSERT INTO merchandise (
     category_id
 ) VALUES
 -- DJ Service
-('Service',1,  'Professional DJ Services',
+('Product',1,  'Professional DJ Services',
  'Experienced DJ for your events',
  'Top-quality sound equipment included',
  500.00, 0, true, true,
@@ -249,7 +249,7 @@ INSERT INTO merchandise (
  38.9072, 1),
 
 -- Photography Service
-('Service', 2, 'Event Photography',
+('Product', 2, 'Event Photography',
  'Professional event photography service',
  'High-resolution photos, digital delivery within 1 week',
  800.00, 10, true, true,
@@ -261,7 +261,7 @@ INSERT INTO merchandise (
  38.9072, 1),
 
 -- Catering Service
-('Service', 3,'Gourmet Catering',
+('Product', 3,'Gourmet Catering',
  'Premium catering service for all events',
  'Custom menu options available, includes staff',
  1200.00, 5, true, true,
@@ -277,7 +277,7 @@ INSERT INTO merchandise (
  'Comprehensive event planning and coordination',
  'Includes venue selection, vendor coordination, and day-of management',
  2000.00, 0, true, true,
- 10, 40, 168, 120, false, false,
+ 10, 121, 43200, 120, false, false,
  'Security Street',
  'Washington DC',
  901,

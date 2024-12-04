@@ -2,9 +2,7 @@ package com.example.eventplanner.repositories.merchandise;
 
 import com.example.eventplanner.model.merchandise.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-@Repository
-public interface ProductRepository extends JpaRepository<Product, Integer> {
-
+public interface ProductRepository extends JpaRepository<Product, Integer>, JpaSpecificationExecutor<Product> {
 }

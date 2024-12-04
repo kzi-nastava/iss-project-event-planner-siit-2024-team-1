@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 @Entity
@@ -24,7 +26,7 @@ public class Event {
     private String description;
     private int maxParticipants;
     private boolean isPublic;
-    private Date date;
+    private LocalDateTime date;
     private double maxBudget;
 
     @OneToMany

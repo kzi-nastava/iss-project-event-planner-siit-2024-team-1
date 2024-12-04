@@ -1,5 +1,6 @@
 package com.example.eventplanner.dto.event;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class CreateEventDTO {
     private String description;
     private int maxParticipants;
     private boolean isPublic;
-    private Date date;
+    private LocalDateTime date;
     private AddressDTO address; // Embeddable Address representation
     private List<Integer> eventTypeIds; // IDs of selected event types
     private List<Integer> productIds;   // IDs of selected products
