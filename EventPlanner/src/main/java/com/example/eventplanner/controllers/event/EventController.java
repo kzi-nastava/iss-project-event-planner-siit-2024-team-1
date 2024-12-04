@@ -14,9 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/events")
 @RequiredArgsConstructor
@@ -37,14 +39,14 @@ public class EventController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<EventOverviewDTO>> filterEvents(
-            @RequestBody EventFiltersDTO eventFilters,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String city,
             @RequestParam(required = false) String search,
             @PageableDefault(size = 10) Pageable pageable) {
-
-        List<EventOverviewDTO> emptyDTOs = Collections.nCopies(pageable.getPageSize(), new EventOverviewDTO());
-        Page<EventOverviewDTO> eventDTOs = new PageImpl<>(emptyDTOs, pageable, 0);
-
-        return ResponseEntity.ok(eventDTOs);
+        EventFiltersDTO eventFiltersDTO=new EventFiltersDTO(startDate,endDate,type,city);
+        return ResponseEntity.ok(eventService.search(eventFiltersDTO,search,pageable));
     }
 
     @GetMapping("/{id}/agenda")

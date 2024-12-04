@@ -7,6 +7,7 @@ import com.example.eventplanner.dto.merchandise.service.GetServiceByIdResponseDT
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class CreatedEventOverviewDTO {
     private String description;
     private int maxParticipants;
     private boolean isPublic;
-    private Date date;
+    private LocalDateTime date;
     private AddressDTO address; // Embeddable Address representation
     private EventTypeOverviewDTO eventType; // IDs of selected event types
     private List<GetProductByIdResponseDTO> products;   // IDs of selected products

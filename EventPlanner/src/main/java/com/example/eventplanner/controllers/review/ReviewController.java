@@ -5,6 +5,7 @@ import com.example.eventplanner.dto.review.ReviewUpdateResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/reviews")
 public class ReviewController {
