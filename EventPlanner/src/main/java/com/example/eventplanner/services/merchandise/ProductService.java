@@ -2,7 +2,7 @@ package com.example.eventplanner.services.merchandise;
 
 import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
-import com.example.eventplanner.model.merchandise.Product;
+import com.example.eventplanner.model.merchandise.*;
 import com.example.eventplanner.repositories.merchandise.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,8 +27,6 @@ import com.example.eventplanner.model.event.Activity;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
-import com.example.eventplanner.model.merchandise.Merchandise;
-import com.example.eventplanner.model.merchandise.MerchandisePhoto;
 import com.example.eventplanner.model.merchandise.Product;
 import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.model.user.User;
@@ -135,7 +133,7 @@ public class ProductService {
         dto.setAddress(product.getAddress());
         dto.setCategory(product.getCategory().getTitle());
         if(product.getPhotos() != null && !product.getPhotos().isEmpty())
-            dto.setPhoto(product.getPhotos().getFirst().getPhoto());
+            dto.setPhotos(product.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
         dto.setRating(product.getRating());
         dto.setType(product.getClass().getSimpleName());
         dto.setPrice(product.getPrice());
@@ -226,9 +224,19 @@ public class ProductService {
         product.setEventTypes(eventTypes);
 
         // Step 5: Set Category
-        Category category = categoryRepository.findById(createProductRequestDTO.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
-        product.setCategory(category);
+        if (createProductRequestDTO.getCategoryId() != -1) {
+            Category category = categoryRepository.findById(createProductRequestDTO.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
+            product.setCategory(category);
+            product.setState(MerchandiseState.APPROVED);
+        }else{
+            Category category = new Category();
+            category.setTitle(createProductRequestDTO.getCategory().getTitle());
+            category.setDescription(createProductRequestDTO.getCategory().getDescription());
+            category.setPending(false);
+            product.setCategory(categoryRepository.save(category));
+            product.setState(MerchandiseState.PENDING);
+        }
 
         // Step 6: Set Address
         Address address = new Address();
@@ -255,6 +263,10 @@ public class ProductService {
         Merchandise product = merchandiseRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
+        product.setAvailable(false);
+        Merchandise oldProduct = merchandiseRepository.save(product);
+        Merchandise newProduct = new Merchandise();
+
         // Step 1: Fetch the ServiceProvider
         User serviceProvider = userRepository.findById(updateProductRequestDTO.getServiceProviderId())
                 .orElseThrow(() -> new RuntimeException("Service provider not found"));
@@ -263,18 +275,18 @@ public class ProductService {
         serviceProviderDTO.setName(serviceProvider.getName());
         serviceProviderDTO.setSurname(serviceProvider.getSurname());
 
-        product.setTitle(updateProductRequestDTO.getTitle());
-        product.setDescription(updateProductRequestDTO.getDescription());
-        product.setSpecificity(updateProductRequestDTO.getSpecificity());
-        product.setPrice(updateProductRequestDTO.getPrice());
-        product.setDiscount(updateProductRequestDTO.getDiscount());
-        product.setVisible(updateProductRequestDTO.isVisible());
-        product.setAvailable(updateProductRequestDTO.isAvailable());
-        product.setMinDuration(updateProductRequestDTO.getMinDuration());
-        product.setMaxDuration(updateProductRequestDTO.getMaxDuration());
-        product.setReservationDeadline(updateProductRequestDTO.getReservationDeadline());
-        product.setCancellationDeadline(updateProductRequestDTO.getCancellationDeadline());
-        product.setAutomaticReservation(updateProductRequestDTO.isAutomaticReservation());
+        newProduct.setTitle(updateProductRequestDTO.getTitle());
+        newProduct.setDescription(updateProductRequestDTO.getDescription());
+        newProduct.setSpecificity(updateProductRequestDTO.getSpecificity());
+        newProduct.setPrice(updateProductRequestDTO.getPrice());
+        newProduct.setDiscount(updateProductRequestDTO.getDiscount());
+        newProduct.setVisible(updateProductRequestDTO.isVisible());
+        newProduct.setAvailable(true);
+        newProduct.setMinDuration(updateProductRequestDTO.getMinDuration());
+        newProduct.setMaxDuration(updateProductRequestDTO.getMaxDuration());
+        newProduct.setReservationDeadline(updateProductRequestDTO.getReservationDeadline());
+        newProduct.setCancellationDeadline(updateProductRequestDTO.getCancellationDeadline());
+        newProduct.setAutomaticReservation(updateProductRequestDTO.isAutomaticReservation());
 
         // Step 3: Create and map Merchandise Photos
         List<MerchandisePhoto> photos = updateProductRequestDTO.getMerchandisePhotos().stream()
@@ -287,11 +299,11 @@ public class ProductService {
 
         // Save photos to the database first, before associating them with the product
         List<MerchandisePhoto> savedPhotos = merchandisePhotoRepository.saveAll(photos);
-        product.setPhotos(savedPhotos);
+        newProduct.setPhotos(savedPhotos);
 
         // Step 4: Map Event Types
         List<EventType> eventTypes = eventTypeRepository.findAllById(updateProductRequestDTO.getEventTypesIds());
-        product.setEventTypes(eventTypes);
+        newProduct.setEventTypes(eventTypes);
 
         // Step 6: Set Address
         Address address = new Address();
@@ -300,10 +312,12 @@ public class ProductService {
         address.setNumber(updateProductRequestDTO.getAddress().getNumber());
         address.setLatitude(updateProductRequestDTO.getAddress().getLatitude());
         address.setLongitude(updateProductRequestDTO.getAddress().getLongitude());
-        product.setAddress(address);
+        newProduct.setAddress(address);
+
+        newProduct.setCategory(product.getCategory());
 
         // Step 7: Save the new product (Merchandise)
-        Merchandise savedProduct = merchandiseRepository.save(product);
+        Merchandise savedProduct = merchandiseRepository.save(newProduct);
 
         // Step 8: Map to CreateProductResponseDTO and return
         return mapToCreateProductResponseDTO(savedProduct, serviceProviderDTO, savedPhotos.stream().map(this::mapToMerchandisePhotoDTO).toList());

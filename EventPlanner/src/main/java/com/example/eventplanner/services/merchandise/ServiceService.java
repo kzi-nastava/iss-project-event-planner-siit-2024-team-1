@@ -3,9 +3,11 @@ package com.example.eventplanner.services.merchandise;
 import com.example.eventplanner.dto.filter.ServiceFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 
+import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
 import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.ReservationResponseDTO;
 import com.example.eventplanner.model.event.Event;
+import com.example.eventplanner.model.merchandise.MerchandisePhoto;
 import com.example.eventplanner.model.merchandise.Timeslot;
 import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.ServiceProvider;
@@ -112,11 +114,19 @@ public class ServiceService {
         dto.setAddress(service.getAddress());
         dto.setCategory(service.getCategory().getTitle());
         if(service.getPhotos() != null && !service.getPhotos().isEmpty())
-            dto.setPhoto(service.getPhotos().getFirst().getPhoto());
+            dto.setPhotos(service.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
         dto.setRating(service.getRating());
         dto.setType(service.getClass().getSimpleName());
         dto.setPrice(service.getPrice());
         return dto;
+    }
+
+    public MerchandisePhotoDTO mapToMerchandisePhotoDTO(MerchandisePhoto merchandisePhoto) {
+        MerchandisePhotoDTO photoDTO = new MerchandisePhotoDTO();
+        photoDTO.setId(merchandisePhoto.getId());  // Set the photo ID
+        photoDTO.setPhoto(merchandisePhoto.getPhoto());  // Set the byte array of the photo
+
+        return photoDTO;
     }
 
     @Transactional

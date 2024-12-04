@@ -2,6 +2,7 @@ package com.example.eventplanner.dto.merchandise.product.create;
 
 import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.merchandise.CreateMerchandisePhotoDTO;
+import com.example.eventplanner.dto.merchandise.product.CreateCategoryDTO;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.MerchandisePhoto;
@@ -32,4 +33,5 @@ public class CreateProductRequestDTO {
     private List<Integer> eventTypesIds;
     private AddressDTO address;
     private int categoryId;
+    private CreateCategoryDTO category;
 }
