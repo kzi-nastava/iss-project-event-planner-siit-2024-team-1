@@ -15,7 +15,6 @@ public class MerchandisePhoto {
     private int id;
 
     @Lob
-    @Column(columnDefinition = "BYTEA")
-    private byte[] photo;
+    private String photo;
 }
 

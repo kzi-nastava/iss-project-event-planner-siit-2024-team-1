@@ -213,160 +213,160 @@ INSERT INTO category (title,description,pending) VALUES ('Entertainment','Entert
                                                         ('Protest','Entertainment description',false);
 -- First, ensure we have the id generator table and category
 -- Insert into merchandise table (using SINGLE_TABLE inheritance)
-INSERT INTO merchandise (
-    merchandise_type,
-                         id,
-    title,
-    description,
-    specificity,
-    price,
-    discount,
-    visible,
-    available,
-    min_duration,
-    max_duration,
-    reservation_deadline,
-    cancellation_deadline,
-    automatic_reservation,
-    deleted,
-    street,
-    city,
-    number,
-    longitude,
-    latitude,
-    category_id
-) VALUES
--- DJ Service
-('Service',1,  'Professional DJ Services',
- 'Experienced DJ for your events',
- 'Top-quality sound equipment included',
- 500.00, 0, true, true,
- 2, 8, 48, 24, true, false,
- 'Security Street',
- 'Washington DC',
- 901,
- -77.0369,
- 38.9072, 1),
-
--- Photography Service
-('Service', 2, 'Event Photography',
- 'Professional event photography service',
- 'High-resolution photos, digital delivery within 1 week',
- 800.00, 10, true, true,
- 3, 12, 72, 48, false, false,
- 'Security Street',
- 'Washington DC',
- 901,
- -77.0369,
- 38.9072, 1),
-
--- Catering Service
-('Service', 3,'Gourmet Catering',
- 'Premium catering service for all events',
- 'Custom menu options available, includes staff',
- 1200.00, 5, true, true,
- 4, 8, 96, 72, false, false,
- 'Security Street',
- 'Washington DC',
- 901,
- -77.0369,
- 38.9072, 1),
-
--- Event Planning Service
-('Service',  4,'Full Event Planning',
- 'Comprehensive event planning and coordination',
- 'Includes venue selection, vendor coordination, and day-of management',
- 2000.00, 0, true, true,
- 10, 40, 168, 120, false, false,
- 'Security Street',
- 'Washington DC',
- 901,
- -77.0369,
- 38.9072, 1),
-('Product',  5,'Dildo Cake',
- 'Comprehensive event planning and coordination',
- 'Includes venue selection, vendor coordination, and day-of management',
- 2000.00, 0, true, true,
- 10, 40, 168, 120, false, false,
- 'Security Street',
- 'Washington DC',
- 901,
- -77.0369,
- 38.9072, 1),
-
--- Decoration Service
-('Service',  6,'Event Decoration',
- 'Professional decoration and setup service',
- 'Custom themes and designs available',
- 600.00, 15, true, true,
- 2, 6, 72, 48, true, false,
- 'Security Street',
- 'Washington DC',
- 901,
- -77.0369,
- 38.9072, 1);
-
-INSERT INTO review (id, comment, rating, status) VALUES
--- DJ Service Reviews (ID: 1)
-(1, 'Amazing DJ! Kept the party going all night long', 5, true),
-(2, 'Great music selection and very professional', 5, true),
-(3, 'Good service but could improve song transitions', 4, true),
-(4, 'Fantastic energy and crowd engagement', 5, true),
-
--- Photography Service Reviews (ID: 2)
-(5, 'Beautiful photos, captured every moment perfectly', 5, true),
-(6, 'Professional service but took longer than promised for delivery', 3, true),
-(7, 'Excellent attention to detail', 4, true),
-(8, 'Worth every penny, amazing quality', 5, true),
-
--- Catering Service Reviews (ID: 3)
-(9, 'Food was delicious and presentation was beautiful', 5, true),
-(10, 'Great variety but some dishes were cold', 3, true),
-(11, 'Professional staff and excellent service', 4, true),
-(12, 'Outstanding quality and presentation', 5, true),
-
--- Event Planning Service Reviews (ID: 4)
-(13, 'Made our event completely stress-free', 5, true),
-(14, 'Excellent coordination and attention to detail', 5, true),
-(15, 'Good planning but some communication issues', 4, true),
-(16, 'Went above and beyond our expectations', 5, true),
-
--- Decoration Service Reviews (ID: 5)
-(17, 'Beautiful decorations, exactly what we wanted', 5, true),
-(18, 'Creative designs but setup was delayed', 3, true),
-(19, 'Transformed the venue beautifully', 4, true),
-(20, 'High-quality materials and great execution', 5, true);
-
-INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
--- DJ Service (merchandise_id: 1)
-(1, 1),
-(1, 2),
-(1, 3),
-(1, 4),
-
--- Photography Service (merchandise_id: 2)
-(2, 5),
-(2, 6),
-(2, 7),
-(2, 8),
-
--- Catering Service (merchandise_id: 3)
-(3, 9),
-(3, 10),
-(3, 11),
-(3, 12),
-
--- Event Planning Service (merchandise_id: 4)
-(4, 13),
-(4, 14),
-(4, 15),
-(4, 16),
-
--- Decoration Service (merchandise_id: 5)
-(5, 17),
-(5, 18),
-(5, 19),
-(5, 20);
+-- INSERT INTO merchandise (
+--     merchandise_type,
+--                          id,
+--     title,
+--     description,
+--     specificity,
+--     price,
+--     discount,
+--     visible,
+--     available,
+--     min_duration,
+--     max_duration,
+--     reservation_deadline,
+--     cancellation_deadline,
+--     automatic_reservation,
+--     deleted,
+--     street,
+--     city,
+--     number,
+--     longitude,
+--     latitude,
+--     category_id
+-- ) VALUES
+-- -- DJ Service
+-- ('Service',1,  'Professional DJ Services',
+--  'Experienced DJ for your events',
+--  'Top-quality sound equipment included',
+--  500.00, 0, true, true,
+--  2, 8, 48, 24, true, false,
+--  'Security Street',
+--  'Washington DC',
+--  901,
+--  -77.0369,
+--  38.9072, 1),
+--
+-- -- Photography Service
+-- ('Service', 2, 'Event Photography',
+--  'Professional event photography service',
+--  'High-resolution photos, digital delivery within 1 week',
+--  800.00, 10, true, true,
+--  3, 12, 72, 48, false, false,
+--  'Security Street',
+--  'Washington DC',
+--  901,
+--  -77.0369,
+--  38.9072, 1),
+--
+-- -- Catering Service
+-- ('Service', 3,'Gourmet Catering',
+--  'Premium catering service for all events',
+--  'Custom menu options available, includes staff',
+--  1200.00, 5, true, true,
+--  4, 8, 96, 72, false, false,
+--  'Security Street',
+--  'Washington DC',
+--  901,
+--  -77.0369,
+--  38.9072, 1),
+--
+-- -- Event Planning Service
+-- ('Service',  4,'Full Event Planning',
+--  'Comprehensive event planning and coordination',
+--  'Includes venue selection, vendor coordination, and day-of management',
+--  2000.00, 0, true, true,
+--  10, 40, 168, 120, false, false,
+--  'Security Street',
+--  'Washington DC',
+--  901,
+--  -77.0369,
+--  38.9072, 1),
+-- ('Product',  5,'Dildo Cake',
+--  'Comprehensive event planning and coordination',
+--  'Includes venue selection, vendor coordination, and day-of management',
+--  2000.00, 0, true, true,
+--  10, 40, 168, 120, false, false,
+--  'Security Street',
+--  'Washington DC',
+--  901,
+--  -77.0369,
+--  38.9072, 1),
+--
+-- -- Decoration Service
+-- ('Service',  6,'Event Decoration',
+--  'Professional decoration and setup service',
+--  'Custom themes and designs available',
+--  600.00, 15, true, true,
+--  2, 6, 72, 48, true, false,
+--  'Security Street',
+--  'Washington DC',
+--  901,
+--  -77.0369,
+--  38.9072, 1);
+--
+-- INSERT INTO review (id, comment, rating, status) VALUES
+-- -- DJ Service Reviews (ID: 1)
+-- (1, 'Amazing DJ! Kept the party going all night long', 5, true),
+-- (2, 'Great music selection and very professional', 5, true),
+-- (3, 'Good service but could improve song transitions', 4, true),
+-- (4, 'Fantastic energy and crowd engagement', 5, true),
+--
+-- -- Photography Service Reviews (ID: 2)
+-- (5, 'Beautiful photos, captured every moment perfectly', 5, true),
+-- (6, 'Professional service but took longer than promised for delivery', 3, true),
+-- (7, 'Excellent attention to detail', 4, true),
+-- (8, 'Worth every penny, amazing quality', 5, true),
+--
+-- -- Catering Service Reviews (ID: 3)
+-- (9, 'Food was delicious and presentation was beautiful', 5, true),
+-- (10, 'Great variety but some dishes were cold', 3, true),
+-- (11, 'Professional staff and excellent service', 4, true),
+-- (12, 'Outstanding quality and presentation', 5, true),
+--
+-- -- Event Planning Service Reviews (ID: 4)
+-- (13, 'Made our event completely stress-free', 5, true),
+-- (14, 'Excellent coordination and attention to detail', 5, true),
+-- (15, 'Good planning but some communication issues', 4, true),
+-- (16, 'Went above and beyond our expectations', 5, true),
+--
+-- -- Decoration Service Reviews (ID: 5)
+-- (17, 'Beautiful decorations, exactly what we wanted', 5, true),
+-- (18, 'Creative designs but setup was delayed', 3, true),
+-- (19, 'Transformed the venue beautifully', 4, true),
+-- (20, 'High-quality materials and great execution', 5, true);
+--
+-- INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
+-- -- DJ Service (merchandise_id: 1)
+-- (1, 1),
+-- (1, 2),
+-- (1, 3),
+-- (1, 4),
+--
+-- -- Photography Service (merchandise_id: 2)
+-- (2, 5),
+-- (2, 6),
+-- (2, 7),
+-- (2, 8),
+--
+-- -- Catering Service (merchandise_id: 3)
+-- (3, 9),
+-- (3, 10),
+-- (3, 11),
+-- (3, 12),
+--
+-- -- Event Planning Service (merchandise_id: 4)
+-- (4, 13),
+-- (4, 14),
+-- (4, 15),
+-- (4, 16),
+--
+-- -- Decoration Service (merchandise_id: 5)
+-- (5, 17),
+-- (5, 18),
+-- (5, 19),
+-- (5, 20);
 
 -- INSERT INTO public."user"(
 --     active, id, latitude, longitude, "number", role, user_type, authorities, city, company, description, name, password, phone_number, photo, street, surname, username)

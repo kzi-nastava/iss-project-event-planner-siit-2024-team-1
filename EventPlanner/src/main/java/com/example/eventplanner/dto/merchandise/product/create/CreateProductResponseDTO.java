@@ -3,6 +3,7 @@ package com.example.eventplanner.dto.merchandise.product.create;
 import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.merchandise.CreateMerchandisePhotoDTO;
 import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
+import com.example.eventplanner.dto.merchandise.product.ServiceProviderDTO;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
@@ -31,7 +32,7 @@ public class CreateProductResponseDTO {
     private int cancellationDeadline;
     private boolean automaticReservation;
 
-    private User serviceProvider;
+    private ServiceProviderDTO serviceProvider;
     private List<MerchandisePhotoDTO> merchandisePhotos;
     private List<EventType> eventTypes;
     private AddressDTO address;

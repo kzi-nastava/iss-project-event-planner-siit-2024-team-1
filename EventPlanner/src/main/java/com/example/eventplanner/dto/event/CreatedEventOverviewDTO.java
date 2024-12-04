@@ -20,7 +20,7 @@ public class CreatedEventOverviewDTO {
     private boolean isPublic;
     private Date date;
     private AddressDTO address; // Embeddable Address representation
-    private List<EventTypeOverviewDTO> eventTypes; // IDs of selected event types
+    private EventTypeOverviewDTO eventType; // IDs of selected event types
     private List<GetProductByIdResponseDTO> products;   // IDs of selected products
     private List<GetServiceByIdResponseDTO> services;
 }

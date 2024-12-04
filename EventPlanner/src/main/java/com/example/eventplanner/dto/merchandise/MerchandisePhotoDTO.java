@@ -8,5 +8,5 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 public class MerchandisePhotoDTO {
     private int id;
-    private byte[] photo;
+    private String photo;
 }

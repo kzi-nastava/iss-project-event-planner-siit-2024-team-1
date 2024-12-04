@@ -14,7 +14,7 @@ public class MerchandiseOverviewDTO {
     private int id;
     private String category;
     private String type;
-    private byte[] photo;
+    private List<MerchandisePhotoDTO> photos;
     private String title;
     private double rating;
     private Address address;

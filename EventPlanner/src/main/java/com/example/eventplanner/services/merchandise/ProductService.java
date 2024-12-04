@@ -8,6 +8,7 @@ import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
 import com.example.eventplanner.dto.merchandise.product.GetAllProductsResponseDTO;
 import com.example.eventplanner.dto.merchandise.product.GetProductByIdResponseDTO;
 import com.example.eventplanner.dto.merchandise.product.ProductOverviewDTO;
+import com.example.eventplanner.dto.merchandise.product.ServiceProviderDTO;
 import com.example.eventplanner.dto.merchandise.product.create.CreateProductRequestDTO;
 import com.example.eventplanner.dto.merchandise.product.create.CreateProductResponseDTO;
 import com.example.eventplanner.dto.merchandise.product.update.UpdateProductRequestDTO;
@@ -120,7 +121,7 @@ public class ProductService {
         List<MerchandisePhoto> photos = createProductRequestDTO.getMerchandisePhotos().stream()
                 .map(photoDto -> {
                     MerchandisePhoto newPhoto = new MerchandisePhoto();
-                    newPhoto.setPhoto(Base64.getDecoder().decode(photoDto.getPhoto()));// Assuming the photo ID is passed as part of DTO
+                    newPhoto.setPhoto(photoDto.getPhoto());// Assuming the photo ID is passed as part of DTO
                     return newPhoto;
                 })
                 .collect(Collectors.toList());
@@ -147,11 +148,16 @@ public class ProductService {
         address.setLongitude(createProductRequestDTO.getAddress().getLongitude());
         product.setAddress(address);
 
+        ServiceProviderDTO serviceProviderDTO = new ServiceProviderDTO();
+        serviceProviderDTO.setId(serviceProvider.getId());
+        serviceProviderDTO.setName(serviceProvider.getName());
+        serviceProviderDTO.setSurname(serviceProvider.getSurname());
+
         // Step 7: Save the new product (Merchandise)
         Merchandise savedProduct = merchandiseRepository.save(product);
 
         // Step 8: Map to CreateProductResponseDTO and return
-        return mapToCreateProductResponseDTO(savedProduct, serviceProvider, savedPhotos.stream().map(this::mapToMerchandisePhotoDTO).toList());
+        return mapToCreateProductResponseDTO(savedProduct, serviceProviderDTO, savedPhotos.stream().map(this::mapToMerchandisePhotoDTO).toList());
     }
 
     public CreateProductResponseDTO updateProduct(int productId, UpdateProductRequestDTO updateProductRequestDTO) {
@@ -161,6 +167,10 @@ public class ProductService {
         // Step 1: Fetch the ServiceProvider
         User serviceProvider = userRepository.findById(updateProductRequestDTO.getServiceProviderId())
                 .orElseThrow(() -> new RuntimeException("Service provider not found"));
+        ServiceProviderDTO serviceProviderDTO = new ServiceProviderDTO();
+        serviceProviderDTO.setId(serviceProvider.getId());
+        serviceProviderDTO.setName(serviceProvider.getName());
+        serviceProviderDTO.setSurname(serviceProvider.getSurname());
 
         product.setTitle(updateProductRequestDTO.getTitle());
         product.setDescription(updateProductRequestDTO.getDescription());
@@ -179,7 +189,7 @@ public class ProductService {
         List<MerchandisePhoto> photos = updateProductRequestDTO.getMerchandisePhotos().stream()
                 .map(photoDto -> {
                     MerchandisePhoto newPhoto = new MerchandisePhoto();
-                    newPhoto.setPhoto(Base64.getDecoder().decode(photoDto.getPhoto()));// Assuming the photo ID is passed as part of DTO
+                    newPhoto.setPhoto(photoDto.getPhoto() );// Assuming the photo ID is passed as part of DTO
                     return newPhoto;
                 })
                 .collect(Collectors.toList());
@@ -205,7 +215,7 @@ public class ProductService {
         Merchandise savedProduct = merchandiseRepository.save(product);
 
         // Step 8: Map to CreateProductResponseDTO and return
-        return mapToCreateProductResponseDTO(savedProduct, serviceProvider, savedPhotos.stream().map(this::mapToMerchandisePhotoDTO).toList());
+        return mapToCreateProductResponseDTO(savedProduct, serviceProviderDTO, savedPhotos.stream().map(this::mapToMerchandisePhotoDTO).toList());
     }
 
     public MerchandisePhotoDTO mapToMerchandisePhotoDTO(MerchandisePhoto merchandisePhoto) {
@@ -216,7 +226,7 @@ public class ProductService {
         return photoDTO;
     }
 
-    private CreateProductResponseDTO mapToCreateProductResponseDTO(Merchandise savedProduct, User serviceProvider, List<MerchandisePhotoDTO> photoDTOs) {
+    private CreateProductResponseDTO mapToCreateProductResponseDTO(Merchandise savedProduct, ServiceProviderDTO serviceProvider, List<MerchandisePhotoDTO> photoDTOs) {
         CreateProductResponseDTO responseDTO = new CreateProductResponseDTO();
 
         responseDTO.setTitle(savedProduct.getTitle());
