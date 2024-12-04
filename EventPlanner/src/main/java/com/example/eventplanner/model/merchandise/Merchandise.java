@@ -18,7 +18,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Merchandise {
+public class  Merchandise {
     @Id
     @TableGenerator(
             name = "merchandise",
@@ -43,6 +43,7 @@ public class Merchandise {
     private boolean automaticReservation;
     private boolean deleted;
 
+    private MerchandiseState state;
 
     @OneToMany
     @JoinTable(inverseJoinColumns = @JoinColumn(name = "photo_id"))

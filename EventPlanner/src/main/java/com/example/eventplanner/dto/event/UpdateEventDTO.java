@@ -19,7 +19,7 @@ public class UpdateEventDTO {
     private boolean isPublic;
     private LocalDateTime date;
     private AddressDTO address; // Embeddable Address representation
-    private List<Integer> eventTypeIds; // IDs of selected event types
+    private int eventTypeId; // IDs of selected event types
     private List<Integer> productIds;   // IDs of selected products
     private List<Integer> serviceIds;
 }

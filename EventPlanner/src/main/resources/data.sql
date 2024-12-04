@@ -211,8 +211,7 @@ INSERT INTO category (title,description,pending) VALUES ('Entertainment','Entert
                                                         ('Funerality','Entertainment description',false),
                                                         ('Suicidabiliyu','Entertainment description',false),
                                                         ('Protest','Entertainment description',false);
--- First, ensure we have the id generator table and category
--- Insert into merchandise table (using SINGLE_TABLE inheritance)
+
 INSERT INTO merchandise (
     merchandise_type,
                          id,
@@ -283,14 +282,14 @@ INSERT INTO merchandise (
  901,
  -77.0369,
  38.9072, 1),
-('Product',  5,'Dildo Cake',
- 'Comprehensive event planning and coordination',
+('Product',  5,'Kasandrina Torta',
+ 'Torta sa mlevenim orajima',
  'Includes venue selection, vendor coordination, and day-of management',
  2000.00, 0, true, true,
  10, 40, 168, 120, false, false,
- 'Security Street',
- 'Washington DC',
- 901,
+ 'Nova',
+ 'Klisa',
+ 1,
  -77.0369,
  38.9072, 1),
 

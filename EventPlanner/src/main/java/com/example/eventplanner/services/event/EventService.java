@@ -153,20 +153,18 @@ public class EventService {
         address.setLongitude(dto.getAddress().getLongitude());
         event.setAddress(address);
 
-        List<EventType> eventTypes = eventTypeRepository.findAllById(dto.getEventTypeIds());
-        if (!eventTypes.isEmpty()) {
-            event.setType(eventTypes.get(0)); // Assuming the first type as primary
-        }
+        EventType eventType = eventTypeRepository.findById(dto.getEventTypeId()).orElseThrow();
+        event.setType(eventType);
         List<Merchandise> merchandise = merchandiseRepository.findAllById(dto.getProductIds());
         merchandise.addAll(merchandiseRepository.findAllById(dto.getServiceIds()));
         event.setMerchandise(merchandise);
 
         Event savedEvent = eventRepository.save(event);
 
-        return mapToCreatedEventOverviewDTO(savedEvent, eventTypes, merchandise);
+        return mapToCreatedEventOverviewDTO(savedEvent, eventType, merchandise);
     }
 
-    private CreatedEventOverviewDTO mapToCreatedEventOverviewDTO(Event event, List<EventType> eventTypes, List<Merchandise> merchandise) {
+    private CreatedEventOverviewDTO mapToCreatedEventOverviewDTO(Event event, EventType eventType, List<Merchandise> merchandise) {
         CreatedEventOverviewDTO dto = new CreatedEventOverviewDTO();
         dto.setTitle(event.getTitle());
         dto.setDescription(event.getDescription());
@@ -184,17 +182,14 @@ public class EventService {
         dto.setAddress(addressDTO);
 
         // Map event types
-        List<EventTypeOverviewDTO> eventTypeOverviewDTOs = eventTypes.stream()
-                .map(eventType -> {
-                    EventTypeOverviewDTO typeDTO = new EventTypeOverviewDTO();
-                    typeDTO.setId(eventType.getId());
-                    typeDTO.setTitle(eventType.getTitle());
-                    typeDTO.setDescription(eventType.getDescription());
-                    typeDTO.setActive(eventType.isActive());
-                    return typeDTO;
-                })
-                .toList();
-        dto.setEventTypes(eventTypeOverviewDTOs);
+
+        EventTypeOverviewDTO typeDTO = new EventTypeOverviewDTO();
+        typeDTO.setId(eventType.getId());
+        typeDTO.setTitle(eventType.getTitle());
+        typeDTO.setDescription(eventType.getDescription());
+        typeDTO.setActive(eventType.isActive());
+
+        dto.setEventType(typeDTO);
 
         // Separate and map merchandise into Products and Services
         List<GetProductByIdResponseDTO> productDTOs = merchandise.stream()
@@ -255,17 +250,15 @@ public class EventService {
         address.setLongitude(dto.getAddress().getLongitude());
         event.setAddress(address);
 
-        List<EventType> eventTypes = eventTypeRepository.findAllById(dto.getEventTypeIds());
-        if (!eventTypes.isEmpty()) {
-            event.setType(eventTypes.get(0)); // Assuming the first type as primary
-        }
+        EventType eventType = eventTypeRepository.findById(dto.getEventTypeId()).orElseThrow();
+        event.setType(eventType);
         List<Merchandise> merchandise = merchandiseRepository.findAllById(dto.getProductIds());
         merchandise.addAll(merchandiseRepository.findAllById(dto.getServiceIds()));
         event.setMerchandise(merchandise);
 
         Event savedEvent = eventRepository.save(event);
 
-        return mapToCreatedEventOverviewDTO(savedEvent, eventTypes, merchandise);
+        return mapToCreatedEventOverviewDTO(savedEvent, eventType, merchandise);
     }
 
     public CreatedActivityDTO updateAgenda(int eventId, CreateActivityDTO dto) {

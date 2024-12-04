@@ -1,10 +1,17 @@
 package com.example.eventplanner.services;
 
+import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.user.auth.*;
 import com.example.eventplanner.model.auth.AuthenticationResponse;
 import com.example.eventplanner.model.auth.Token;
+import com.example.eventplanner.model.common.Address;
+import com.example.eventplanner.model.user.BusinessPhoto;
+import com.example.eventplanner.model.user.EventOrganizer;
+import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.auth.TokenRepository;
+import com.example.eventplanner.repositories.user.EventOrganizerRepository;
+import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -72,16 +79,16 @@ public class AuthenticationService {
 
         // check if user already exist. if exist than authenticate the user
         if(repository.findByUsername(request.getEmail()).isPresent()) {
-            return new RegisterEoRequestResponseDTO(1, "User Already Exists", null,null, null,null, null,null, null, null);
+            return new RegisterEoRequestResponseDTO(-1, "User Already Exists", null,null, null,null, null,null, null, null);
         }
 
-        User user = new User();
+        EventOrganizer user = new EventOrganizer();
         user.setName(request.getName());
         user.setSurname(request.getSurname());
         user.setUsername(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhoneNumber(request.getPhoneNumber());
-        user.setAddress(request.getAddress());
+        user.setAddress(mapToAddress(request.getAddress()));
         user.setPhoto(request.getPhoto());
         user.setRole(request.getRole());
         user.setAuthorities("ahahah");
@@ -93,25 +100,44 @@ public class AuthenticationService {
 
         saveUserToken(accessToken, refreshToken, user);
 
-        return new RegisterEoRequestResponseDTO(1, "User Created Successfully", null,null, null,null, null, null, accessToken, refreshToken);
+        return new RegisterEoRequestResponseDTO(user.getId(), "User Created Successfully", user.getName(), user.getSurname(), user.getPhoneNumber(),request.getAddress(), user.getUsername(), user.getPhoto(), accessToken, refreshToken);
 
+    }
+
+    public Address mapToAddress(AddressDTO dto){
+        Address address = new Address();
+
+        address.setCity(dto.getCity());
+        address.setNumber(dto.getNumber());
+        address.setStreet(dto.getStreet());
+        address.setLatitude(dto.getLatitude());
+        address.setLongitude(dto.getLongitude());
+
+        return address;
     }
 
     public RegisterSpRequestResponseDTO registerSp(RegisterSpRequestDTO request) {
 
         // check if user already exist. if exist than authenticate the user
         if(repository.findByUsername(request.getEmail()).isPresent()) {
-            return new RegisterSpRequestResponseDTO(1, "User Already Exists", null,null, null,null, null, null,null, null, null, null, null);
+            return new RegisterSpRequestResponseDTO(-1, "User Already Exists", null,null, null,null, null, null,null, null, null, null, null);
         }
 
-        User user = new User();
+        ServiceProvider user = new ServiceProvider();
         user.setName(request.getName());
         user.setSurname(request.getSurname());
         user.setUsername(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setAddress(mapToAddress(request.getAddress()));
+        user.setPhoto(request.getPhoto());
         user.setRole(request.getRole());
+        user.setAuthorities("ahahah");
+
+        user.setCompany(request.getCompany());
+        user.setDescription(request.getDescription());
+
+
 
         user = repository.save(user);
 
@@ -120,7 +146,7 @@ public class AuthenticationService {
 
         saveUserToken(accessToken, refreshToken, user);
 
-        return new RegisterSpRequestResponseDTO(1, "User Created Successfully", null,null, null,null, null,null, null,null, null, accessToken, refreshToken);
+        return new RegisterSpRequestResponseDTO(user.getId(), "User Created Successfully", user.getName(), user.getSurname(), user.getPhoneNumber(),request.getAddress(), user.getUsername(), user.getPhoto(), user.getCompany(),user.getDescription(), null, accessToken, refreshToken);
 
     }
 

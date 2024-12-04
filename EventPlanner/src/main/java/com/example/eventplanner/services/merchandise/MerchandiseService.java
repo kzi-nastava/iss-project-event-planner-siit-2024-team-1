@@ -1,7 +1,9 @@
 package com.example.eventplanner.services.merchandise;
 
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
+import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
 import com.example.eventplanner.model.merchandise.Merchandise;
+import com.example.eventplanner.model.merchandise.MerchandisePhoto;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -38,10 +40,17 @@ public class MerchandiseService {
         dto.setAddress(merchandise.getAddress());
         dto.setCategory(merchandise.getCategory().getTitle());
         if(merchandise.getPhotos() != null && !merchandise.getPhotos().isEmpty())
-            dto.setPhoto(merchandise.getPhotos().getFirst().getPhoto());
+            dto.setPhotos(merchandise.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
         dto.setRating(merchandise.getRating());
         dto.setType(merchandise.getClass().getSimpleName());
         dto.setPrice(merchandise.getPrice());
+        return dto;
+    }
+
+    private MerchandisePhotoDTO mapToMerchandisePhotoDTO(MerchandisePhoto photo){
+        MerchandisePhotoDTO dto = new MerchandisePhotoDTO();
+        dto.setId(photo.getId());
+        dto.setPhoto(photo.getPhoto());
         return dto;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 @Repository
 public interface ServiceProviderRepository extends JpaRepository<ServiceProvider, Integer> {
+    Optional<ServiceProvider> findByUsername(String username);
     @Query("SELECT sp FROM ServiceProvider sp JOIN sp.merchandise m WHERE m.id = :merchandiseId")
     Optional<ServiceProvider> findByMerchandiseId(@Param("merchandiseId") int merchandiseId);
 }
