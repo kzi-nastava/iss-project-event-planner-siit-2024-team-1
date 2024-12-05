@@ -214,7 +214,7 @@ INSERT INTO category (title,description,pending) VALUES ('Entertainment','Entert
 
 INSERT INTO merchandise (
     merchandise_type,
-                         id,
+    id,
     title,
     description,
     specificity,
@@ -233,7 +233,8 @@ INSERT INTO merchandise (
     number,
     longitude,
     latitude,
-    category_id
+    category_id,
+    state
 ) VALUES
 -- DJ Service
 ('Product',1,  'Professional DJ Services',
@@ -245,7 +246,7 @@ INSERT INTO merchandise (
  'Washington DC',
  901,
  -77.0369,
- 38.9072, 1),
+ 38.9072, 1, 0),
 
 -- Photography Service
 ('Product', 2, 'Event Photography',
@@ -257,7 +258,7 @@ INSERT INTO merchandise (
  'Washington DC',
  901,
  -77.0369,
- 38.9072, 1),
+ 38.9072, 1, 0),
 
 -- Catering Service
 ('Product', 3,'Gourmet Catering',
@@ -269,7 +270,7 @@ INSERT INTO merchandise (
  'Washington DC',
  901,
  -77.0369,
- 38.9072, 1),
+ 38.9072, 1, 0),
 
 -- Event Planning Service
 ('Service',  4,'Full Event Planning',
@@ -281,7 +282,7 @@ INSERT INTO merchandise (
  'Washington DC',
  901,
  -77.0369,
- 38.9072, 1),
+ 38.9072, 1, 0),
 ('Product',  5,'Kasandrina Torta',
  'Torta sa mlevenim orajima',
  'Includes venue selection, vendor coordination, and day-of management',
@@ -291,7 +292,7 @@ INSERT INTO merchandise (
  'Klisa',
  1,
  -77.0369,
- 38.9072, 1),
+ 38.9072, 1, 0),
 
 -- Decoration Service
 ('Service',  6,'Event Decoration',
@@ -303,7 +304,7 @@ INSERT INTO merchandise (
  'Washington DC',
  901,
  -77.0369,
- 38.9072, 1);
+ 38.9072, 1, 0);
 
 INSERT INTO review (id, comment, rating, status) VALUES
 -- DJ Service Reviews (ID: 1)
@@ -367,18 +368,18 @@ INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
 (5, 19),
 (5, 20);
 
-INSERT INTO public."user"(
-    active, id, latitude, longitude, "number", role, user_type, authorities, city, company, description, name, password, phone_number, photo, street, surname, username)
-VALUES
-    (true, 1, 40.7128, -74.0060, 123, '0', 'authenticated_user', 'USER', 'New York', 'TechCorp', 'Software engineer', 'John', 'password123', '555-1234', 'john_doe.jpg', '5th Ave', 'Doe', 'john_doe'),
-    (true, 2, 34.0522, -118.2437, 456, '2', 'ServiceProvider', 'USER', 'Los Angeles', 'Creative Solutions', 'Graphic designer', 'Jane', 'password456', '555-5678', 'jane_smith.jpg', 'Sunset Blvd', 'Smith', 'jane_smith'),
-    (false, 3, 51.5074, -0.1278, 789, '1', 'event_organizer', 'USER', 'London', 'Innovate Ltd', 'Marketing manager', 'Alice', 'password789', '555-8765', 'alice_white.jpg', 'Oxford St', 'White', 'alice_white'),
-    (true, 4, 48.8566, 2.3522, 101, '1', 'event_organizer', 'USER', 'Paris', 'Design Works', 'Product designer', 'Bob', 'password101', '555-1122', 'bob_brown.jpg', 'Champs-Elysees', 'Brown', 'bob_brown'),
-    (true, 5, 40.7306, -73.9352, 202, '0', 'authenticated_user', 'USER', 'New York', 'Tech Innovators', 'Frontend developer', 'Charlie', 'password202', '555-3344', 'charlie_green.jpg', 'Broadway', 'Green', 'charlie_green'),
-    (true, 6, 37.7749, -122.4194, 303, '0', 'authenticated_user', 'USER', 'San Francisco', 'EcoSolutions', 'Project manager', 'Dave', 'password303', '555-5566', 'dave_young.jpg', 'Market St', 'Young', 'dave_young'),
-    (true, 7, 39.9042, 116.4074, 404, '1', 'event_organizer', 'USER', 'Beijing', 'Global Innovations', 'Business analyst', 'Eve', 'password404', '555-6677', 'eve_liu.jpg', 'Wangfujing', 'Liu', 'eve_liu'),
-    (true, 8, 34.0522, -118.2437, 505, '1', 'service_provider', 'USER', 'Los Angeles', 'Tech Synergy', 'Software architect', 'Frank', 'password505', '555-7788', 'frank_lee.jpg', 'Wilshire Blvd', 'Lee', 'frank_lee'),
-    (false, 9, 35.6895, 139.6917, 606, '2', 'event_organizer', 'USER', 'Tokyo', 'Creative Minds', 'Data scientist', 'Grace', 'password606', '555-8899', 'grace_kim.jpg', 'Shibuya', 'Kim', 'grace_kim'),
-    (true, 10, 40.7306, -73.9352, 707, '2', 'service_provider', 'USER', 'New York', 'DesignHub', 'UX designer', 'Hank', 'password707', '555-9900', 'hank_jones.jpg', 'Park Ave', 'Jones', 'hank_jones');
-
-insert into user_merchandise(merchandise_id,service_provider_id) values (4,2);
+-- INSERT INTO public."user"(
+--     active, id, latitude, longitude, "number", role, user_type, authorities, city, company, description, name, password, phone_number, photo, street, surname, username, activation_token, token_expiration)
+-- VALUES
+--     (true, 1, 40.7128, -74.0060, 123, '0', 'authenticated_user', 'USER', 'New York', 'TechCorp', 'Software engineer', 'John', 'password123', '555-1234', 'john_doe.jpg', '5th Ave', 'Doe', 'john.doe@gmail.com', '', '2024-12-31'),
+--     (true, 2, 34.0522, -118.2437, 456, '2', 'ServiceProvider', 'USER', 'Los Angeles', 'Creative Solutions', 'Graphic designer', 'Jane', 'password456', '555-5678', 'jane_smith.jpg', 'Sunset Blvd', 'Smith', 'jane.smith@example.com', null, null),
+--     (true, 3, 51.5074, -0.1278, 789, '1', 'event_organizer', 'USER', 'London', 'Innovate Ltd', 'Marketing manager', 'Alice', 'password789', '555-8765', 'alice_white.jpg', 'Oxford St', 'White', 'alice.white@gmail.com', null, null),
+--     (true, 4, 48.8566, 2.3522, 101, '1', 'event_organizer', 'USER', 'Paris', 'Design Works', 'Product designer', 'Bob', 'password101', '555-1122', 'bob_brown.jpg', 'Champs-Elysees', 'Brown', 'bob.brown@example.com', null, null),
+--     (true, 5, 40.7306, -73.9352, 202, '0', 'authenticated_user', 'USER', 'New York', 'Tech Innovators', 'Frontend developer', 'Charlie', 'password202', '555-3344', 'charlie_green.jpg', 'Broadway', 'Green', 'charlie.green@gmail.com', null, null),
+--     (true, 6, 37.7749, -122.4194, 303, '0', 'authenticated_user', 'USER', 'San Francisco', 'EcoSolutions', 'Project manager', 'Dave', 'password303', '555-5566', 'dave_young.jpg', 'Market St', 'Young', 'dave.young@example.com', null, null),
+--     (true, 7, 39.9042, 116.4074, 404, '1', 'event_organizer', 'USER', 'Beijing', 'Global Innovations', 'Business analyst', 'Eve', 'password404', '555-6677', 'eve_liu.jpg', 'Wangfujing', 'Liu', 'eve.liu@gmail.com', null, null),
+--     (true, 8, 34.0522, -118.2437, 505, '1', 'service_provider', 'USER', 'Los Angeles', 'Tech Synergy', 'Software architect', 'Frank', 'password505', '555-7788', 'frank_lee.jpg', 'Wilshire Blvd', 'Lee', 'frank.lee@example.com', null, null),
+--     (true, 9, 35.6895, 139.6917, 606, '2', 'event_organizer', 'USER', 'Tokyo', 'Creative Minds', 'Data scientist', 'Grace', 'password606', '555-8899', 'grace_kim.jpg', 'Shibuya', 'Kim', 'grace.kim@gmail.com', null, null),
+--     (true, 10, 40.7306, -73.9352, 707, '2', 'service_provider', 'USER', 'New York', 'DesignHub', 'UX designer', 'Hank', 'password707', '555-9900', 'hank_jones.jpg', 'Park Ave', 'Jones', 'hank.jones@example.com', null, null);
+--
+-- insert into user_merchandise(merchandise_id,service_provider_id) values (4,2);
