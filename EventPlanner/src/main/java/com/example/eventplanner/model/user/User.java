@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -41,6 +42,10 @@ public class User {
     private boolean active;
     private Role role;
     private String authorities;
+
+    private boolean isVerified = false;
+    private String activationToken;
+    private Date tokenExpiration;
 
     @OneToMany(mappedBy = "recipient")
     private List<Message> receivedMessages;

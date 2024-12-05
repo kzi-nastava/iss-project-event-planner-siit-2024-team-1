@@ -1,6 +1,7 @@
 package com.example.eventplanner.services;
 
 import com.example.eventplanner.dto.common.AddressDTO;
+import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
 import com.example.eventplanner.dto.user.auth.*;
 import com.example.eventplanner.model.auth.AuthenticationResponse;
 import com.example.eventplanner.model.auth.Token;
@@ -13,8 +14,11 @@ import com.example.eventplanner.repositories.auth.TokenRepository;
 import com.example.eventplanner.repositories.user.EventOrganizerRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
+import com.example.eventplanner.services.email.EmailService;
+import com.example.eventplanner.services.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,30 +27,21 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticationService {
 
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-
+    private final EmailService emailService;
     private final TokenRepository tokenRepository;
-
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationService(UserRepository repository,
-                                 PasswordEncoder passwordEncoder,
-                                 JwtService jwtService,
-                                 TokenRepository tokenRepository,
-                                 AuthenticationManager authenticationManager) {
-        this.repository = repository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
-        this.tokenRepository = tokenRepository;
-        this.authenticationManager = authenticationManager;
-    }
 
 //    public RegisterAuUserResponseRequestDTO registerAu(RegisterAuUserRequestDTO request) {
 //
@@ -93,7 +88,15 @@ public class AuthenticationService {
         user.setRole(request.getRole());
         user.setAuthorities("ahahah");
 
+        long activationTokenExpire = 24 * 60 * 60 * 1000;
+        String activationToken = jwtService.generateActivationToken(user, activationTokenExpire);
+        user.setActivationToken(activationToken);
+        user.setTokenExpiration(new Date(System.currentTimeMillis() + activationTokenExpire));
+        user.setVerified(false);
+
         user = repository.save(user);
+
+        sendActivationEmail(user.getUsername(), activationToken);
 
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
@@ -102,6 +105,29 @@ public class AuthenticationService {
 
         return new RegisterEoRequestResponseDTO(user.getId(), "User Created Successfully", user.getName(), user.getSurname(), user.getPhoneNumber(),request.getAddress(), user.getUsername(), user.getPhoto(), accessToken, refreshToken);
 
+    }
+
+    public String verifyUser(String activationToken) {
+        // Extract the username from the token
+        String username = jwtService.extractUsername(activationToken);
+
+        // Validate the token and retrieve the user
+        User user = repository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Invalid or expired token"));
+
+        // Check if the token matches and has not expired
+        if (!user.getActivationToken().equals(activationToken) ||
+                user.getTokenExpiration().before(new Date())) {
+            throw new RuntimeException("Invalid or expired activation token");
+        }
+
+        // Update user status to verified
+        user.setVerified(true);
+        user.setActivationToken(null); // Clear the activation token
+        user.setTokenExpiration(null); // Clear the token expiration
+        repository.save(user);
+
+        return "Account verified successfully!";
     }
 
     public Address mapToAddress(AddressDTO dto){
@@ -138,8 +164,15 @@ public class AuthenticationService {
         user.setDescription(request.getDescription());
 
 
+        long activationTokenExpire = 24 * 60 * 60 * 1000;
+        String activationToken = jwtService.generateActivationToken(user, activationTokenExpire);
+        user.setActivationToken(activationToken);
+        user.setTokenExpiration(new Date(System.currentTimeMillis() + activationTokenExpire));
+        user.setVerified(false);
 
         user = repository.save(user);
+
+        sendActivationEmail(user.getUsername(), activationToken);
 
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
@@ -148,6 +181,17 @@ public class AuthenticationService {
 
         return new RegisterSpRequestResponseDTO(user.getId(), "User Created Successfully", user.getName(), user.getSurname(), user.getPhoneNumber(),request.getAddress(), user.getUsername(), user.getPhoto(), user.getCompany(),user.getDescription(), null, accessToken, refreshToken);
 
+    }
+
+    private void sendActivationEmail(String email, String token) {
+        String activationLink = "http://localhost:8080/api/auth/activate?token=" + token;
+        emailService.sendMail(
+                "system@eventplanner.com",
+                email,
+                "Activate Your Account",
+                "Click the link to activate your account: " + activationLink +
+                        ". The link will expire in 24 hours."
+        );
     }
 
     public LoginResponseDTO authenticate(LoginRequestDTO request) {
@@ -159,6 +203,11 @@ public class AuthenticationService {
         );
 
         User user = repository.findByUsername(request.getEmail()).orElseThrow();
+
+        if (!user.isVerified()) {
+            throw new RuntimeException("Account not verified. Please verify your email.");
+        }
+
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 

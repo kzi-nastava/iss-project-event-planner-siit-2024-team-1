@@ -107,4 +107,13 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64URL.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+    public String generateActivationToken(User user, long activationTokenExpire) {
+        return Jwts.builder()
+                .setSubject(user.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + activationTokenExpire))
+                .signWith(getSigninKey())
+                .compact();
+    }
 }

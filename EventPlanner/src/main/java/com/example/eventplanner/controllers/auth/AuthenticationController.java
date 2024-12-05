@@ -6,13 +6,12 @@ import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.services.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController("api/v1/auth")
 public class    AuthenticationController {
 
     private final AuthenticationService authService;
@@ -30,6 +29,16 @@ public class    AuthenticationController {
 //            ) {
 //        return ResponseEntity.ok(authService.registerAu(request));
 //    }
+
+    @GetMapping("/activate")
+    public ResponseEntity<String> activateUser(@RequestParam("token") String token) {
+        try {
+            String message = authService.verifyUser(token);
+            return ResponseEntity.ok(message);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 
     @PostMapping("/register-eo")
     public ResponseEntity<RegisterEoRequestResponseDTO> registerEo(
