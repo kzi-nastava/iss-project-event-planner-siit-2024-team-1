@@ -39,11 +39,10 @@ public class User {
     private String username;
     private String password;
     private String photo;
-    private boolean active;
     private Role role;
     private String authorities;
 
-    private boolean isVerified = false;
+    private boolean active = false;
     private String activationToken;
     private Date tokenExpiration;
 

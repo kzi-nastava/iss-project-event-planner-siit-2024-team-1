@@ -92,7 +92,7 @@ public class AuthenticationService {
         String activationToken = jwtService.generateActivationToken(user, activationTokenExpire);
         user.setActivationToken(activationToken);
         user.setTokenExpiration(new Date(System.currentTimeMillis() + activationTokenExpire));
-        user.setVerified(false);
+        user.setActive(false);
 
         user = repository.save(user);
 
@@ -122,7 +122,7 @@ public class AuthenticationService {
         }
 
         // Update user status to verified
-        user.setVerified(true);
+        user.setActive(true);
         user.setActivationToken(null); // Clear the activation token
         user.setTokenExpiration(null); // Clear the token expiration
         repository.save(user);
@@ -168,7 +168,7 @@ public class AuthenticationService {
         String activationToken = jwtService.generateActivationToken(user, activationTokenExpire);
         user.setActivationToken(activationToken);
         user.setTokenExpiration(new Date(System.currentTimeMillis() + activationTokenExpire));
-        user.setVerified(false);
+        user.setActive(false);
 
         user = repository.save(user);
 
@@ -184,13 +184,13 @@ public class AuthenticationService {
     }
 
     private void sendActivationEmail(String email, String token) {
-        String activationLink = "http://localhost:8080/api/auth/activate?token=" + token;
+        String activationLink = "http://localhost:8080/api/v1/auth/activate?token=" + token;
         emailService.sendMail(
                 "system@eventplanner.com",
                 email,
                 "Activate Your Account",
-                "Click the link to activate your account: " + activationLink +
-                        ". The link will expire in 24 hours."
+                "Click the link to activate your account: \n\n" + activationLink +
+                        "\n\nThe link will expire in 24 hours."
         );
     }
 
@@ -204,7 +204,7 @@ public class AuthenticationService {
 
         User user = repository.findByUsername(request.getEmail()).orElseThrow();
 
-        if (!user.isVerified()) {
+        if (!user.isActive()) {
             throw new RuntimeException("Account not verified. Please verify your email.");
         }
 
