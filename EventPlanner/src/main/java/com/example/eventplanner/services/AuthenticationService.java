@@ -215,7 +215,7 @@ public class AuthenticationService {
 
         saveUserToken(accessToken, refreshToken, user);
 
-        return new LoginResponseDTO(user.getUsername(), accessToken, refreshToken);
+        return new LoginResponseDTO(accessToken, refreshToken);
 
     }
     private void revokeAllTokenByUser(User user) {

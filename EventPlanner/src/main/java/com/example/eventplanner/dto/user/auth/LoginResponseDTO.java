@@ -1,22 +1,12 @@
 package com.example.eventplanner.dto.user.auth;
 
 public class LoginResponseDTO {
-    private String email;
     private String accessToken;
     private String refreshToken;
 
-    public LoginResponseDTO(String email, String accessToken, String refreshToken) {
-        this.email = email;
+    public LoginResponseDTO(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getAccessToken() {
