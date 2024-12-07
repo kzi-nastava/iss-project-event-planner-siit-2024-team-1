@@ -1,32 +1,23 @@
 package com.example.eventplanner.controllers.merchandise;
 
-import com.example.eventplanner.dto.filter.EventFiltersDTO;
-import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.filter.ServiceFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
-import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
-import com.example.eventplanner.dto.merchandise.service.ReservationResponseDTO;
-import com.example.eventplanner.dto.merchandise.service.GetAllServicesResponseDTO;
-import com.example.eventplanner.dto.merchandise.service.GetServiceByIdResponseDTO;
-import com.example.eventplanner.dto.merchandise.service.FilterServiceRequestDTO;
+import com.example.eventplanner.dto.merchandise.service.*;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceRequestDTO;
-import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceResponseDTO;
 import com.example.eventplanner.services.merchandise.ServiceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 @CrossOrigin
@@ -47,21 +38,26 @@ public class ServiceController {
 
     @GetMapping()
     public ResponseEntity<GetAllServicesResponseDTO> GetAll() {
-        return ResponseEntity.ok( new GetAllServicesResponseDTO());
-    }
-
-    @GetMapping("sp/{id}")
-    public ResponseEntity<GetAllServicesResponseDTO> GetAllById(@PathVariable(value = "id") long id) {
         return ResponseEntity.ok(new GetAllServicesResponseDTO());
     }
 
+    @GetMapping("sp/{id}")
+    public ResponseEntity<List<ServiceOverviewDTO>> GetAllBySpId(@PathVariable(value = "id") int id) {
+        List<ServiceOverviewDTO> responseDTO = serviceService.getAllBySpId(id);
+        return ResponseEntity.ok(responseDTO);
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<GetServiceByIdResponseDTO> GetById(@PathVariable(value = "id") long id) {
+    public ResponseEntity<GetServiceByIdResponseDTO> GetById(@PathVariable(value = "id") int id) {
         return ResponseEntity.ok(new GetServiceByIdResponseDTO());
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<GetAllServicesResponseDTO> GetFiltered(@RequestBody FilterServiceRequestDTO filterRequest) {
+    public ResponseEntity<GetAllServicesResponseDTO> GetFiltered(
+            @RequestParam (required = false) String category,
+            @RequestParam (required = false) String eventType,
+            @RequestParam (required = false) double maxPrice,
+            @RequestParam (required = false) boolean available) {
         return ResponseEntity.ok(new GetAllServicesResponseDTO());
     }
 
@@ -72,17 +68,20 @@ public class ServiceController {
 
     @PostMapping()
     public ResponseEntity<CreateServiceResponseDTO> Create(@RequestBody CreateServiceRequestDTO request) {
-        return ResponseEntity.ok(new CreateServiceResponseDTO());
+        CreateServiceResponseDTO createServiceResponseDTO = serviceService.createService(request);
+        return new ResponseEntity<>(createServiceResponseDTO, HttpStatus.CREATED);
     }
 
-    @PutMapping()
-    public ResponseEntity<UpdateServiceResponseDTO> Update(@RequestBody UpdateServiceRequestDTO request) {
-        return ResponseEntity.ok(new UpdateServiceResponseDTO());
+    @PutMapping("/{id}")
+    public ResponseEntity<CreateServiceResponseDTO> Update(@PathVariable int id, @RequestBody UpdateServiceRequestDTO request) {
+        CreateServiceResponseDTO responseDTO = serviceService.updateService(id, request);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable int id) {
-        return ResponseEntity.ok("success");
+    public ResponseEntity<Void> delete(@PathVariable int id) {
+        serviceService.deleteService(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/review")
