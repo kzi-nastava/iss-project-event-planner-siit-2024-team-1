@@ -15,9 +15,13 @@ import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -143,4 +147,22 @@ public class UserService {
 
         return responseDTO;
     }
+
+
+
+    // Optional: Method to add an event to followed events
+    public void followEvent(int userId, int eventId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        // Check if the event is not already followed
+       Event event = eventRepository.findById(userId)
+               .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+        if (!user.getFollowedEvents().contains(event)) {
+            user.getFollowedEvents().add(event);
+            userRepository.save(user);
+        }
+    }
+
+
 }

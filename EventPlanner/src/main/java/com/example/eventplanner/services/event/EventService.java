@@ -13,10 +13,13 @@ import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.Product;
+import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.event.ActivityRepository;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.eventType.EventTypeRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
+import com.example.eventplanner.repositories.user.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -26,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class EventService {
     private final EventTypeRepository eventTypeRepository;
     private final MerchandiseRepository merchandiseRepository;
     private final ActivityRepository activityRepository;
+    private final UserRepository userRepository;
 
     public Page<EventOverviewDTO> getTop(Pageable pageable) {
         return eventRepository.findAll(pageable)
@@ -43,6 +48,14 @@ public class EventService {
     public Page<EventOverviewDTO> getAll(Pageable pageable) {
         return eventRepository.findAll(pageable)
                 .map(this::convertToOverviewDTO);
+    }
+
+    public List<EventOverviewDTO> getUserFollowedEvents(int userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        return user.getFollowedEvents().stream()
+                .map(this::convertToOverviewDTO)
+                .collect(Collectors.toList());
     }
 
     public Page<EventOverviewDTO> search(EventFiltersDTO eventFiltersDTO, String search, Pageable pageable) {

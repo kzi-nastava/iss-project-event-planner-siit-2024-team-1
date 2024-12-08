@@ -1,15 +1,13 @@
 package com.example.eventplanner.services;
 
 import com.example.eventplanner.dto.common.AddressDTO;
+import com.example.eventplanner.dto.event.InviteResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
 import com.example.eventplanner.dto.user.auth.*;
 import com.example.eventplanner.model.auth.AuthenticationResponse;
 import com.example.eventplanner.model.auth.Token;
 import com.example.eventplanner.model.common.Address;
-import com.example.eventplanner.model.user.BusinessPhoto;
-import com.example.eventplanner.model.user.EventOrganizer;
-import com.example.eventplanner.model.user.ServiceProvider;
-import com.example.eventplanner.model.user.User;
+import com.example.eventplanner.model.user.*;
 import com.example.eventplanner.repositories.auth.TokenRepository;
 import com.example.eventplanner.repositories.user.EventOrganizerRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
@@ -27,6 +25,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +41,7 @@ public class AuthenticationService {
     private final EmailService emailService;
     private final TokenRepository tokenRepository;
     private final AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
 
 
 //    public RegisterAuUserResponseRequestDTO registerAu(RegisterAuUserRequestDTO request) {
@@ -181,6 +182,26 @@ public class AuthenticationService {
 
         return new RegisterSpRequestResponseDTO(user.getId(), "User Created Successfully", user.getName(), user.getSurname(), user.getPhoneNumber(),request.getAddress(), user.getUsername(), user.getPhoto(), user.getCompany(),user.getDescription(), null, accessToken, refreshToken);
 
+    }
+
+    public LoginResponseDTO fastRegister(String email){
+        AuthenticatedUser authenticatedUser = new AuthenticatedUser();
+        authenticatedUser.setUsername(email);
+        String userPassword=generateSecurePassword();
+        authenticatedUser.setPassword(passwordEncoder.encode(userPassword));
+        authenticatedUser.setActive(true);
+        authenticatedUser.setAddress(new Address());
+        emailService.sendMail("system@eventplanner.com",email,"Generated Password","Dear user, your password has been automatically generated, please" +
+                " change it as soon as possible! <br><br>Password:<br>"+userPassword);
+        userRepository.save(authenticatedUser);
+        return authenticate(new LoginRequestDTO(email,userPassword));
+    }
+
+    private String generateSecurePassword() {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] randomBytes = new byte[16];
+        secureRandom.nextBytes(randomBytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
     }
 
     private void sendActivationEmail(String email, String token) {
