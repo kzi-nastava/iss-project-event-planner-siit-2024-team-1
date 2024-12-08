@@ -371,7 +371,7 @@ INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
 -- INSERT INTO public."user"(
 --     active, id, latitude, longitude, "number", role, user_type, authorities, city, company, description, name, password, phone_number, photo, street, surname, username, activation_token, token_expiration)
 -- VALUES
---     (true, 1, 40.7128, -74.0060, 123, '0', 'authenticated_user', 'USER', 'New York', 'TechCorp', 'Software engineer', 'John', 'password123', '555-1234', 'john_doe.jpg', '5th Ave', 'Doe', 'john.doe@gmail.com', '', '2024-12-31'),
+--     (true, 1, 40.7128, -74.0060, 123, '0', 'authenticatedUser', 'USER', 'New York', 'TechCorp', 'Software engineer', 'John', '$2a$10$3TYrKiXr/LEDyMPvjtvqU.VApcWoOrpUetE8PaiW6DXkB4I0kCYYm', '555-1234', 'john_doe.jpg', '5th Ave', 'Doe', 'john.doe@gmail.com', '', '2024-12-31'),
 --     (true, 2, 34.0522, -118.2437, 456, '2', 'ServiceProvider', 'USER', 'Los Angeles', 'Creative Solutions', 'Graphic designer', 'Jane', 'password456', '555-5678', 'jane_smith.jpg', 'Sunset Blvd', 'Smith', 'jane.smith@example.com', null, null),
 --     (true, 3, 51.5074, -0.1278, 789, '1', 'event_organizer', 'USER', 'London', 'Innovate Ltd', 'Marketing manager', 'Alice', 'password789', '555-8765', 'alice_white.jpg', 'Oxford St', 'White', 'alice.white@gmail.com', null, null),
 --     (true, 4, 48.8566, 2.3522, 101, '1', 'event_organizer', 'USER', 'Paris', 'Design Works', 'Product designer', 'Bob', 'password101', '555-1122', 'bob_brown.jpg', 'Champs-Elysees', 'Brown', 'bob.brown@example.com', null, null),
@@ -381,5 +381,18 @@ INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
 --     (true, 8, 34.0522, -118.2437, 505, '1', 'service_provider', 'USER', 'Los Angeles', 'Tech Synergy', 'Software architect', 'Frank', 'password505', '555-7788', 'frank_lee.jpg', 'Wilshire Blvd', 'Lee', 'frank.lee@example.com', null, null),
 --     (true, 9, 35.6895, 139.6917, 606, '2', 'event_organizer', 'USER', 'Tokyo', 'Creative Minds', 'Data scientist', 'Grace', 'password606', '555-8899', 'grace_kim.jpg', 'Shibuya', 'Kim', 'grace.kim@gmail.com', null, null),
 --     (true, 10, 40.7306, -73.9352, 707, '2', 'service_provider', 'USER', 'New York', 'DesignHub', 'UX designer', 'Hank', 'password707', '555-9900', 'hank_jones.jpg', 'Park Ave', 'Jones', 'hank.jones@example.com', null, null);
---
+
+INSERT INTO public."user" (active, id, latitude, longitude, number, role, token_expiration, user_type, activation_token, authorities, city, company, description, name, password, phone_number, photo, street, surname, username) VALUES (true, 1, 1, 1, 1, 1, '2024-12-09 19:22:23.471000', 'ServiceProvider', 'eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqb2huYWRvZUBleGFtcGxlLmNvbSIsImlhdCI6MTczMzY4MjE0MywiZXhwIjoxNzMzNzY4NTQzfQ.F2Q4zEG8q4i8FLBOfD6biTKGmMcjpDC-2aw505OutNKF3w8lF901qxGLVI1KKmsh', 'ahahah', 'asda', 'asd', 'asdasd', 'asd', '$2a$10$3TYrKiXr/LEDyMPvjtvqU.VApcWoOrpUetE8PaiW6DXkB4I0kCYYm', 'asdas', null, 'sasd', 'asd', 'johnadoe@example.com');
+INSERT INTO public."user" (active, id, latitude, longitude, number, role, token_expiration, user_type, activation_token, authorities, city, company, description, name, password, phone_number, photo, street, surname, username) VALUES (true, 2, 1, 1, 1, 1, '2024-12-09 19:39:51.043000', 'ServiceProvider', 'eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhQGEuYSIsImlhdCI6MTczMzY4MzE5MSwiZXhwIjoxNzMzNzY5NTkxfQ.6kntnma1lTlTT1Kj2oZVI14pIDfWmwnXqi6FYWYHyf9_t1G-gQ5lG446ixDxRPEE', 'ahahah', 'asd', 'asd', 'asd', 'asd', '$2a$10$COCA2xSgJHIrM5RODGOIROdelB1Xz7AD0W9YKuyGD08eEY74VXmLG', 'asd', null, 'asd', 'asd', 'a@a.a');
+
+UPDATE public.id_generator
+SET next_val = 100
+WHERE sequence_name = 'user';
+
+-- insert into user_followed_events(event_id,user_id)
+-- values
+--     (1,1),
+--     (2,1),
+--     (3,1);
+
 -- insert into user_merchandise(merchandise_id,service_provider_id) values (4,2);

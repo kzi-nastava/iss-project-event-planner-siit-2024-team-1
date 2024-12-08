@@ -1,12 +1,12 @@
 package com.example.eventplanner.controllers.event;
 
 import com.example.eventplanner.dto.event.*;
-import com.example.eventplanner.dto.eventType.CreateEventTypeDTO;
 import com.example.eventplanner.dto.filter.EventFiltersDTO;
+import com.example.eventplanner.services.JwtService;
 import com.example.eventplanner.services.event.EventService;
+import com.example.eventplanner.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 @CrossOrigin
@@ -24,6 +23,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
+    private final UserService userService;
+    private final JwtService jwtService;
     @GetMapping("/top")
     public ResponseEntity<Page<EventOverviewDTO>> getTopEvents(
             @PageableDefault(size = 5, sort = "date", direction = Sort.Direction.DESC) Pageable eventPage
@@ -35,6 +36,13 @@ public class EventController {
             @PageableDefault(size = 10, sort = "date", direction = Sort.Direction.DESC) Pageable eventPage
     ) {
         return ResponseEntity.ok(eventService.getAll(eventPage));
+    }
+
+    @GetMapping("/followed")
+    public ResponseEntity<List<EventOverviewDTO>> getFollowedEvents(
+            @RequestParam int userId
+    ) {
+        return ResponseEntity.ok(eventService.getUserFollowedEvents(userId));
     }
 
     @GetMapping("/search")
@@ -93,5 +101,13 @@ public class EventController {
 
         // Return the created event DTO
         return ResponseEntity.ok(activityDTOs);
+    }
+
+    @PostMapping("/invite")
+    public ResponseEntity<InviteResponseDTO> login(
+            @RequestParam String email,
+            @RequestParam int eventId
+    ) {
+        return ResponseEntity.ok(jwtService.inviteToEvent(eventId,email));
     }
 }

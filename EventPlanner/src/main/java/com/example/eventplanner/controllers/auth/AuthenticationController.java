@@ -1,5 +1,6 @@
 package com.example.eventplanner.controllers.auth;
 
+import com.example.eventplanner.dto.event.InviteResponseDTO;
 import com.example.eventplanner.dto.user.auth.*;
 import com.example.eventplanner.model.auth.AuthenticationResponse;
 import com.example.eventplanner.model.user.User;
@@ -51,6 +52,13 @@ public class    AuthenticationController {
             @RequestBody RegisterSpRequestDTO request
     ) {
         return ResponseEntity.ok(authService.registerSp(request));
+    }
+
+    @PostMapping("/fast-register")
+    public ResponseEntity<LoginResponseDTO> fastRegister(
+            @RequestParam String email
+    ) {
+        return ResponseEntity.ok(authService.fastRegister(email));
     }
 
     @PostMapping("/login")
