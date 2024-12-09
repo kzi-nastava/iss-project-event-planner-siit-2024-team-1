@@ -104,7 +104,7 @@ public class EventController {
     }
 
     @PostMapping("/invite")
-    public ResponseEntity<InviteResponseDTO> login(
+    public ResponseEntity<InviteResponseDTO> inviteToEvent(
             @RequestParam String email,
             @RequestParam int eventId
     ) {
