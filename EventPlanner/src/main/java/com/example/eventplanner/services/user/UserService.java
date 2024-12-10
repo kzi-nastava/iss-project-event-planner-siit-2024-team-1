@@ -206,7 +206,7 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
         // Check if the event is not already followed
-       Event event = eventRepository.findById(userId)
+       Event event = eventRepository.findById(eventId)
                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
         if (!user.getFollowedEvents().contains(event)) {
             user.getFollowedEvents().add(event);
