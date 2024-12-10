@@ -42,8 +42,8 @@ public class ServiceController {
     }
 
     @GetMapping("sp/{id}")
-    public ResponseEntity<List<ServiceOverviewDTO>> GetAllBySpId(@PathVariable(value = "id") int id) {
-        List<ServiceOverviewDTO> responseDTO = serviceService.getAllBySpId(id);
+    public ResponseEntity<List<CreateServiceResponseDTO>> GetAllBySpId(@PathVariable(value = "id") int id) {
+        List<CreateServiceResponseDTO> responseDTO = serviceService.getAllBySpId(id);
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -66,19 +66,19 @@ public class ServiceController {
         return ResponseEntity.ok(new GetServiceByIdResponseDTO());
     }
 
-    @PostMapping()
+    @PostMapping("/create")
     public ResponseEntity<CreateServiceResponseDTO> Create(@RequestBody CreateServiceRequestDTO request) {
         CreateServiceResponseDTO createServiceResponseDTO = serviceService.createService(request);
         return new ResponseEntity<>(createServiceResponseDTO, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("update/{id}")
     public ResponseEntity<CreateServiceResponseDTO> Update(@PathVariable int id, @RequestBody UpdateServiceRequestDTO request) {
         CreateServiceResponseDTO responseDTO = serviceService.updateService(id, request);
         return ResponseEntity.ok(responseDTO);
     }
 
-    @DeleteMapping("/{id}")
+    @PutMapping("delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable int id) {
         serviceService.deleteService(id);
         return ResponseEntity.noContent().build();

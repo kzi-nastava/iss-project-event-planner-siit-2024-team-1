@@ -10,6 +10,7 @@ import lombok.Data;
 import java.util.List;
 @Data
 public class CreateServiceResponseDTO {
+    private int id;
     private String title;
     private String description;
     private String specificity;
@@ -26,5 +27,5 @@ public class CreateServiceResponseDTO {
     private List<EventType> eventTypes;
     private AddressDTO address;
     private Category category;
-
+    private int serviceProviderId;
 }
