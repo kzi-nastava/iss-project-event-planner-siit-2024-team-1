@@ -8,7 +8,9 @@ import com.example.eventplanner.dto.merchandise.service.*;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceRequestDTO;
+import com.example.eventplanner.services.merchandise.ServiceReservationException;
 import com.example.eventplanner.services.merchandise.ServiceService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,7 +20,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -29,11 +33,38 @@ public class ServiceController {
 
 
     @PostMapping("/{serviceId}/reserve")
-    public ResponseEntity<ReservationResponseDTO> reserveService(
+    public ResponseEntity<?> reserveService(
             @PathVariable int serviceId,
             @Valid @RequestBody ReservationRequestDTO request) {
-        ReservationResponseDTO response = serviceService.reserveService(serviceId, request);
-        return ResponseEntity.ok(response);
+        try {
+            ReservationResponseDTO response = serviceService.reserveService(serviceId, request);
+            return ResponseEntity.ok(response);
+        } catch (ServiceReservationException e) {
+            // Create a detailed error response
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("errorType", e.getErrorType());
+            errorResponse.put("message", e.getMessage());
+
+            // Return appropriate HTTP status based on error type
+            switch (e.getErrorType()) {
+                case SERVICE_NOT_FOUND:
+                case EVENT_NOT_FOUND:
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+                case TIMING_CONSTRAINT_VIOLATION:
+                case DURATION_CONSTRAINT_VIOLATION:
+                case TIME_SLOT_ALREADY_BOOKED:
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+                default:
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            }
+        }
+
+    }
+
+    @GetMapping("/{serviceId}/timeslots")
+    public ResponseEntity<List<TimeSlotDTO>> getServiceTimeslots(@PathVariable int serviceId) {
+        List<TimeSlotDTO> timeslots = serviceService.getServiceTimeslots(serviceId);
+        return ResponseEntity.ok(timeslots);
     }
 
     @GetMapping()

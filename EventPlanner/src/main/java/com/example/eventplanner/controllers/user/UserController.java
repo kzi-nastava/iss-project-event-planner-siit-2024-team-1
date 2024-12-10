@@ -2,6 +2,7 @@ package com.example.eventplanner.controllers.user;
 
 import com.example.eventplanner.dto.event.EventOverviewDTO;
 //import com.example.eventplanner.dto.event.FollowEventResponseDTO;
+import com.example.eventplanner.dto.event.FollowEventResponseDTO;
 import com.example.eventplanner.dto.merchandise.FavoriteResponseDTO;
 import com.example.eventplanner.dto.user.GetAuByIdResponseDTO;
 import com.example.eventplanner.dto.user.GetEoByIdResponseDTO;
@@ -67,12 +68,12 @@ public class UserController {
         return ResponseEntity.ok(new FavoriteResponseDTO());
     }
 
-//    @PostMapping("/follow-event")
-//    public ResponseEntity<FollowEventResponseDTO> followEvent(
-//            @RequestParam int userId,
-//            @RequestParam int eventId
-//    ) {
-//        userService.followEvent(userId,eventId);
-//        return ResponseEntity.ok(new FollowEventResponseDTO(userId,eventId));
-//    }
+    @PostMapping("/follow-event")
+    public ResponseEntity<FollowEventResponseDTO> followEvent(
+            @RequestParam int userId,
+            @RequestParam int eventId
+    ) {
+        userService.followEvent(userId,eventId);
+        return ResponseEntity.ok(new FollowEventResponseDTO(userId,eventId));
+    }
 }
