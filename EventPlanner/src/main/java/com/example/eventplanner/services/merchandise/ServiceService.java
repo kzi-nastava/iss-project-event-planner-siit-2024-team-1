@@ -8,6 +8,7 @@ import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
 import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.ReservationResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.ServiceOverviewDTO;
+import com.example.eventplanner.dto.merchandise.service.TimeSlotDTO;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceRequestDTO;
@@ -31,6 +32,7 @@ import com.example.eventplanner.repositories.merchandise.TimeslotRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
 import com.example.eventplanner.services.email.EmailService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -155,36 +157,38 @@ public class ServiceService {
     @Transactional
     public ReservationResponseDTO reserveService(int serviceId, ReservationRequestDTO request) {
         // Fetch the service
-        com.example.eventplanner.model.merchandise.Service service = null;
-        try {
-            service = serviceRepository.findAvailableServiceById(serviceId)
-                    .orElseThrow(() -> new Exception("Service not found or unavailable"));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // Fetch the service
+        com.example.eventplanner.model.merchandise.Service service = serviceRepository.findAvailableServiceById(serviceId)
+                .orElseThrow(() -> new ServiceReservationException(
+                        "Service not found or unavailable",
+                        ServiceReservationException.ErrorType.SERVICE_NOT_FOUND
+                ));
 
         // Fetch the event
-        Event event = null;
-        try {
-            event = eventRepository.findById(request.getEventId())
-                    .orElseThrow(() -> new Exception("Event not found"));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        Event event = eventRepository.findById(request.getEventId())
+                .orElseThrow(() -> new ServiceReservationException(
+                        "Event not found",
+                        ServiceReservationException.ErrorType.EVENT_NOT_FOUND
+                ));
 
         // Validate reservation timing
         try {
             validateReservationTiming(service, event, request);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ServiceReservationException(
+                    "Reservation timing is invalid: " + e.getMessage(),
+                    ServiceReservationException.ErrorType.TIMING_CONSTRAINT_VIOLATION
+            );
         }
-
 
         // Check time slot availability
         try {
             checkTimeSlotAvailability(service, request);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ServiceReservationException(
+                    "Time slot is not available",
+                    ServiceReservationException.ErrorType.TIME_SLOT_ALREADY_BOOKED
+            );
         }
 
 
@@ -254,6 +258,17 @@ public class ServiceService {
         if (!isTimeSlotAvailable) {
             throw new Exception("Selected time slot is already booked");
         }
+    }
+
+    public List<TimeSlotDTO> getServiceTimeslots(int serviceId) {
+        // Fetch the service
+        com.example.eventplanner.model.merchandise.Service service = serviceRepository.findById(serviceId)
+                .orElseThrow(() -> new EntityNotFoundException("Service not found with id: " + serviceId));
+
+        // Convert timeslots to DTOs
+        return service.getTimeslots().stream()
+                .map(TimeSlotDTO::new)
+                .collect(Collectors.toList());
     }
 
     private LocalDateTime calculateEndTime(com.example.eventplanner.model.merchandise.Service service, ReservationRequestDTO request) {

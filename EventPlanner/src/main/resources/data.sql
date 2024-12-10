@@ -37,7 +37,7 @@ INSERT INTO event (
           'Annual conference exploring cutting-edge technologies',
           500,
           true,
-          '2024-09-15 09:00:00',
+          '2024-12-30 18:00:00',
           75000.00,
           1,
           'Market Street',
@@ -296,7 +296,7 @@ INSERT INTO merchandise (
  'Torta sa mlevenim orajima',
  'Includes venue selection, vendor coordination, and day-of management',
  2000.00, 0, true, true,
- 10, 40, 168, 120, false, false,
+ 10, 40, 5000, 120, false, false,
  'Nova',
  'Klisa',
  1,
@@ -398,4 +398,4 @@ INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
 --     (2,1),
 --     (3,1);
 
--- insert into user_merchandise(merchandise_id,service_provider_id) values (4,2);
+insert into user_merchandise(merchandise_id,service_provider_id) values (4,2);
