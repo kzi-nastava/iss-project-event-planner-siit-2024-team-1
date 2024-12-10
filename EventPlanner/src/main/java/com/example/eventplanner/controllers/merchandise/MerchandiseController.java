@@ -1,5 +1,7 @@
 package com.example.eventplanner.controllers.merchandise;
 
+import com.example.eventplanner.dto.category.CategoryOverviewDTO;
+import com.example.eventplanner.dto.category.GetAllCategoriesDTO;
 import com.example.eventplanner.dto.event.EventOverviewDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.services.merchandise.MerchandiseService;
@@ -34,5 +36,10 @@ public class MerchandiseController {
             @PageableDefault(size = 10, sort = "price", direction = Sort.Direction.DESC) Pageable merchandisePage
     ) {
         return ResponseEntity.ok(merchandiseService.getAll(merchandisePage));
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<GetAllCategoriesDTO> getAllMerchandise() {
+        return ResponseEntity.ok(merchandiseService.getAllCategories());
     }
 }

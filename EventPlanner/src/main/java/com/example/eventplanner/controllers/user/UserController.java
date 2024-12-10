@@ -1,7 +1,7 @@
 package com.example.eventplanner.controllers.user;
 
 import com.example.eventplanner.dto.event.EventOverviewDTO;
-import com.example.eventplanner.dto.event.FollowEventResponseDTO;
+//import com.example.eventplanner.dto.event.FollowEventResponseDTO;
 import com.example.eventplanner.dto.merchandise.FavoriteResponseDTO;
 import com.example.eventplanner.dto.user.GetAuByIdResponseDTO;
 import com.example.eventplanner.dto.user.GetEoByIdResponseDTO;
@@ -24,17 +24,17 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<GetAuByIdResponseDTO> getAuById(@PathVariable(value = "id") int id) {
-        return ResponseEntity.ok(new GetAuByIdResponseDTO());
+        return ResponseEntity.ok(userService.getAuById(id));
     }
 
     @GetMapping("/sp/{id}")
     public ResponseEntity<GetSpByIdResponseDTO> getSpById(@PathVariable(value = "id") int id) {
-        return ResponseEntity.ok(new GetSpByIdResponseDTO());
+        return ResponseEntity.ok(userService.getSpById(id));
     }
 
     @GetMapping("/eo/{id}")
     public ResponseEntity<GetEoByIdResponseDTO> getEoById(@PathVariable(value = "id") int id) {
-        return ResponseEntity.ok(new GetEoByIdResponseDTO());
+        return ResponseEntity.ok(userService.getEoById(id));
     }
 
     @PutMapping("/{userId}/favorite-events/{eventId}")
@@ -67,12 +67,12 @@ public class UserController {
         return ResponseEntity.ok(new FavoriteResponseDTO());
     }
 
-    @PostMapping("/follow-event")
-    public ResponseEntity<FollowEventResponseDTO> followEvent(
-            @RequestParam int userId,
-            @RequestParam int eventId
-    ) {
-        userService.followEvent(userId,eventId);
-        return ResponseEntity.ok(new FollowEventResponseDTO(userId,eventId));
-    }
+//    @PostMapping("/follow-event")
+//    public ResponseEntity<FollowEventResponseDTO> followEvent(
+//            @RequestParam int userId,
+//            @RequestParam int eventId
+//    ) {
+//        userService.followEvent(userId,eventId);
+//        return ResponseEntity.ok(new FollowEventResponseDTO(userId,eventId));
+//    }
 }

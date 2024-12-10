@@ -2,6 +2,7 @@ package com.example.eventplanner.model.event;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.Review;
 import com.example.eventplanner.model.common.Address;
+import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.Notification;
 import com.example.eventplanner.model.user.User;
 import jakarta.persistence.*;
@@ -64,5 +65,7 @@ public class Event {
     @ManyToMany
     private List<User> participants;
 
-
+    @ManyToOne
+    @JoinColumn(name = "organizer_id")
+    private EventOrganizer organizer;
 }

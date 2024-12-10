@@ -1,9 +1,13 @@
 package com.example.eventplanner.services.merchandise;
 
+import com.example.eventplanner.dto.category.CategoryOverviewDTO;
+import com.example.eventplanner.dto.category.GetAllCategoriesDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
+import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.MerchandisePhoto;
+import com.example.eventplanner.repositories.category.CategoryRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MerchandiseService {
     private final MerchandiseRepository merchandiseRepository;
+    private final CategoryRepository categoryRepository;
 
     public List<MerchandiseOverviewDTO> getTop() {
         return merchandiseRepository.findAll().stream()
@@ -52,5 +57,19 @@ public class MerchandiseService {
         dto.setId(photo.getId());
         dto.setPhoto(photo.getPhoto());
         return dto;
+    }
+
+    public GetAllCategoriesDTO getAllCategories(){
+        GetAllCategoriesDTO allCategoriesDTO = new GetAllCategoriesDTO();
+        allCategoriesDTO.setCategories(categoryRepository.findAll().stream().map(this::convertToCategoryOverviewDTO).toList());
+        return allCategoriesDTO;
+    }
+
+    private CategoryOverviewDTO convertToCategoryOverviewDTO(Category category) {
+        CategoryOverviewDTO categoryDTO = new CategoryOverviewDTO();
+        categoryDTO.setId(category.getId());
+        categoryDTO.setTitle(category.getTitle());
+        categoryDTO.setDescription(category.getDescription());
+        return categoryDTO;
     }
 }

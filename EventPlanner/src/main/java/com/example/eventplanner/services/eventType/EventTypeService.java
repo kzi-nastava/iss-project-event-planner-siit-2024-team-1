@@ -24,11 +24,14 @@ public class EventTypeService {
     private final EventTypeRepository eventTypeRepository;
     private final CategoryRepository categoryRepository;
 
-    public List<EventTypeOverviewDTO> getAll() {
-        return eventTypeRepository.findAll()
-                .stream()
-                .map(this::convertToOverviewDTO)
-                .toList();
+    public Page<EventTypeOverviewDTO> getAll(Pageable pageable) {
+        return eventTypeRepository.findAll(pageable)
+                .map(this::convertToOverviewDTO);
+    }
+
+    public EventTypeOverviewDTO getById(int id){
+        return convertToOverviewDTO(eventTypeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("EventType with id " + id + " not found")));
     }
 
     public EventTypeOverviewDTO create(CreateEventTypeDTO dto) {
@@ -49,6 +52,16 @@ public class EventTypeService {
         eventType.setDescription(dto.getDescription());
         eventType.setActive(dto.isActive());
         eventType.setCategories(categoryRepository.findAllById(dto.getRecommendedCategoryIds()));
+
+        EventType updatedEventType = eventTypeRepository.save(eventType);
+        return convertToOverviewDTO(updatedEventType);
+    }
+
+    public EventTypeOverviewDTO deactivate(int id) {
+        EventType eventType = eventTypeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("EventType with id " + id + " not found"));
+
+        eventType.setActive(!eventType.isActive());
 
         EventType updatedEventType = eventTypeRepository.save(eventType);
         return convertToOverviewDTO(updatedEventType);

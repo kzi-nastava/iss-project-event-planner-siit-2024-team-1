@@ -2,6 +2,9 @@ package com.example.eventplanner.services.user;
 
 import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.event.EventOverviewDTO;
+import com.example.eventplanner.dto.user.GetAuByIdResponseDTO;
+import com.example.eventplanner.dto.user.GetEoByIdResponseDTO;
+import com.example.eventplanner.dto.user.GetSpByIdResponseDTO;
 import com.example.eventplanner.dto.user.auth.RegisterEoRequestDTO;
 import com.example.eventplanner.dto.user.auth.RegisterEoRequestResponseDTO;
 import com.example.eventplanner.dto.user.auth.RegisterSpRequestDTO;
@@ -13,6 +16,7 @@ import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.event.EventRepository;
+import com.example.eventplanner.repositories.user.EventOrganizerRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -30,6 +34,52 @@ public class UserService {
     private final EventRepository eventRepository;
     private final ServiceProviderRepository serviceProviderRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EventOrganizerRepository eventOrganizerRepository;
+
+    public GetAuByIdResponseDTO getAuById(int id){
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        GetAuByIdResponseDTO responseDTO = new GetAuByIdResponseDTO();
+        responseDTO.setEmail(user.getUsername());
+        responseDTO.setName(user.getName());
+        responseDTO.setSurname(user.getSurname());
+        responseDTO.setPhoneNumber(user.getPhoneNumber());
+        responseDTO.setAddress(user.getAddress());
+        responseDTO.setPhoto(user.getPhoto());
+        return responseDTO;
+    }
+
+    public GetEoByIdResponseDTO getEoById(int id){
+        User user = eventOrganizerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        GetEoByIdResponseDTO responseDTO = new GetEoByIdResponseDTO();
+        responseDTO.setEmail(user.getUsername());
+        responseDTO.setName(user.getName());
+        responseDTO.setSurname(user.getSurname());
+        responseDTO.setPhoneNumber(user.getPhoneNumber());
+        responseDTO.setAddress(user.getAddress());
+        responseDTO.setPhoto(user.getPhoto());
+        return responseDTO;
+    }
+
+    public GetSpByIdResponseDTO getSpById(int id){
+        ServiceProvider user = serviceProviderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        GetSpByIdResponseDTO responseDTO = new GetSpByIdResponseDTO();
+        responseDTO.setEmail(user.getUsername());
+        responseDTO.setName(user.getName());
+        responseDTO.setSurname(user.getSurname());
+        responseDTO.setPhoneNumber(user.getPhoneNumber());
+        responseDTO.setAddress(user.getAddress());
+        responseDTO.setPhoto(user.getPhoto());
+
+        responseDTO.setCompany(user.getCompany());
+        responseDTO.setDescription(user.getDescription());
+        return responseDTO;
+    }
 
     public EventOverviewDTO addEventToFavorites(int userId, int eventId) {
         // Fetch the user
@@ -69,7 +119,7 @@ public class UserService {
             return new UpdateEoResponseDTO(id, "User Doesn't Exist", null,null, null,null, null);
         }
 
-        EventOrganizer user = new EventOrganizer();
+        EventOrganizer user = eventOrganizerRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         user.setName(request.getName());
         user.setSurname(request.getSurname());
         user.setPhoneNumber(request.getPhoneNumber());
@@ -101,7 +151,7 @@ public class UserService {
             return new UpdateSpResponseDTO(id, "User Doesn't Exist", null,null, null,null, null, null,null);
         }
 
-        ServiceProvider user = serviceProviderRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        ServiceProvider user =  serviceProviderRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         user.setName(request.getName());
         user.setSurname(request.getSurname());
         user.setPhoneNumber(request.getPhoneNumber());

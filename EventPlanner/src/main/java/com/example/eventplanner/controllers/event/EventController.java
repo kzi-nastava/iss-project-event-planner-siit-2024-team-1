@@ -38,6 +38,13 @@ public class EventController {
         return ResponseEntity.ok(eventService.getAll(eventPage));
     }
 
+    @GetMapping("/eo/{id}")
+    public ResponseEntity<Page<EventOverviewDTO>> getEventsByEo(@PathVariable int id,
+            @PageableDefault(size = 10, sort = "date", direction = Sort.Direction.DESC) Pageable eventPage
+    ) {
+        return ResponseEntity.ok(eventService.getByEo(id, eventPage));
+    }
+
     @GetMapping("/followed")
     public ResponseEntity<List<EventOverviewDTO>> getFollowedEvents(
             @RequestParam int userId

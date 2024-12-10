@@ -13,11 +13,13 @@ import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.Product;
+import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.event.ActivityRepository;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.eventType.EventTypeRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
+import com.example.eventplanner.repositories.user.EventOrganizerRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
@@ -35,6 +37,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;
+    private final EventOrganizerRepository eventOrganizerRepository;
     private final EventTypeRepository eventTypeRepository;
     private final MerchandiseRepository merchandiseRepository;
     private final ActivityRepository activityRepository;
@@ -48,6 +51,10 @@ public class EventService {
     public Page<EventOverviewDTO> getAll(Pageable pageable) {
         return eventRepository.findAll(pageable)
                 .map(this::convertToOverviewDTO);
+    }
+
+    public Page<EventOverviewDTO> getByEo(int id, Pageable pageable) {
+        return eventRepository.findByOrganizerId(id, pageable).map(this::convertToOverviewDTO);
     }
 
     public List<EventOverviewDTO> getUserFollowedEvents(int userId) {
@@ -147,6 +154,7 @@ public class EventService {
         dto.setDescription(event.getDescription());
         dto.setMaxParticipants(event.getMaxParticipants());
         dto.setPublic(event.isPublic());
+        dto.setOrganizer(convertToEoDTO(event.getOrganizer()));
 
         return dto;
     }
@@ -172,6 +180,9 @@ public class EventService {
         merchandise.addAll(merchandiseRepository.findAllById(dto.getServiceIds()));
         event.setMerchandise(merchandise);
 
+        EventOrganizer eventOrganizer = eventOrganizerRepository.findById(dto.getOrganizerId()).orElseThrow();
+        event.setOrganizer(eventOrganizer);
+
         Event savedEvent = eventRepository.save(event);
 
         return mapToCreatedEventOverviewDTO(savedEvent, eventType, merchandise);
@@ -179,11 +190,13 @@ public class EventService {
 
     private CreatedEventOverviewDTO mapToCreatedEventOverviewDTO(Event event, EventType eventType, List<Merchandise> merchandise) {
         CreatedEventOverviewDTO dto = new CreatedEventOverviewDTO();
+        dto.setId(event.getId());
         dto.setTitle(event.getTitle());
         dto.setDescription(event.getDescription());
         dto.setMaxParticipants(event.getMaxParticipants());
         dto.setPublic(event.isPublic());
         dto.setDate(event.getDate());
+        dto.setOrganizer(convertToEoDTO(event.getOrganizer()));
 
         // Map address
         AddressDTO addressDTO = new AddressDTO();
@@ -232,6 +245,15 @@ public class EventService {
         dto.setServices(serviceDTOs);
 
         return dto;
+    }
+
+    private EventOrganizerDTO convertToEoDTO(EventOrganizer eventOrganizer) {
+        EventOrganizerDTO eventOrganizerDTO = new EventOrganizerDTO();
+        eventOrganizerDTO.setId(eventOrganizer.getId());
+        eventOrganizerDTO.setEmail(eventOrganizer.getUsername());
+        eventOrganizerDTO.setName(eventOrganizer.getName());
+        eventOrganizerDTO.setSurname(eventOrganizer.getSurname());
+        return eventOrganizerDTO;
     }
 
     private EventOverviewDTO convertToOverviewDTO(Event event) {
