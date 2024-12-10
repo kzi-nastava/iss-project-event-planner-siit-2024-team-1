@@ -37,8 +37,8 @@ public class ServiceController {
     }
 
     @GetMapping()
-    public ResponseEntity<GetAllServicesResponseDTO> GetAll() {
-        return ResponseEntity.ok(new GetAllServicesResponseDTO());
+    public ResponseEntity<List<MerchandiseOverviewDTO>> GetAll() {
+        return ResponseEntity.ok(serviceService.getAll());
     }
 
     @GetMapping("sp/{id}")
