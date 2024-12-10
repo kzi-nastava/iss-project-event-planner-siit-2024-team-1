@@ -85,6 +85,10 @@ public class ServiceService {
         return spec;
     }
 
+    public List<MerchandiseOverviewDTO> getAll(){
+        return serviceRepository.findAll().stream().map(this::convertToOverviewDTO).toList();
+    }
+
     private Specification<com.example.eventplanner.model.merchandise.Service> addCategoryFilter(Specification<com.example.eventplanner.model.merchandise.Service> spec, ServiceFiltersDTO ServiceFiltersDTO) {
         if (StringUtils.hasText(ServiceFiltersDTO.getCategory())) {
             return spec.and((root, query, criteriaBuilder) ->

@@ -18,16 +18,23 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api/v1/event-types")
 @RequiredArgsConstructor
 public class EventTypeController {
     private final EventTypeService eventTypeService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<EventTypeOverviewDTO>> getAllEventTypes(
+    public ResponseEntity<Page<EventTypeOverviewDTO>> getAllEventTypes(
             @PageableDefault(size = 10) Pageable eventPage
     ) {
-        return ResponseEntity.ok(eventTypeService.getAll());
+        return ResponseEntity.ok(eventTypeService.getAll(eventPage));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EventTypeOverviewDTO> getById(@PathVariable int id
+    ) {
+        return ResponseEntity.ok(eventTypeService.getById(id));
     }
 
     @PostMapping
@@ -41,6 +48,13 @@ public class EventTypeController {
             @PathVariable int id,
             @RequestBody UpdateEventTypeDTO dto) {
         EventTypeOverviewDTO updatedEventType = eventTypeService.update(id, dto);
+        return ResponseEntity.ok(updatedEventType);
+    }
+
+    @PutMapping("/deactivate/{id}")
+    public ResponseEntity<EventTypeOverviewDTO> deactivateEventType(
+            @PathVariable int id) {
+        EventTypeOverviewDTO updatedEventType = eventTypeService.deactivate(id);
         return ResponseEntity.ok(updatedEventType);
     }
 }

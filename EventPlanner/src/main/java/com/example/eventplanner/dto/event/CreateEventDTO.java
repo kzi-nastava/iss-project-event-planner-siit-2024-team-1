@@ -22,4 +22,5 @@ public class CreateEventDTO {
     private int eventTypeId; // IDs of selected event types
     private List<Integer> productIds;   // IDs of selected products
     private List<Integer> serviceIds;
+    private int organizerId;
 }

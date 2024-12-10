@@ -20,4 +20,5 @@ public class EventDetailsDTO {
     private String description;
     private int maxParticipants;
     private boolean isPublic;
+    private EventOrganizerDTO organizer;
 }

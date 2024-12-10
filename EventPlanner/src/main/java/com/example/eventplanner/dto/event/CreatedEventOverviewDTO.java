@@ -4,6 +4,7 @@ import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
 import com.example.eventplanner.dto.merchandise.product.GetProductByIdResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.GetServiceByIdResponseDTO;
+import com.example.eventplanner.model.user.EventOrganizer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class CreatedEventOverviewDTO {
+    private int id;
     private String title;
     private String description;
     private int maxParticipants;
@@ -24,4 +26,5 @@ public class CreatedEventOverviewDTO {
     private EventTypeOverviewDTO eventType; // IDs of selected event types
     private List<GetProductByIdResponseDTO> products;   // IDs of selected products
     private List<GetServiceByIdResponseDTO> services;
+    private EventOrganizerDTO organizer;
 }

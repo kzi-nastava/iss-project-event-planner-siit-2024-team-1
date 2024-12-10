@@ -1,3 +1,11 @@
+INSERT INTO public."user" (active, id, latitude, longitude, number, role, token_expiration, user_type, activation_token, authorities, city, company, description, name, password, phone_number, photo, street, surname, username) VALUES (true, 1, 1, 1, 1, 1, '2024-12-09 19:22:23.471000', 'EventOrganizer', 'eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqb2huYWRvZUBleGFtcGxlLmNvbSIsImlhdCI6MTczMzY4MjE0MywiZXhwIjoxNzMzNzY4NTQzfQ.F2Q4zEG8q4i8FLBOfD6biTKGmMcjpDC-2aw505OutNKF3w8lF901qxGLVI1KKmsh', 'ahahah', 'asda', 'asd', 'asdasd', 'asd', '$2a$10$3TYrKiXr/LEDyMPvjtvqU.VApcWoOrpUetE8PaiW6DXkB4I0kCYYm', 'asdas', null, 'sasd', 'asd', 'johnadoe@example.com');
+INSERT INTO public."user" (active, id, latitude, longitude, number, role, token_expiration, user_type, activation_token, authorities, city, company, description, name, password, phone_number, photo, street, surname, username) VALUES (true, 2, 1, 1, 1, 2, '2024-12-09 19:39:51.043000', 'ServiceProvider', 'eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhQGEuYSIsImlhdCI6MTczMzY4MzE5MSwiZXhwIjoxNzMzNzY5NTkxfQ.6kntnma1lTlTT1Kj2oZVI14pIDfWmwnXqi6FYWYHyf9_t1G-gQ5lG446ixDxRPEE', 'ahahah', 'asd', 'asd', 'asd', 'asd', '$2a$10$COCA2xSgJHIrM5RODGOIROdelB1Xz7AD0W9YKuyGD08eEY74VXmLG', 'asd', null, 'asd', 'asd', 'a@a.a');
+
+
+UPDATE public.id_generator
+SET next_val = 100
+WHERE sequence_name = 'user';
+
 -- Insert Event Types
 INSERT INTO event_type (title, description, is_active) VALUES
                                                            ('Tech Conference', 'Technology and innovation events', true),
@@ -21,7 +29,8 @@ INSERT INTO event (
     city,
     number,
     longitude,
-    latitude
+    latitude,
+    organizer_id
 ) VALUES
       (
           'Tech Innovation Summit 2024',
@@ -35,7 +44,7 @@ INSERT INTO event (
           'San Francisco',
           123,
           -122.4194,
-          37.7749
+          37.7749, 1
       ),
       (
           'Digital Marketing Workshop',
@@ -49,7 +58,7 @@ INSERT INTO event (
           'New York',
           456,
           -74.0060,
-          40.7128
+          40.7128, 1
       ),
       (
           'Startup Networking Night',
@@ -63,7 +72,7 @@ INSERT INTO event (
           'Chicago',
           789,
           -87.6298,
-          41.8781
+          41.8781, 1
       ),
       (
           'AI & Machine Learning Forum',
@@ -77,7 +86,7 @@ INSERT INTO event (
           'Austin',
           555,
           -97.7431,
-          30.2672
+          30.2672, 1
       ),
       (
           'Leadership Development Seminar',
@@ -91,7 +100,7 @@ INSERT INTO event (
           'Boston',
           777,
           -71.0589,
-          42.3601
+          42.3601, 1
       ),
       (
           'Cloud Computing Workshop',
@@ -105,7 +114,7 @@ INSERT INTO event (
           'Seattle',
           234,
           -122.3321,
-          47.6062
+          47.6062, 1
       ),
       (
           'Entrepreneur Meetup',
@@ -119,7 +128,7 @@ INSERT INTO event (
           'Miami',
           445,
           -80.1918,
-          25.7617
+          25.7617, 1
       ),
       (
           'Data Science Summit',
@@ -133,7 +142,7 @@ INSERT INTO event (
           'San Jose',
           890,
           -121.8863,
-          37.3382
+          37.3382, 1
       ),
       (
           'Community Tech Fair',
@@ -147,7 +156,7 @@ INSERT INTO event (
           'Denver',
           567,
           -104.9903,
-          39.7392
+          39.7392, 1
       ),
       (
           'Agile Project Management',
@@ -161,7 +170,7 @@ INSERT INTO event (
           'Portland',
           333,
           -122.6784,
-          45.5155
+          45.5155, 1
       ),
       (
           'Tech Startup Pitch Night',
@@ -175,7 +184,7 @@ INSERT INTO event (
           'Los Angeles',
           678,
           -118.2437,
-          34.0522
+          34.0522, 1
       ),
       (
           'Cybersecurity Conference',
@@ -189,7 +198,7 @@ INSERT INTO event (
           'Washington DC',
           901,
           -77.0369,
-          38.9072
+          38.9072, 1
       ),
       (
           'Digital Transformation Forum',
@@ -203,7 +212,7 @@ INSERT INTO event (
           'Houston',
           432,
           -95.3698,
-          29.7604
+          29.7604, 1
       );
 
 -- First, ensure we have a category
@@ -382,12 +391,6 @@ INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
 --     (true, 9, 35.6895, 139.6917, 606, '2', 'event_organizer', 'USER', 'Tokyo', 'Creative Minds', 'Data scientist', 'Grace', 'password606', '555-8899', 'grace_kim.jpg', 'Shibuya', 'Kim', 'grace.kim@gmail.com', null, null),
 --     (true, 10, 40.7306, -73.9352, 707, '2', 'service_provider', 'USER', 'New York', 'DesignHub', 'UX designer', 'Hank', 'password707', '555-9900', 'hank_jones.jpg', 'Park Ave', 'Jones', 'hank.jones@example.com', null, null);
 
-INSERT INTO public."user" (active, id, latitude, longitude, number, role, token_expiration, user_type, activation_token, authorities, city, company, description, name, password, phone_number, photo, street, surname, username) VALUES (true, 1, 1, 1, 1, 1, '2024-12-09 19:22:23.471000', 'ServiceProvider', 'eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqb2huYWRvZUBleGFtcGxlLmNvbSIsImlhdCI6MTczMzY4MjE0MywiZXhwIjoxNzMzNzY4NTQzfQ.F2Q4zEG8q4i8FLBOfD6biTKGmMcjpDC-2aw505OutNKF3w8lF901qxGLVI1KKmsh', 'ahahah', 'asda', 'asd', 'asdasd', 'asd', '$2a$10$3TYrKiXr/LEDyMPvjtvqU.VApcWoOrpUetE8PaiW6DXkB4I0kCYYm', 'asdas', null, 'sasd', 'asd', 'johnadoe@example.com');
-INSERT INTO public."user" (active, id, latitude, longitude, number, role, token_expiration, user_type, activation_token, authorities, city, company, description, name, password, phone_number, photo, street, surname, username) VALUES (true, 2, 1, 1, 1, 1, '2024-12-09 19:39:51.043000', 'ServiceProvider', 'eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhQGEuYSIsImlhdCI6MTczMzY4MzE5MSwiZXhwIjoxNzMzNzY5NTkxfQ.6kntnma1lTlTT1Kj2oZVI14pIDfWmwnXqi6FYWYHyf9_t1G-gQ5lG446ixDxRPEE', 'ahahah', 'asd', 'asd', 'asd', 'asd', '$2a$10$COCA2xSgJHIrM5RODGOIROdelB1Xz7AD0W9YKuyGD08eEY74VXmLG', 'asd', null, 'asd', 'asd', 'a@a.a');
-
-UPDATE public.id_generator
-SET next_val = 100
-WHERE sequence_name = 'user';
 
 -- insert into user_followed_events(event_id,user_id)
 -- values
