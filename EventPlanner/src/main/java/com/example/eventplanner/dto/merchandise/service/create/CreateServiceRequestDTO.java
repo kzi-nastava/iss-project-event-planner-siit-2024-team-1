@@ -1,5 +1,8 @@
 package com.example.eventplanner.dto.merchandise.service.create;
 
+import com.example.eventplanner.dto.common.AddressDTO;
+import com.example.eventplanner.dto.merchandise.CreateMerchandisePhotoDTO;
+import com.example.eventplanner.dto.merchandise.product.CreateCategoryDTO;
 import lombok.Data;
 
 import java.util.List;
@@ -10,15 +13,17 @@ public class CreateServiceRequestDTO {
     private String description;
     private String specificity;
     private double price;
-    private double discount;
-    private String category;
-    private List<String> types;
+    private int discount;
+    private int categoryId;
+    private CreateCategoryDTO category;
+    private List<Integer> eventTypesIds;
     private int minDuration;
     private int maxDuration;
-    private int duration;
     private int reservationDeadline;
     private int cancellationDeadline;
     private boolean automaticReservation;
-    private String image;
+    private List<CreateMerchandisePhotoDTO> merchandisePhotos;
+    private int serviceProviderId;
+    private AddressDTO address;
 
 }

@@ -1,16 +1,15 @@
-package com.example.eventplanner.dto.merchandise.service.update;
+package com.example.eventplanner.dto.merchandise.service;
 
-import com.example.eventplanner.model.common.Address;
+import com.example.eventplanner.dto.common.AddressDTO;
+import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.EventType;
-import com.example.eventplanner.model.merchandise.MerchandisePhoto;
-import com.example.eventplanner.model.merchandise.Review;
-import com.example.eventplanner.model.merchandise.Timeslot;
 import lombok.Data;
 
 import java.util.List;
+
 @Data
-public class UpdateServiceResponseDTO {
+public class ServiceOverviewDTO {
     private int id;
     private String title;
     private String description;
@@ -24,12 +23,8 @@ public class UpdateServiceResponseDTO {
     private int reservationDeadline;
     private int cancellationDeadline;
     private boolean automaticReservation;
-    private boolean deleted;
-    private List<Timeslot> timeslots;
-    private List<MerchandisePhoto> photos;
+    private List<MerchandisePhotoDTO> photos;
     private List<EventType> eventTypes;
-    private Address address;
+    private AddressDTO address;
     private Category category;
-    private List<Review> reviews;
-
 }
