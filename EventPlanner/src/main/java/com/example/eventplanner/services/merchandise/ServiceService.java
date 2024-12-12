@@ -360,18 +360,26 @@ public class ServiceService {
             Category category = new Category();
             category.setTitle(request.getCategory().getTitle());
             category.setDescription(request.getCategory().getDescription());
-            category.setPending(false);
+            category.setPending(true);
             service.setCategory(categoryRepository.save(category));
             service.setState(MerchandiseState.PENDING);
         }
 
         Address address = new Address();
-        address.setStreet(request.getAddress().getStreet());
-        address.setCity(request.getAddress().getCity());
-        address.setNumber(request.getAddress().getNumber());
-        address.setLongitude(request.getAddress().getLongitude());
-        address.setLatitude(request.getAddress().getLatitude());
-        service.setAddress(address);
+        if(request.getAddress() != null) {
+            address.setStreet(request.getAddress().getStreet());
+            address.setCity(request.getAddress().getCity());
+            address.setNumber(request.getAddress().getNumber());
+            address.setLongitude(request.getAddress().getLongitude());
+            address.setLatitude(request.getAddress().getLatitude());
+            service.setAddress(address);
+        }else {
+            address.setStreet(serviceProvider.getAddress().getStreet());
+            address.setCity(serviceProvider.getAddress().getCity());
+            address.setNumber(serviceProvider.getAddress().getNumber());
+            address.setLongitude(serviceProvider.getAddress().getLongitude());
+            address.setLatitude(serviceProvider.getAddress().getLatitude());
+        }
 
         com.example.eventplanner.model.merchandise.Service savedService = merchandiseRepository.save(service);
 
@@ -419,7 +427,8 @@ public class ServiceService {
                 .orElseThrow(() -> new RuntimeException("Service provider with id " + id + " not found"));
 
         return serviceProvider.getMerchandise().stream()
-                .filter(merchandise -> !merchandise.isDeleted())
+                .filter(merchandise -> !merchandise.isDeleted() &&
+                        merchandise instanceof com.example.eventplanner.model.merchandise.Service)
                 .map(merchandise -> mapToCreateServiceResponseDTO(merchandise, serviceProvider.getId())).toList();
     }
 
@@ -477,11 +486,20 @@ public class ServiceService {
         updatedService.setEventTypes(eventTypes);
 
         Address address = new Address();
-        address.setStreet(request.getAddress().getStreet());
-        address.setCity(request.getAddress().getCity());
-        address.setNumber(request.getAddress().getNumber());
-        address.setLongitude(request.getAddress().getLongitude());
-        address.setLatitude(request.getAddress().getLatitude());
+        if(request.getAddress() != null) {
+            address.setStreet(request.getAddress().getStreet());
+            address.setCity(request.getAddress().getCity());
+            address.setNumber(request.getAddress().getNumber());
+            address.setLongitude(request.getAddress().getLongitude());
+            address.setLatitude(request.getAddress().getLatitude());
+            service.setAddress(address);
+        }else {
+            address.setStreet(serviceProvider.getAddress().getStreet());
+            address.setCity(serviceProvider.getAddress().getCity());
+            address.setNumber(serviceProvider.getAddress().getNumber());
+            address.setLongitude(serviceProvider.getAddress().getLongitude());
+            address.setLatitude(serviceProvider.getAddress().getLatitude());
+        }
         updatedService.setAddress(address);
         updatedService.setCategory(service.getCategory());
 
