@@ -46,11 +46,6 @@ public class User {
     private String activationToken;
     private Date tokenExpiration;
 
-    @OneToMany(mappedBy = "recipient")
-    private List<Message> receivedMessages;
-
-    @OneToMany(mappedBy = "sender")
-    private List<Message> sentMessages;
 
     @OneToMany(mappedBy = "reporter")
     private List<UserReport> sentUserReports;

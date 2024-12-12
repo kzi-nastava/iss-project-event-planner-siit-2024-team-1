@@ -215,6 +215,20 @@ INSERT INTO event (
           29.7604, 1
       );
 
+insert into user_organizing_events(event_organizer_id,organizing_events_id) values
+                                                                                (1,1),
+                                                                                (1,2),
+                                                                                (1,3),
+                                                                                (1,4),
+                                                                                (1,5),
+                                                                                (1,6),
+                                                                                (1,7),
+                                                                                (1,8),
+                                                                                (1,9),
+                                                                                (1,10),
+                                                                                (1,11);
+
+
 -- First, ensure we have a category
 INSERT INTO category (title,description,pending) VALUES ('Entertainment','Entertainment description',false),
                                                         ('Funerality','Entertainment description',false),

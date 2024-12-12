@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -15,6 +17,8 @@ public class Message {
     private int id;
 
     private String content;
+
+    private LocalDateTime sentTIme;
 
     @ManyToOne
     private User sender;

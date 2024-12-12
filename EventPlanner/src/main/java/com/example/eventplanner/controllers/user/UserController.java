@@ -7,6 +7,7 @@ import com.example.eventplanner.dto.merchandise.FavoriteResponseDTO;
 import com.example.eventplanner.dto.user.GetAuByIdResponseDTO;
 import com.example.eventplanner.dto.user.GetEoByIdResponseDTO;
 import com.example.eventplanner.dto.user.GetSpByIdResponseDTO;
+import com.example.eventplanner.dto.user.UserOverviewDTO;
 import com.example.eventplanner.dto.user.auth.*;
 import com.example.eventplanner.dto.user.update.*;
 import com.example.eventplanner.services.event.EventService;
@@ -14,6 +15,8 @@ import com.example.eventplanner.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -75,5 +78,20 @@ public class UserController {
     ) {
         userService.followEvent(userId,eventId);
         return ResponseEntity.ok(new FollowEventResponseDTO(userId,eventId));
+    }
+
+    @GetMapping("/eo/{id}/chat-users")
+    public ResponseEntity<List<UserOverviewDTO>> getChatUsersForEo(@PathVariable int id) {
+        return ResponseEntity.ok(userService.getChatUsersForEo(id));
+    }
+
+    @GetMapping("/au/chat-users")
+    public ResponseEntity<List<UserOverviewDTO>> getChatUsersForAu() {
+        return ResponseEntity.ok(userService.getChatUsersForAu());
+    }
+
+    @GetMapping("/sp/{id}/chat-users")
+    public ResponseEntity<List<UserOverviewDTO>> getChatUsersForSp(@PathVariable int id) {
+        return ResponseEntity.ok(userService.getEoWhoMessagedSp(id));
     }
 }
