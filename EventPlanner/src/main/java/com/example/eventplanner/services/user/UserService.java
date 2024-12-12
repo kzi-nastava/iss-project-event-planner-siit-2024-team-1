@@ -5,6 +5,7 @@ import com.example.eventplanner.dto.event.EventOverviewDTO;
 import com.example.eventplanner.dto.user.GetAuByIdResponseDTO;
 import com.example.eventplanner.dto.user.GetEoByIdResponseDTO;
 import com.example.eventplanner.dto.user.GetSpByIdResponseDTO;
+import com.example.eventplanner.dto.user.UserOverviewDTO;
 import com.example.eventplanner.dto.user.auth.RegisterEoRequestDTO;
 import com.example.eventplanner.dto.user.auth.RegisterEoRequestResponseDTO;
 import com.example.eventplanner.dto.user.auth.RegisterSpRequestDTO;
@@ -12,10 +13,10 @@ import com.example.eventplanner.dto.user.auth.RegisterSpRequestResponseDTO;
 import com.example.eventplanner.dto.user.update.*;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.event.Event;
-import com.example.eventplanner.model.user.EventOrganizer;
-import com.example.eventplanner.model.user.ServiceProvider;
-import com.example.eventplanner.model.user.User;
+import com.example.eventplanner.model.merchandise.Merchandise;
+import com.example.eventplanner.model.user.*;
 import com.example.eventplanner.repositories.event.EventRepository;
+import com.example.eventplanner.repositories.message.MessageRepository;
 import com.example.eventplanner.repositories.user.EventOrganizerRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +37,7 @@ public class UserService {
     private final ServiceProviderRepository serviceProviderRepository;
     private final PasswordEncoder passwordEncoder;
     private final EventOrganizerRepository eventOrganizerRepository;
+    private final MessageRepository messageRepository;
 
     public GetAuByIdResponseDTO getAuById(int id){
         User user = userRepository.findById(id)
@@ -213,6 +216,79 @@ public class UserService {
             userRepository.save(user);
         }
     }
+
+    public List<UserOverviewDTO> getServiceProvidersForOrganizerEvents(int organizerId) {
+        // Fetch the Event Organizer by ID
+        EventOrganizer organizer = eventOrganizerRepository.findById(organizerId)
+                .orElseThrow(() -> new EntityNotFoundException("Event Organizer not found with id: " + organizerId));
+
+        // Fetch all events organized by the Event Organizer
+        List<Event> organizedEvents = organizer.getOrganizingEvents();
+
+        // Fetch unique Service Providers for Merchandise in the events' budgets
+        List<UserOverviewDTO> serviceProviders = organizedEvents.stream()
+                .flatMap(event -> event.getMerchandise().stream()) // Get merchandise from each event
+                .distinct() // Avoid duplicate merchandise
+                .map(merchandise -> serviceProviderRepository.findByMerchandiseId(merchandise.getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Service Provider not found for merchandise id: " + merchandise.getId())))
+                .distinct() // Avoid duplicate service providers
+                .map(this::convertToUserOverviewDTO) // Convert to DTO
+                .toList();
+
+        return serviceProviders;
+    }
+
+    public List<UserOverviewDTO> getAuWhoMessagedEo(int organizerId) {
+        List<Message> messages = messageRepository.findByRecipientId(organizerId);
+
+        // Extract senders who are AuthenticatedUsers
+        return messages.stream()
+                .map(Message::getSender) // Get the sender of the message
+                .filter(user -> user instanceof AuthenticatedUser) // Keep only AuthenticatedUsers
+                .distinct() // Remove duplicates
+                .map(this::convertToUserOverviewDTO) // Convert to UserOverviewDTO
+                .toList(); // Collect the result as a list
+    }
+
+    public List<UserOverviewDTO> getChatUsersForEo(int organizerId) {
+        // Fetch users who are authenticated and messaged the organizer
+        List<UserOverviewDTO> users = new ArrayList<>(getAuWhoMessagedEo(organizerId));
+
+        // Fetch service providers for the organizer's events and add them to the list
+        users.addAll(getServiceProvidersForOrganizerEvents(organizerId));
+
+        return users;
+    }
+
+    public List<UserOverviewDTO> getChatUsersForAu(){
+        return eventOrganizerRepository.findAll().stream().map(this::convertToUserOverviewDTO).toList();
+    }
+
+    public List<UserOverviewDTO> getEoWhoMessagedSp(int serviceProviderId) {
+        // Fetch the Service Provider by ID
+        ServiceProvider serviceProvider = serviceProviderRepository.findById(serviceProviderId)
+                .orElseThrow(() -> new RuntimeException("Service Provider not found with id: " + serviceProviderId));
+
+        // Fetch all messages where the recipient is the service provider
+        List<Message> messages = messageRepository.findByRecipientId(serviceProviderId);
+
+        // Extract senders who are EventOrganizers
+        return messages.stream()
+                .map(Message::getSender) // Get the sender of the message
+                .filter(user -> user instanceof EventOrganizer) // Keep only EventOrganizers
+                .distinct() // Remove duplicates
+                .map(this::convertToUserOverviewDTO) // Convert to UserOverviewDTO
+                .toList(); // Collect the result as a list
+    }
+
+    private UserOverviewDTO convertToUserOverviewDTO(User user) {
+        return new UserOverviewDTO(user.getId(), user.getUsername(), user.getName(), user.getSurname(), user.getPhoto());
+    }
+
+    private UserOverviewDTO  convertToUserOverviewDTO(ServiceProvider sp){
+        return new UserOverviewDTO(sp.getId(),sp.getUsername(),sp.getName(),sp.getSurname(),sp.getPhoto());
+    }
+
 
 
 }
