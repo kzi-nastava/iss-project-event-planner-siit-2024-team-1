@@ -1,4 +1,4 @@
-package com.example.eventplanner.services.merchandise;
+package com.example.eventplanner.exceptions;
 
 public class ServiceReservationException extends RuntimeException {
     private final ErrorType errorType;

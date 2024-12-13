@@ -47,12 +47,6 @@ public class User {
     private Date tokenExpiration;
 
 
-    @OneToMany(mappedBy = "reporter")
-    private List<UserReport> sentUserReports;
-
-    @OneToMany(mappedBy = "reportedUser")
-    private List<UserReport> receivedUserReports;
-
     @ManyToMany
     @JoinTable(name = "user_blocked_users",
             joinColumns = @JoinColumn(name = "user_id"),

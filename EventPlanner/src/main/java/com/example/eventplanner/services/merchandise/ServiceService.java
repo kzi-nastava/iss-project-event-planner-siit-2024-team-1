@@ -12,6 +12,7 @@ import com.example.eventplanner.dto.merchandise.service.TimeSlotDTO;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceRequestDTO;
+import com.example.eventplanner.exceptions.ServiceReservationException;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.Event;

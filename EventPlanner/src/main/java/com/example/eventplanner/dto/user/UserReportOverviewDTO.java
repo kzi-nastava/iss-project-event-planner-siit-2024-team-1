@@ -5,16 +5,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserReportResponseDTO {
+@AllArgsConstructor
+public class UserReportOverviewDTO {
     private int id;
     private int reportedUserId;
     private int reporterId;
+    private String reporterEmail;
+    private String reportedUserName;
+    private String reportedUserSurname;
+    private String reportedUserEmail;
+
 
     private String reason;
     private UserReportStatus status;
-
 }
