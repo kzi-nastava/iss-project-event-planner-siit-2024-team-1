@@ -88,8 +88,8 @@ public class ServiceService {
         return spec;
     }
 
-    public List<MerchandiseOverviewDTO> getAll(){
-        return serviceRepository.findAll().stream().map(this::convertToOverviewDTO).toList();
+    public List<ServiceOverviewDTO> getAll(){
+        return serviceRepository.findAll().stream().map(this::convertToServiceOverviewDTO).toList();
     }
 
     private Specification<com.example.eventplanner.model.merchandise.Service> addCategoryFilter(Specification<com.example.eventplanner.model.merchandise.Service> spec, ServiceFiltersDTO ServiceFiltersDTO) {
@@ -144,6 +144,29 @@ public class ServiceService {
         dto.setRating(service.getRating());
         dto.setType(service.getClass().getSimpleName());
         dto.setPrice(service.getPrice());
+        return dto;
+    }
+
+    private ServiceOverviewDTO convertToServiceOverviewDTO(com.example.eventplanner.model.merchandise.Service service) {
+        ServiceOverviewDTO dto = new ServiceOverviewDTO();
+        dto.setId(service.getId());
+        dto.setTitle(service.getTitle());
+        dto.setDescription(service.getDescription());
+        dto.setAddress(convertToAddressDTO(service.getAddress()));
+        dto.setCategory(service.getCategory());
+        if(service.getPhotos() != null && !service.getPhotos().isEmpty())
+            dto.setPhotos(service.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
+        dto.setPrice(service.getPrice());
+        return dto;
+    }
+
+    private AddressDTO convertToAddressDTO(Address address) {
+        AddressDTO dto = new AddressDTO();
+        dto.setCity(address.getCity());
+        dto.setStreet(address.getStreet());
+        dto.setNumber(address.getNumber());
+        dto.setLatitude(address.getLatitude());
+        dto.setLongitude(address.getLongitude());
         return dto;
     }
 

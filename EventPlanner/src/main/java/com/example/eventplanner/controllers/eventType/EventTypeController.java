@@ -31,6 +31,11 @@ public class EventTypeController {
         return ResponseEntity.ok(eventTypeService.getAll(eventPage));
     }
 
+    @GetMapping("/all-wp")
+    public ResponseEntity<List<EventTypeOverviewDTO>> getAllEventTypesWithoutPagination() {
+        return ResponseEntity.ok(eventTypeService.getAll());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<EventTypeOverviewDTO> getById(@PathVariable int id
     ) {

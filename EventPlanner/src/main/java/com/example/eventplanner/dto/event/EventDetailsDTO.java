@@ -1,6 +1,7 @@
 package com.example.eventplanner.dto.event;
 
 import com.example.eventplanner.dto.common.AddressDTO;
+import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
 import com.example.eventplanner.model.common.Address;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
-public class EventDetailsDTO {
+public class  EventDetailsDTO {
     private int id;
     private String type;
     private String title;
@@ -19,6 +20,7 @@ public class EventDetailsDTO {
     private AddressDTO address;
     private String description;
     private int maxParticipants;
+    private EventTypeOverviewDTO eventType;
     private boolean isPublic;
     private EventOrganizerDTO organizer;
 }

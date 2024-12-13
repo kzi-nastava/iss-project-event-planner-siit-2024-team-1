@@ -65,6 +65,10 @@ public class ProductService {
         return products.map(this::convertToOverviewDTO);
     }
 
+    public List<MerchandiseOverviewDTO> getAll(){
+        return productRepository.findAll().stream().map(this::convertToOverviewDTO).toList();
+    }
+
     private Specification<Product> createSpecification(ProductFiltersDTO productFiltersDTO, String search) {
         Specification<Product> spec = Specification.where(null);
         spec = addPriceRangeFilter(spec, productFiltersDTO);
