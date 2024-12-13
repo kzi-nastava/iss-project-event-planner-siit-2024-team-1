@@ -22,6 +22,6 @@ public class UserReport {
 
     private String reason;
     private Date approvalDate;
-    private boolean status;
+    private UserReportStatus status;
 }
 

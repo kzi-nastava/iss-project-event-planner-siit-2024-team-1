@@ -28,6 +28,4 @@ public class UserSuspension {
 
     private String reason;
 
-    @Column(nullable = false)
-    private boolean active;
 }

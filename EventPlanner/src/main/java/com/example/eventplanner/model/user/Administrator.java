@@ -10,12 +10,6 @@ import java.util.List;
 @Entity
 @DiscriminatorValue("Administrator")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Administrator extends User {
-    @OneToMany
-    @JoinTable(
-            inverseJoinColumns = @JoinColumn(name = "report_id")
-    )
-    List<UserReport> reports;
+
 }

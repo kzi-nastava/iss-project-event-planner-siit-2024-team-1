@@ -3,7 +3,9 @@ package com.example.eventplanner.services;
 import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.event.InviteResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
+import com.example.eventplanner.dto.user.UserSuspensionDTO;
 import com.example.eventplanner.dto.user.auth.*;
+import com.example.eventplanner.exceptions.UserAuthenticationException;
 import com.example.eventplanner.model.auth.AuthenticationResponse;
 import com.example.eventplanner.model.auth.Token;
 import com.example.eventplanner.model.common.Address;
@@ -14,6 +16,7 @@ import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
 import com.example.eventplanner.services.email.EmailService;
 import com.example.eventplanner.services.user.UserService;
+import com.example.eventplanner.services.userreport.UserReportService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -42,6 +46,7 @@ public class AuthenticationService {
     private final TokenRepository tokenRepository;
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
+    private final UserReportService userReportService;
 
 
 //    public RegisterAuUserResponseRequestDTO registerAu(RegisterAuUserRequestDTO request) {
@@ -216,29 +221,59 @@ public class AuthenticationService {
     }
 
     public LoginResponseDTO authenticate(LoginRequestDTO request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        // Lookup user by email
+        User user = repository.findByUsername(request.getEmail())
+                .orElseThrow(() -> new UserAuthenticationException(
+                        "Invalid email or password",
+                        UserAuthenticationException.ErrorType.USER_NOT_FOUND
+                ));
 
-        User user = repository.findByUsername(request.getEmail()).orElseThrow();
+        // Check if the user is suspended
+        UserSuspensionDTO suspensionDTO = userReportService.getSuspension(user);
+        if (suspensionDTO != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+            String formattedDate = suspensionDTO.getEndTime().format(formatter);
+            throw new UserAuthenticationException(
 
-        if (!user.isActive()) {
-            throw new RuntimeException("Account not verified. Please verify your email.");
+                    "User is suspended until\n" + formattedDate + "\nReason: " + suspensionDTO.getReason(),
+                    UserAuthenticationException.ErrorType.USER_SUSPENDED
+            );
         }
 
+        // Authenticate user credentials
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    request.getEmail(),
+                    request.getPassword()
+            ));
+        } catch (Exception e) {
+            throw new UserAuthenticationException(
+                    "Invalid email or password",
+                    UserAuthenticationException.ErrorType.INVALID_CREDENTIALS
+            );
+        }
+
+        // Check if the account is active
+        if (!user.isActive()) {
+            throw new UserAuthenticationException(
+                    "Account not verified. Please verify your email.",
+                    UserAuthenticationException.ErrorType.ACCOUNT_NOT_VERIFIED
+            );
+        }
+
+        // Generate tokens for the user
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
+        // Revoke any previous tokens
         revokeAllTokenByUser(user);
 
+        // Save new tokens
         saveUserToken(accessToken, refreshToken, user);
 
         return new LoginResponseDTO(accessToken, refreshToken);
-
     }
+
     private void revokeAllTokenByUser(User user) {
         List<Token> validTokens = tokenRepository.findAllAccessTokensByUser(user.getId());
         if(validTokens.isEmpty()) {

@@ -7,8 +7,8 @@ import lombok.Data;
 import java.util.Date;
 @Data
 public class UserReportDTO {
-    private User reportedUser;
-    private User reporter;
+    private int reportedUserId;
+    private int reporterId;
 
     private String reason;
 }
