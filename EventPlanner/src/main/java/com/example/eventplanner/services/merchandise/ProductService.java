@@ -1,5 +1,7 @@
 package com.example.eventplanner.services.merchandise;
 
+import com.example.eventplanner.dto.category.CategoryOverviewDTO;
+import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
 import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.model.merchandise.*;
@@ -173,10 +175,10 @@ public class ProductService {
         responseDTO.setMerchandisePhotos(savedProduct.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).collect(Collectors.toList()));
 
         // Map the Event Types
-        responseDTO.setEventTypes(savedProduct.getEventTypes());
+        responseDTO.setEventTypes(savedProduct.getEventTypes().stream().map(this::converToEventTypeOverviewDTO).toList());
 
         // Map the Category
-        responseDTO.setCategory(savedProduct.getCategory());
+        responseDTO.setCategory(convertToCategoryOverviewDTO(savedProduct.getCategory()));
 
         // Map the Address
         AddressDTO addressDTO = new AddressDTO();
@@ -187,6 +189,24 @@ public class ProductService {
         addressDTO.setLongitude(savedProduct.getAddress().getLongitude());
         responseDTO.setAddress(addressDTO);
 
+        return responseDTO;
+    }
+
+    private EventTypeOverviewDTO converToEventTypeOverviewDTO(EventType eventType) {
+        EventTypeOverviewDTO responseDTO = new EventTypeOverviewDTO();
+        responseDTO.setId(eventType.getId());
+        responseDTO.setTitle(eventType.getTitle());
+        responseDTO.setDescription(eventType.getDescription());
+        responseDTO.setActive(eventType.isActive());
+        return responseDTO;
+    }
+
+    private CategoryOverviewDTO convertToCategoryOverviewDTO(Category category){
+        CategoryOverviewDTO responseDTO = new CategoryOverviewDTO();
+        responseDTO.setId(category.getId());
+        responseDTO.setTitle(category.getTitle());
+        responseDTO.setDescription(category.getDescription());
+        responseDTO.setPending(category.isPending());
         return responseDTO;
     }
 
