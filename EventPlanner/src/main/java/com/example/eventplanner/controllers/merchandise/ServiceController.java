@@ -37,7 +37,7 @@ public class ServiceController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<MerchandiseOverviewDTO>> GetAll() {
+    public ResponseEntity<List<ServiceOverviewDTO>> GetAll() {
         return ResponseEntity.ok(serviceService.getAll());
     }
 

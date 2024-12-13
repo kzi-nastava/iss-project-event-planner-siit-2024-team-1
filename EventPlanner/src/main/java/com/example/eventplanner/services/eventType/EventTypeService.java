@@ -24,6 +24,11 @@ public class EventTypeService {
     private final EventTypeRepository eventTypeRepository;
     private final CategoryRepository categoryRepository;
 
+    public List<EventTypeOverviewDTO> getAll() {
+        return eventTypeRepository.findAll().stream()
+                .map(this::convertToOverviewDTO).toList();
+    }
+
     public Page<EventTypeOverviewDTO> getAll(Pageable pageable) {
         return eventTypeRepository.findAll(pageable)
                 .map(this::convertToOverviewDTO);

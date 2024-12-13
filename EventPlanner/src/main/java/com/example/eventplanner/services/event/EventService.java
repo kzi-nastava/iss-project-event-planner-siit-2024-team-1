@@ -53,6 +53,10 @@ public class EventService {
                 .map(this::convertToOverviewDTO);
     }
 
+    public CreatedEventOverviewDTO getById(int id) {
+        return mapToCreatedEventOverviewDTO(eventRepository.findById(id).orElseThrow(), eventRepository.findById(id).orElseThrow().getType(), eventRepository.findById(id).orElseThrow().getMerchandise());
+    }
+
     public Page<EventOverviewDTO> getByEo(int id, Pageable pageable) {
         return eventRepository.findByOrganizerId(id, pageable).map(this::convertToOverviewDTO);
     }

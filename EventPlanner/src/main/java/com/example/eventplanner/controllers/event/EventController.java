@@ -69,6 +69,11 @@ public class EventController {
         return ResponseEntity.ok(eventService.getAgenda(id));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CreatedEventOverviewDTO> getById(@PathVariable int id) {
+        return ResponseEntity.ok(eventService.getById(id));
+    }
+
     @GetMapping("/{id}/details")
     public ResponseEntity<EventDetailsDTO> getDetails(@PathVariable int id) {
         return ResponseEntity.ok(eventService.getDetails(id));
