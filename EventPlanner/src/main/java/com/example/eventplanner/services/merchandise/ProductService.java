@@ -1,5 +1,7 @@
 package com.example.eventplanner.services.merchandise;
 
+import com.example.eventplanner.dto.category.CategoryOverviewDTO;
+import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
 import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.model.merchandise.*;
@@ -173,10 +175,10 @@ public class ProductService {
         responseDTO.setMerchandisePhotos(savedProduct.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).collect(Collectors.toList()));
 
         // Map the Event Types
-        responseDTO.setEventTypes(savedProduct.getEventTypes());
+        responseDTO.setEventTypes(savedProduct.getEventTypes().stream().map(this::converToEventTypeOverviewDTO).toList());
 
         // Map the Category
-        responseDTO.setCategory(savedProduct.getCategory());
+        responseDTO.setCategory(convertToCategoryOverviewDTO(savedProduct.getCategory()));
 
         // Map the Address
         AddressDTO addressDTO = new AddressDTO();
@@ -190,9 +192,27 @@ public class ProductService {
         return responseDTO;
     }
 
+    private EventTypeOverviewDTO converToEventTypeOverviewDTO(EventType eventType) {
+        EventTypeOverviewDTO responseDTO = new EventTypeOverviewDTO();
+        responseDTO.setId(eventType.getId());
+        responseDTO.setTitle(eventType.getTitle());
+        responseDTO.setDescription(eventType.getDescription());
+        responseDTO.setActive(eventType.isActive());
+        return responseDTO;
+    }
+
+    private CategoryOverviewDTO convertToCategoryOverviewDTO(Category category){
+        CategoryOverviewDTO responseDTO = new CategoryOverviewDTO();
+        responseDTO.setId(category.getId());
+        responseDTO.setTitle(category.getTitle());
+        responseDTO.setDescription(category.getDescription());
+        responseDTO.setPending(category.isPending());
+        return responseDTO;
+    }
+
     public CreateProductResponseDTO createProduct(CreateProductRequestDTO createProductRequestDTO) {
         // Step 1: Fetch the ServiceProvider
-        User serviceProvider = userRepository.findById(createProductRequestDTO.getServiceProviderId())
+        ServiceProvider serviceProvider = serviceProviderRepository.findById(createProductRequestDTO.getServiceProviderId())
                 .orElseThrow(() -> new RuntimeException("Service provider not found"));
 
         // Step 2: Create a new Product (Merchandise)
@@ -237,7 +257,7 @@ public class ProductService {
             Category category = new Category();
             category.setTitle(createProductRequestDTO.getCategory().getTitle());
             category.setDescription(createProductRequestDTO.getCategory().getDescription());
-            category.setPending(false);
+            category.setPending(true);
             product.setCategory(categoryRepository.save(category));
             product.setState(MerchandiseState.PENDING);
         }
@@ -251,6 +271,7 @@ public class ProductService {
         address.setLongitude(createProductRequestDTO.getAddress().getLongitude());
         product.setAddress(address);
 
+
         ServiceProviderDTO serviceProviderDTO = new ServiceProviderDTO();
         serviceProviderDTO.setId(serviceProvider.getId());
         serviceProviderDTO.setName(serviceProvider.getName());
@@ -258,6 +279,12 @@ public class ProductService {
 
         // Step 7: Save the new product (Merchandise)
         Merchandise savedProduct = merchandiseRepository.save(product);
+
+        List<Merchandise> merchandise = serviceProvider.getMerchandise();
+        merchandise.add(savedProduct);
+        serviceProvider.setMerchandise(merchandise);
+        ServiceProvider sp = serviceProviderRepository.save(serviceProvider);
+
 
         // Step 8: Map to CreateProductResponseDTO and return
         return mapToCreateProductResponseDTO(savedProduct, serviceProviderDTO, savedPhotos.stream().map(this::mapToMerchandisePhotoDTO).toList());
@@ -338,6 +365,7 @@ public class ProductService {
     private CreateProductResponseDTO mapToCreateProductResponseDTO(Merchandise savedProduct, ServiceProviderDTO serviceProvider, List<MerchandisePhotoDTO> photoDTOs) {
         CreateProductResponseDTO responseDTO = new CreateProductResponseDTO();
 
+        responseDTO.setId(savedProduct.getId());
         responseDTO.setTitle(savedProduct.getTitle());
         responseDTO.setDescription(savedProduct.getDescription());
         responseDTO.setSpecificity(savedProduct.getSpecificity());
@@ -358,10 +386,10 @@ public class ProductService {
         responseDTO.setMerchandisePhotos(photoDTOs);
 
         // Map the Event Types
-        responseDTO.setEventTypes(savedProduct.getEventTypes());
+        responseDTO.setEventTypes(savedProduct.getEventTypes().stream().map(this::converToEventTypeOverviewDTO).toList());
 
         // Map the Category
-        responseDTO.setCategory(savedProduct.getCategory());
+        responseDTO.setCategory(convertToCategoryOverviewDTO(savedProduct.getCategory()));
 
         // Map the Address
         AddressDTO addressDTO = new AddressDTO();

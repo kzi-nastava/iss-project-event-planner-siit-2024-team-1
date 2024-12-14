@@ -12,7 +12,7 @@ INSERT INTO event_type (title, description, is_active) VALUES
                                                            ('Professional Workshop', 'Skill development and training', true),
                                                            ('Networking Event', 'Professional networking opportunities', true),
                                                            ('Educational Seminar', 'Knowledge sharing and learning', true),
-                                                           ('Social Gathering', 'Community and social events', true);
+                                                           ( 'Social Gathering', 'Community and social events', true);
 
 -- No separate address table needed since it's an @Embeddable
 
@@ -235,181 +235,203 @@ INSERT INTO category (title,description,pending) VALUES ('Entertainment','Entert
                                                         ('Suicidabiliyu','Entertainment description',false),
                                                         ('Protest','Entertainment description',false);
 
-INSERT INTO merchandise (
-    merchandise_type,
-    id,
-    title,
-    description,
-    specificity,
-    price,
-    discount,
-    visible,
-    available,
-    min_duration,
-    max_duration,
-    reservation_deadline,
-    cancellation_deadline,
-    automatic_reservation,
-    deleted,
-    street,
-    city,
-    number,
-    longitude,
-    latitude,
-    category_id,
-    state
-) VALUES
--- DJ Service
-('Product',1,  'Professional DJ Services',
- 'Experienced DJ for your events',
- 'Top-quality sound equipment included',
- 500.00, 0, true, true,
- 2, 8, 48, 24, true, false,
- 'Security Street',
- 'Washington DC',
- 901,
- -77.0369,
- 38.9072, 1, 0),
-
--- Photography Service
-('Product', 2, 'Event Photography',
- 'Professional event photography service',
- 'High-resolution photos, digital delivery within 1 week',
- 800.00, 10, true, true,
- 3, 12, 72, 48, false, false,
- 'Security Street',
- 'Washington DC',
- 901,
- -77.0369,
- 38.9072, 1, 0),
-
--- Catering Service
-('Product', 3,'Gourmet Catering',
- 'Premium catering service for all events',
- 'Custom menu options available, includes staff',
- 1200.00, 5, true, true,
- 4, 8, 96, 72, false, false,
- 'Security Street',
- 'Washington DC',
- 901,
- -77.0369,
- 38.9072, 1, 0),
-
--- Event Planning Service
-('Service',  4,'Full Event Planning',
- 'Comprehensive event planning and coordination',
- 'Includes venue selection, vendor coordination, and day-of management',
- 2000.00, 0, true, true,
- 10, 121, 43200, 120, false, false,
- 'Security Street',
- 'Washington DC',
- 901,
- -77.0369,
- 38.9072, 1, 0),
-('Product',  5,'Kasandrina Torta',
- 'Torta sa mlevenim orajima',
- 'Includes venue selection, vendor coordination, and day-of management',
- 2000.00, 0, true, true,
- 10, 40, 5000, 120, false, false,
- 'Nova',
- 'Klisa',
- 1,
- -77.0369,
- 38.9072, 1, 0),
-
--- Decoration Service
-('Service',  6,'Event Decoration',
- 'Professional decoration and setup service',
- 'Custom themes and designs available',
- 600.00, 15, true, true,
- 2, 6, 72, 48, true, false,
- 'Security Street',
- 'Washington DC',
- 901,
- -77.0369,
- 38.9072, 1, 0);
-
-INSERT INTO review (id, comment, rating, status) VALUES
--- DJ Service Reviews (ID: 1)
-(1, 'Amazing DJ! Kept the party going all night long', 5, true),
-(2, 'Great music selection and very professional', 5, true),
-(3, 'Good service but could improve song transitions', 4, true),
-(4, 'Fantastic energy and crowd engagement', 5, true),
-
--- Photography Service Reviews (ID: 2)
-(5, 'Beautiful photos, captured every moment perfectly', 5, true),
-(6, 'Professional service but took longer than promised for delivery', 3, true),
-(7, 'Excellent attention to detail', 4, true),
-(8, 'Worth every penny, amazing quality', 5, true),
-
--- Catering Service Reviews (ID: 3)
-(9, 'Food was delicious and presentation was beautiful', 5, true),
-(10, 'Great variety but some dishes were cold', 3, true),
-(11, 'Professional staff and excellent service', 4, true),
-(12, 'Outstanding quality and presentation', 5, true),
-
--- Event Planning Service Reviews (ID: 4)
-(13, 'Made our event completely stress-free', 5, true),
-(14, 'Excellent coordination and attention to detail', 5, true),
-(15, 'Good planning but some communication issues', 4, true),
-(16, 'Went above and beyond our expectations', 5, true),
-
--- Decoration Service Reviews (ID: 5)
-(17, 'Beautiful decorations, exactly what we wanted', 5, true),
-(18, 'Creative designs but setup was delayed', 3, true),
-(19, 'Transformed the venue beautifully', 4, true),
-(20, 'High-quality materials and great execution', 5, true);
-
-INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
--- DJ Service (merchandise_id: 1)
-(1, 1),
-(1, 2),
-(1, 3),
-(1, 4),
-
--- Photography Service (merchandise_id: 2)
-(2, 5),
-(2, 6),
-(2, 7),
-(2, 8),
-
--- Catering Service (merchandise_id: 3)
-(3, 9),
-(3, 10),
-(3, 11),
-(3, 12),
-
--- Event Planning Service (merchandise_id: 4)
-(4, 13),
-(4, 14),
-(4, 15),
-(4, 16),
-
--- Decoration Service (merchandise_id: 5)
-(5, 17),
-(5, 18),
-(5, 19),
-(5, 20);
-
--- INSERT INTO public."user"(
---     active, id, latitude, longitude, "number", role, user_type, authorities, city, company, description, name, password, phone_number, photo, street, surname, username, activation_token, token_expiration)
--- VALUES
---     (true, 1, 40.7128, -74.0060, 123, '0', 'authenticatedUser', 'USER', 'New York', 'TechCorp', 'Software engineer', 'John', '$2a$10$3TYrKiXr/LEDyMPvjtvqU.VApcWoOrpUetE8PaiW6DXkB4I0kCYYm', '555-1234', 'john_doe.jpg', '5th Ave', 'Doe', 'john.doe@gmail.com', '', '2024-12-31'),
---     (true, 2, 34.0522, -118.2437, 456, '2', 'ServiceProvider', 'USER', 'Los Angeles', 'Creative Solutions', 'Graphic designer', 'Jane', 'password456', '555-5678', 'jane_smith.jpg', 'Sunset Blvd', 'Smith', 'jane.smith@example.com', null, null),
---     (true, 3, 51.5074, -0.1278, 789, '1', 'event_organizer', 'USER', 'London', 'Innovate Ltd', 'Marketing manager', 'Alice', 'password789', '555-8765', 'alice_white.jpg', 'Oxford St', 'White', 'alice.white@gmail.com', null, null),
---     (true, 4, 48.8566, 2.3522, 101, '1', 'event_organizer', 'USER', 'Paris', 'Design Works', 'Product designer', 'Bob', 'password101', '555-1122', 'bob_brown.jpg', 'Champs-Elysees', 'Brown', 'bob.brown@example.com', null, null),
---     (true, 5, 40.7306, -73.9352, 202, '0', 'authenticated_user', 'USER', 'New York', 'Tech Innovators', 'Frontend developer', 'Charlie', 'password202', '555-3344', 'charlie_green.jpg', 'Broadway', 'Green', 'charlie.green@gmail.com', null, null),
---     (true, 6, 37.7749, -122.4194, 303, '0', 'authenticated_user', 'USER', 'San Francisco', 'EcoSolutions', 'Project manager', 'Dave', 'password303', '555-5566', 'dave_young.jpg', 'Market St', 'Young', 'dave.young@example.com', null, null),
---     (true, 7, 39.9042, 116.4074, 404, '1', 'event_organizer', 'USER', 'Beijing', 'Global Innovations', 'Business analyst', 'Eve', 'password404', '555-6677', 'eve_liu.jpg', 'Wangfujing', 'Liu', 'eve.liu@gmail.com', null, null),
---     (true, 8, 34.0522, -118.2437, 505, '1', 'service_provider', 'USER', 'Los Angeles', 'Tech Synergy', 'Software architect', 'Frank', 'password505', '555-7788', 'frank_lee.jpg', 'Wilshire Blvd', 'Lee', 'frank.lee@example.com', null, null),
---     (true, 9, 35.6895, 139.6917, 606, '2', 'event_organizer', 'USER', 'Tokyo', 'Creative Minds', 'Data scientist', 'Grace', 'password606', '555-8899', 'grace_kim.jpg', 'Shibuya', 'Kim', 'grace.kim@gmail.com', null, null),
---     (true, 10, 40.7306, -73.9352, 707, '2', 'service_provider', 'USER', 'New York', 'DesignHub', 'UX designer', 'Hank', 'password707', '555-9900', 'hank_jones.jpg', 'Park Ave', 'Jones', 'hank.jones@example.com', null, null);
-
-
--- insert into user_followed_events(event_id,user_id)
--- values
---     (1,1),
---     (2,1),
---     (3,1);
-
-insert into user_merchandise(merchandise_id,service_provider_id) values (4,2);
+-- INSERT INTO merchandise (
+--     merchandise_type,
+--     id,
+--     title,
+--     description,
+--     specificity,
+--     price,
+--     discount,
+--     visible,
+--     available,
+--     min_duration,
+--     max_duration,
+--     reservation_deadline,
+--     cancellation_deadline,
+--     automatic_reservation,
+--     deleted,
+--     street,
+--     city,
+--     number,
+--     longitude,
+--     latitude,
+--     category_id,
+--     state
+-- ) VALUES
+-- -- DJ Service
+-- ('Product',1,  'Professional DJ Services',
+--  'Experienced DJ for your events',
+--  'Top-quality sound equipment included',
+--  500.00, 0, true, true,
+--  2, 8, 48, 24, true, false,
+--  'Security Street',
+--  'Washington DC',
+--  901,
+--  -77.0369,
+--  38.9072, 1, 0),
+--
+-- -- Photography Service
+-- ('Product', 2, 'Event Photography',
+--  'Professional event photography service',
+--  'High-resolution photos, digital delivery within 1 week',
+--  800.00, 10, true, true,
+--  3, 12, 72, 48, false, false,
+--  'Security Street',
+--  'Washington DC',
+--  901,
+--  -77.0369,
+--  38.9072, 1, 0),
+--
+-- -- Catering Service
+-- ('Product', 3,'Gourmet Catering',
+--  'Premium catering service for all events',
+--  'Custom menu options available, includes staff',
+--  1200.00, 5, true, true,
+--  4, 8, 96, 72, false, false,
+--  'Security Street',
+--  'Washington DC',
+--  901,
+--  -77.0369,
+--  38.9072, 1, 0),
+--
+-- -- Event Planning Service
+-- ('Service',  4,'Full Event Planning',
+--  'Comprehensive event planning and coordination',
+--  'Includes venue selection, vendor coordination, and day-of management',
+--  2000.00, 0, true, true,
+--  10, 121, 43200, 120, false, false,
+--  'Security Street',
+--  'Washington DC',
+--  901,
+--  -77.0369,
+--  38.9072, 1, 0),
+-- ('Product',  5,'Kasandrina Torta',
+--  'Torta sa mlevenim orajima',
+--  'Includes venue selection, vendor coordination, and day-of management',
+--  2000.00, 0, true, true,
+--  10, 40, 5000, 120, false, false,
+--  'Nova',
+--  'Klisa',
+--  1,
+--  -77.0369,
+--  38.9072, 1, 0),
+--
+-- -- Decoration Service
+-- ('Service',  6,'Event Decoration',
+--  'Professional decoration and setup service',
+--  'Custom themes and designs available',
+--  600.00, 15, true, true,
+--  2, 6, 72, 48, true, false,
+--  'Security Street',
+--  'Washington DC',
+--  901,
+--  -77.0369,
+--  38.9072, 1, 0);
+--
+-- INSERT INTO review (id, comment, rating, status) VALUES
+-- -- DJ Service Reviews (ID: 1)
+-- (1, 'Amazing DJ! Kept the party going all night long', 5, true),
+-- (2, 'Great music selection and very professional', 5, true),
+-- (3, 'Good service but could improve song transitions', 4, true),
+-- (4, 'Fantastic energy and crowd engagement', 5, true),
+--
+-- -- Photography Service Reviews (ID: 2)
+-- (5, 'Beautiful photos, captured every moment perfectly', 5, true),
+-- (6, 'Professional service but took longer than promised for delivery', 3, true),
+-- (7, 'Excellent attention to detail', 4, true),
+-- (8, 'Worth every penny, amazing quality', 5, true),
+--
+-- -- Catering Service Reviews (ID: 3)
+-- (9, 'Food was delicious and presentation was beautiful', 5, true),
+-- (10, 'Great variety but some dishes were cold', 3, true),
+-- (11, 'Professional staff and excellent service', 4, true),
+-- (12, 'Outstanding quality and presentation', 5, true),
+--
+-- -- Event Planning Service Reviews (ID: 4)
+-- (13, 'Made our event completely stress-free', 5, true),
+-- (14, 'Excellent coordination and attention to detail', 5, true),
+-- (15, 'Good planning but some communication issues', 4, true),
+-- (16, 'Went above and beyond our expectations', 5, true),
+--
+-- -- Decoration Service Reviews (ID: 5)
+-- (17, 'Beautiful decorations, exactly what we wanted', 5, true),
+-- (18, 'Creative designs but setup was delayed', 3, true),
+-- (19, 'Transformed the venue beautifully', 4, true),
+-- (20, 'High-quality materials and great execution', 5, true);
+--
+-- INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
+-- -- DJ Service (merchandise_id: 1)
+-- (1, 1),
+-- (1, 2),
+-- (1, 3),
+-- (1, 4),
+--
+-- -- Photography Service (merchandise_id: 2)
+-- (2, 5),
+-- (2, 6),
+-- (2, 7),
+-- (2, 8),
+--
+-- -- Catering Service (merchandise_id: 3)
+-- (3, 9),
+-- (3, 10),
+-- (3, 11),
+-- (3, 12),
+--
+-- -- Event Planning Service (merchandise_id: 4)
+-- (4, 13),
+-- (4, 14),
+-- (4, 15),
+-- (4, 16),
+--
+-- -- Decoration Service (merchandise_id: 5)
+-- (5, 17),
+-- (5, 18),
+-- (5, 19),
+-- (5, 20);
+--
+-- -- INSERT INTO public."user"(
+-- --     active, id, latitude, longitude, "number", role, user_type, authorities, city, company, description, name, password, phone_number, photo, street, surname, username, activation_token, token_expiration)
+-- -- VALUES
+-- --     (true, 1, 40.7128, -74.0060, 123, '0', 'authenticatedUser', 'USER', 'New York', 'TechCorp', 'Software engineer', 'John', '$2a$10$3TYrKiXr/LEDyMPvjtvqU.VApcWoOrpUetE8PaiW6DXkB4I0kCYYm', '555-1234', 'john_doe.jpg', '5th Ave', 'Doe', 'john.doe@gmail.com', '', '2024-12-31'),
+-- --     (true, 2, 34.0522, -118.2437, 456, '2', 'ServiceProvider', 'USER', 'Los Angeles', 'Creative Solutions', 'Graphic designer', 'Jane', 'password456', '555-5678', 'jane_smith.jpg', 'Sunset Blvd', 'Smith', 'jane.smith@example.com', null, null),
+-- --     (true, 3, 51.5074, -0.1278, 789, '1', 'event_organizer', 'USER', 'London', 'Innovate Ltd', 'Marketing manager', 'Alice', 'password789', '555-8765', 'alice_white.jpg', 'Oxford St', 'White', 'alice.white@gmail.com', null, null),
+-- --     (true, 4, 48.8566, 2.3522, 101, '1', 'event_organizer', 'USER', 'Paris', 'Design Works', 'Product designer', 'Bob', 'password101', '555-1122', 'bob_brown.jpg', 'Champs-Elysees', 'Brown', 'bob.brown@example.com', null, null),
+-- --     (true, 5, 40.7306, -73.9352, 202, '0', 'authenticated_user', 'USER', 'New York', 'Tech Innovators', 'Frontend developer', 'Charlie', 'password202', '555-3344', 'charlie_green.jpg', 'Broadway', 'Green', 'charlie.green@gmail.com', null, null),
+-- --     (true, 6, 37.7749, -122.4194, 303, '0', 'authenticated_user', 'USER', 'San Francisco', 'EcoSolutions', 'Project manager', 'Dave', 'password303', '555-5566', 'dave_young.jpg', 'Market St', 'Young', 'dave.young@example.com', null, null),
+-- --     (true, 7, 39.9042, 116.4074, 404, '1', 'event_organizer', 'USER', 'Beijing', 'Global Innovations', 'Business analyst', 'Eve', 'password404', '555-6677', 'eve_liu.jpg', 'Wangfujing', 'Liu', 'eve.liu@gmail.com', null, null),
+-- --     (true, 8, 34.0522, -118.2437, 505, '1', 'service_provider', 'USER', 'Los Angeles', 'Tech Synergy', 'Software architect', 'Frank', 'password505', '555-7788', 'frank_lee.jpg', 'Wilshire Blvd', 'Lee', 'frank.lee@example.com', null, null),
+-- --     (true, 9, 35.6895, 139.6917, 606, '2', 'event_organizer', 'USER', 'Tokyo', 'Creative Minds', 'Data scientist', 'Grace', 'password606', '555-8899', 'grace_kim.jpg', 'Shibuya', 'Kim', 'grace.kim@gmail.com', null, null),
+-- --     (true, 10, 40.7306, -73.9352, 707, '2', 'service_provider', 'USER', 'New York', 'DesignHub', 'UX designer', 'Hank', 'password707', '555-9900', 'hank_jones.jpg', 'Park Ave', 'Jones', 'hank.jones@example.com', null, null);
+--
+--
+-- -- insert into user_followed_events(event_id,user_id)
+-- -- values
+-- --     (1,1),
+-- --     (2,1),
+-- --     (3,1);
+--
+-- insert into user_merchandise(merchandise_id,service_provider_id) values (1,2);
+-- insert into user_merchandise(merchandise_id,service_provider_id) values (2,2);
+-- insert into user_merchandise(merchandise_id,service_provider_id) values (3,2);
+-- insert into user_merchandise(merchandise_id,service_provider_id) values (4,2);
+--
+-- INSERT INTO public.merchandise_eventtype(
+--     eventtype_id, merchandise_id)
+-- VALUES (1, 1);
+-- INSERT INTO public.merchandise_eventtype(
+--     eventtype_id, merchandise_id)
+-- VALUES (2, 1);
+-- INSERT INTO public.merchandise_eventtype(
+--     eventtype_id, merchandise_id)
+-- VALUES (3, 2);
+-- INSERT INTO public.merchandise_eventtype(
+--     eventtype_id, merchandise_id)
+-- VALUES (1, 4);
+-- INSERT INTO public.merchandise_eventtype(
+--     eventtype_id, merchandise_id)
+-- VALUES (2, 4);
+-- INSERT INTO public.merchandise_eventtype(
+--     eventtype_id, merchandise_id)
+-- VALUES (5, 4);
