@@ -14,5 +14,4 @@ public class CreateCategoryDTO {
     private String title;
     private String description;
     private boolean pending;
-    private List<Integer> eventTypeIds;
 }

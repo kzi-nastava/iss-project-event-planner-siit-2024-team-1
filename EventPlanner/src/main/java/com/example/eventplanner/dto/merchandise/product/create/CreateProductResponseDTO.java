@@ -1,6 +1,8 @@
 package com.example.eventplanner.dto.merchandise.product.create;
 
+import com.example.eventplanner.dto.category.CategoryOverviewDTO;
 import com.example.eventplanner.dto.common.AddressDTO;
+import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
 import com.example.eventplanner.dto.merchandise.CreateMerchandisePhotoDTO;
 import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
 import com.example.eventplanner.dto.merchandise.product.ServiceProviderDTO;
@@ -19,6 +21,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class CreateProductResponseDTO {
+    private int id;
     private String title;
     private String description;
     private String specificity;
@@ -34,7 +37,7 @@ public class CreateProductResponseDTO {
 
     private ServiceProviderDTO serviceProvider;
     private List<MerchandisePhotoDTO> merchandisePhotos;
-    private List<EventType> eventTypes;
+    private List<EventTypeOverviewDTO> eventTypes;
     private AddressDTO address;
-    private Category category;
+    private CategoryOverviewDTO category;
 }
