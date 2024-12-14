@@ -13,8 +13,6 @@ public class MerchandisePhoto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
-    @Lob
     private String photo;
 }
 
