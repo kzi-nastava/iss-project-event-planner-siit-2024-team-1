@@ -42,7 +42,7 @@ public class CategoryService {
         Category category = new Category();
         category.setTitle(request.getTitle());
         category.setDescription(request.getDescription());
-        category.setPending(false);
+        category.setPending(request.isPending());
         categoryRepository.save(category);
         return getAllApprovedCategories();
     }

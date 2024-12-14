@@ -12,7 +12,7 @@ INSERT INTO event_type (title, description, is_active) VALUES
                                                            ('Professional Workshop', 'Skill development and training', true),
                                                            ('Networking Event', 'Professional networking opportunities', true),
                                                            ('Educational Seminar', 'Knowledge sharing and learning', true),
-                                                           ( 'Social Gathering', 'Community and social events', true);
+                                                           ('Social Gathering', 'Community and social events', true);
 
 -- No separate address table needed since it's an @Embeddable
 
@@ -416,22 +416,4 @@ INSERT INTO category (title,description,pending) VALUES ('Entertainment','Entert
 -- insert into user_merchandise(merchandise_id,service_provider_id) values (2,2);
 -- insert into user_merchandise(merchandise_id,service_provider_id) values (3,2);
 -- insert into user_merchandise(merchandise_id,service_provider_id) values (4,2);
---
--- INSERT INTO public.merchandise_eventtype(
---     eventtype_id, merchandise_id)
--- VALUES (1, 1);
--- INSERT INTO public.merchandise_eventtype(
---     eventtype_id, merchandise_id)
--- VALUES (2, 1);
--- INSERT INTO public.merchandise_eventtype(
---     eventtype_id, merchandise_id)
--- VALUES (3, 2);
--- INSERT INTO public.merchandise_eventtype(
---     eventtype_id, merchandise_id)
--- VALUES (1, 4);
--- INSERT INTO public.merchandise_eventtype(
---     eventtype_id, merchandise_id)
--- VALUES (2, 4);
--- INSERT INTO public.merchandise_eventtype(
---     eventtype_id, merchandise_id)
--- VALUES (5, 4);
+

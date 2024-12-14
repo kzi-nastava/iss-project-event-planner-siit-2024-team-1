@@ -16,6 +16,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class ProductOverviewDTO {
+    private int id;
     private String title;
     private String description;
     private String specificity;
