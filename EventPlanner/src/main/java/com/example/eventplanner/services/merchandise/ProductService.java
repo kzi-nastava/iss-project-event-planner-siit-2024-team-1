@@ -4,7 +4,9 @@ import com.example.eventplanner.dto.category.CategoryOverviewDTO;
 import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
 import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
+import com.example.eventplanner.dto.merchandise.product.*;
 import com.example.eventplanner.model.merchandise.*;
+import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.merchandise.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,10 +19,6 @@ import com.example.eventplanner.dto.event.ActivityOverviewDTO;
 import com.example.eventplanner.dto.event.EventOverviewDTO;
 import com.example.eventplanner.dto.merchandise.CreateMerchandisePhotoDTO;
 import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
-import com.example.eventplanner.dto.merchandise.product.GetAllProductsResponseDTO;
-import com.example.eventplanner.dto.merchandise.product.GetProductByIdResponseDTO;
-import com.example.eventplanner.dto.merchandise.product.ProductOverviewDTO;
-import com.example.eventplanner.dto.merchandise.product.ServiceProviderDTO;
 import com.example.eventplanner.dto.merchandise.product.create.CreateProductRequestDTO;
 import com.example.eventplanner.dto.merchandise.product.create.CreateProductResponseDTO;
 import com.example.eventplanner.dto.merchandise.product.update.UpdateProductRequestDTO;
@@ -60,6 +58,7 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final ServiceRepository serviceRepository;
     private final ServiceProviderRepository serviceProviderRepository;
+    private final EventRepository eventRepository;
 
     public Page<MerchandiseOverviewDTO> search(ProductFiltersDTO productFiltersDTO, String search, Pageable pageable) {
         Specification<Product> spec = createSpecification(productFiltersDTO, search);
@@ -411,5 +410,22 @@ public class ProductService {
         productRepository.deleteById(product.getId());
 
         return true;
+    }
+
+    public BuyProductResponseDTO buyProduct(int productId, int eventId) throws Exception {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
+        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
+
+        boolean exists = event.getMerchandise().stream().anyMatch(
+                p -> p.getCategory().getId() == product.getCategory().getId());
+        if(exists) {
+            throw new Exception("Already have product or service for this category");
+        }
+        else {
+            event.getMerchandise().add(product);
+            Event event1 = eventRepository.save(event);
+        }
+
+        return new BuyProductResponseDTO();
     }
 }
