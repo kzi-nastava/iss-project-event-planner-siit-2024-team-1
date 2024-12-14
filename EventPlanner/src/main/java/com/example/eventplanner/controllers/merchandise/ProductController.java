@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.http.HttpResponse;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -83,9 +84,14 @@ public class ProductController {
         return ResponseEntity.ok(productService.deleteProduct(id));
     }
 
-    @PostMapping("/{id}/buy")
-    public ResponseEntity<BuyProductResponseDTO> buyProduct(@PathVariable(value = "id") int id) {
-        return ResponseEntity.ok(new BuyProductResponseDTO());
+    @PostMapping("/buy/{productId}")
+    public ResponseEntity<Object> buyProduct(@PathVariable(value = "productId") int productId, @RequestBody int eventId) {
+        try {
+            productService.buyProduct(productId, eventId);
+        }catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+        }
+        return ResponseEntity.ok(Map.of("message", "Product bought"));
     }
 
     @PostMapping("/{id}/review")
