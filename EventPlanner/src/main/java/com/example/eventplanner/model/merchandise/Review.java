@@ -14,7 +14,7 @@ public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
+    private String reviewersUsername;
     private String comment;
     private int rating;
     private boolean status;

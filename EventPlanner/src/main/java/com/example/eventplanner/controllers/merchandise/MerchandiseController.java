@@ -3,6 +3,7 @@ package com.example.eventplanner.controllers.merchandise;
 import com.example.eventplanner.dto.category.CategoryOverviewDTO;
 import com.example.eventplanner.dto.category.GetAllCategoriesDTO;
 import com.example.eventplanner.dto.event.EventOverviewDTO;
+import com.example.eventplanner.dto.merchandise.MerchandiseDetailDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.services.merchandise.MerchandiseService;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,5 +39,11 @@ public class MerchandiseController {
     @GetMapping("/categories")
     public ResponseEntity<GetAllCategoriesDTO> getAllMerchandise() {
         return ResponseEntity.ok(merchandiseService.getAllCategories());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MerchandiseDetailDTO> getMerchandiseById(@PathVariable int id) {
+        MerchandiseDetailDTO merchandiseDetail = this.merchandiseService.getMerchandiseById(id);
+        return ResponseEntity.ok(merchandiseDetail);
     }
 }
