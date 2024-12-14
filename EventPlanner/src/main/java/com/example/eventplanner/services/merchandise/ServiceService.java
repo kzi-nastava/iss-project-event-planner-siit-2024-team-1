@@ -16,10 +16,7 @@ import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
-import com.example.eventplanner.model.merchandise.Merchandise;
-import com.example.eventplanner.model.merchandise.MerchandisePhoto;
-import com.example.eventplanner.model.merchandise.MerchandiseState;
-import com.example.eventplanner.model.merchandise.Timeslot;
+import com.example.eventplanner.model.merchandise.*;
 import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.category.CategoryRepository;
@@ -43,6 +40,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -423,7 +421,7 @@ public class ServiceService {
     }
 
     public List<CreateServiceResponseDTO> getAllBySpId(int id) {
-        ServiceProvider serviceProvider = (ServiceProvider) serviceProviderRepository.findById(id)
+        ServiceProvider serviceProvider = (ServiceProvider) userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Service provider with id " + id + " not found"));
 
         return serviceProvider.getMerchandise().stream()
@@ -449,13 +447,12 @@ public class ServiceService {
     }
 
     public CreateServiceResponseDTO updateService(int serviceId, UpdateServiceRequestDTO request) {
-        com.example.eventplanner.model.merchandise.Service service = serviceRepository.findById(serviceId).orElseThrow(
+        com.example.eventplanner.model.merchandise.Service serviceBeforeUpdate = serviceRepository.findById(serviceId).orElseThrow(
                 () -> new RuntimeException("Service with id " + serviceId + " not found"));
-        service.setAvailable(false);
-        com.example.eventplanner.model.merchandise.Service serviceBeforeUpdate = merchandiseRepository.save(service);
+        serviceBeforeUpdate.setAvailable(false);
         com.example.eventplanner.model.merchandise.Service updatedService = new com.example.eventplanner.model.merchandise.Service();
 
-        ServiceProvider serviceProvider = serviceProviderRepository.findById(request.getServiceProviderId()).orElseThrow(
+        ServiceProvider serviceProvider = (ServiceProvider) userRepository.findById(request.getServiceProviderId()).orElseThrow(
                 () -> new RuntimeException("User with id " + request.getServiceProviderId() + " not found")
         );
 
@@ -492,7 +489,6 @@ public class ServiceService {
             address.setNumber(request.getAddress().getNumber());
             address.setLongitude(request.getAddress().getLongitude());
             address.setLatitude(request.getAddress().getLatitude());
-            service.setAddress(address);
         }else {
             address.setStreet(serviceProvider.getAddress().getStreet());
             address.setCity(serviceProvider.getAddress().getCity());
@@ -501,7 +497,12 @@ public class ServiceService {
             address.setLatitude(serviceProvider.getAddress().getLatitude());
         }
         updatedService.setAddress(address);
-        updatedService.setCategory(service.getCategory());
+        updatedService.setCategory(serviceBeforeUpdate.getCategory());
+
+        List<Review> merchandiseReviews = new ArrayList<>(serviceBeforeUpdate.getReviews());
+        serviceBeforeUpdate.setReviews(new ArrayList<>());
+        merchandiseRepository.save(serviceBeforeUpdate);
+        updatedService.setReviews(merchandiseReviews);
 
         com.example.eventplanner.model.merchandise.Service savedService = merchandiseRepository.save(updatedService);
 

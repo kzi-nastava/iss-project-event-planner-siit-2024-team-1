@@ -33,6 +33,7 @@ public class MerchandiseService {
 
     public List<MerchandiseOverviewDTO> getTop() {
         return merchandiseRepository.findAll().stream()
+                .filter(Merchandise::isAvailable)
                 .map(this::convertToOverviewDTO)
                 .sorted(Comparator.comparing(MerchandiseOverviewDTO::getRating).reversed())
                 .limit(5)
@@ -135,6 +136,7 @@ public class MerchandiseService {
 
     private MerchandiseReviewOverviewDTO mapToMerchandiseReviewDTO(Review review) {
         MerchandiseReviewOverviewDTO dto = new MerchandiseReviewOverviewDTO();
+        dto.setReviewersUsername(review.getReviewersUsername());
         dto.setComment(review.getComment());
         dto.setRating(review.getRating());
         return dto;
