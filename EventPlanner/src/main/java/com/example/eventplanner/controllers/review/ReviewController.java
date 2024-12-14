@@ -16,14 +16,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReviewController {
     private final ReviewService reviewService;
-    @PutMapping("/{id}")
-    public ResponseEntity<ReviewUpdateResponseDTO> updateReview(@PathVariable int id, @RequestBody ReviewDTO reviewDetails) {
-        return ResponseEntity.ok(new ReviewUpdateResponseDTO());
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<ReviewOverviewDTO> approveReview(@PathVariable int id) {
+        ReviewOverviewDTO approvedReview = reviewService.approveReview(id);
+        return ResponseEntity.ok(approvedReview);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable int id) {
-        return ResponseEntity.noContent().build();
+    @PutMapping("/{id}/deny")
+    public ResponseEntity<ReviewOverviewDTO> denyReview(@PathVariable int id) {
+        ReviewOverviewDTO deniedReview = reviewService.denyReview(id);
+        return ResponseEntity.ok(deniedReview);
     }
 
     @GetMapping("/pending")
