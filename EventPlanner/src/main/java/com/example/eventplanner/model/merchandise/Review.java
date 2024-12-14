@@ -1,10 +1,12 @@
 package com.example.eventplanner.model.merchandise;
 
-import com.example.eventplanner.model.event.Event;
+import com.example.eventplanner.model.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -17,12 +19,12 @@ public class Review {
 
     private String comment;
     private int rating;
-    private boolean status;
-
-    public Review(String comment, int rating, boolean status) {
-        this.comment = comment;
-        this.rating = rating;
-        this.status = status;
-    }
+    @Enumerated(EnumType.STRING)
+    private ReviewStatus status;
+    private boolean deleted;
+    private LocalDateTime createdAt;
+    @ManyToOne
+    @JoinColumn(name = "reviewerId")
+    private User reviewer;
 
 }

@@ -329,67 +329,6 @@ INSERT INTO merchandise (
  -77.0369,
  38.9072, 1, 0);
 
-INSERT INTO review (id, comment, rating, status) VALUES
--- DJ Service Reviews (ID: 1)
-(1, 'Amazing DJ! Kept the party going all night long', 5, true),
-(2, 'Great music selection and very professional', 5, true),
-(3, 'Good service but could improve song transitions', 4, true),
-(4, 'Fantastic energy and crowd engagement', 5, true),
-
--- Photography Service Reviews (ID: 2)
-(5, 'Beautiful photos, captured every moment perfectly', 5, true),
-(6, 'Professional service but took longer than promised for delivery', 3, true),
-(7, 'Excellent attention to detail', 4, true),
-(8, 'Worth every penny, amazing quality', 5, true),
-
--- Catering Service Reviews (ID: 3)
-(9, 'Food was delicious and presentation was beautiful', 5, true),
-(10, 'Great variety but some dishes were cold', 3, true),
-(11, 'Professional staff and excellent service', 4, true),
-(12, 'Outstanding quality and presentation', 5, true),
-
--- Event Planning Service Reviews (ID: 4)
-(13, 'Made our event completely stress-free', 5, true),
-(14, 'Excellent coordination and attention to detail', 5, true),
-(15, 'Good planning but some communication issues', 4, true),
-(16, 'Went above and beyond our expectations', 5, true),
-
--- Decoration Service Reviews (ID: 5)
-(17, 'Beautiful decorations, exactly what we wanted', 5, true),
-(18, 'Creative designs but setup was delayed', 3, true),
-(19, 'Transformed the venue beautifully', 4, true),
-(20, 'High-quality materials and great execution', 5, true);
-
-INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
--- DJ Service (merchandise_id: 1)
-(1, 1),
-(1, 2),
-(1, 3),
-(1, 4),
-
--- Photography Service (merchandise_id: 2)
-(2, 5),
-(2, 6),
-(2, 7),
-(2, 8),
-
--- Catering Service (merchandise_id: 3)
-(3, 9),
-(3, 10),
-(3, 11),
-(3, 12),
-
--- Event Planning Service (merchandise_id: 4)
-(4, 13),
-(4, 14),
-(4, 15),
-(4, 16),
-
--- Decoration Service (merchandise_id: 5)
-(5, 17),
-(5, 18),
-(5, 19),
-(5, 20);
 
 -- INSERT INTO public."user"(
 --     active, id, latitude, longitude, "number", role, user_type, authorities, city, company, description, name, password, phone_number, photo, street, surname, username, activation_token, token_expiration)
@@ -413,3 +352,73 @@ INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
 --     (3,1);
 
 insert into user_merchandise(merchandise_id,service_provider_id) values (4,2);
+
+
+-- Reviews for "Tech Innovation Summit 2024"
+INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
+                                                                                     (41, 'Amazing experience! Learned so much about cutting-edge technology.', 5, 'PENDING', false, '2023-09-15 10:00:00', 1),
+                                                                                     (42, 'Well-organized but I felt the sessions were too long.', 4, 'PENDING', false, '2023-09-16 11:00:00', 2),
+                                                                                     (43, 'The location was too crowded for the number of attendees.', 3, 'PENDING', false, '2023-09-17 12:00:00', 1),
+                                                                                     (44, 'Great event! Excellent speakers and engaging sessions.', 5, 'PENDING', false, '2023-09-18 13:00:00', 1);
+
+-- Reviews for "AI & Machine Learning Forum"
+INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
+                                                                                     (45, 'Fantastic forum for AI enthusiasts. Great networking opportunities.', 5, 'PENDING', false, '2023-08-10 09:00:00', 2),
+                                                                                     (46, 'Loved the hands-on workshops. Very informative.', 5, 'PENDING', false, '2023-08-11 10:00:00', 2),
+                                                                                     (47, 'Would have liked more beginner-friendly content.', 3, 'PENDING', false, '2023-08-12 11:00:00', 1),
+                                                                                     (48, 'Keynote speaker was excellent! Very inspiring.', 4, 'PENDING', false, '2023-08-13 12:00:00', 2);
+
+-- Reviews for "Startup Networking Night"
+INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
+                                                                                     (49, 'Met a lot of amazing people. Great for entrepreneurs!', 5, 'PENDING', false, '2023-07-20 14:00:00', 2),
+                                                                                     (50, 'Good opportunity, but the event seemed too short.', 4, 'PENDING', false, '2023-07-21 15:00:00', 2),
+                                                                                     (51, 'Loved the casual atmosphere, and it was easy to connect with others.', 5, 'PENDING', false, '2023-07-22 16:00:00', 1),
+                                                                                     (52, 'Food options were limited, but overall a good experience.', 3, 'PENDING', false, '2023-07-23 17:00:00', 1);
+
+-- Link Reviews to Events
+INSERT INTO event_reviews (event_id, review_id) VALUES
+-- Tech Innovation Summit (event_id: 1)
+(1, 41),
+(1, 42),
+(1, 43),
+(1, 44),
+
+-- AI & Machine Learning Forum (event_id: 4)
+(4, 45),
+(4, 46),
+(4, 47),
+(4, 48),
+
+-- Startup Networking Night (event_id: 3)
+(3, 49),
+(3, 50),
+(3, 51),
+(3, 52);
+
+-- Reviews for "Professional DJ Services"
+INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
+                                                                                     (53, 'The DJ played great music and kept the energy high throughout the event.', 5, 'PENDING', false, '2023-06-10 18:00:00', 2),
+                                                                                     (54, 'Good service but arrived slightly late.', 4, 'PENDING', false, '2023-06-11 19:00:00', 2),
+                                                                                     (55, 'Decent performance, but I expected more variety in the playlist.', 3, 'PENDING', false, '2023-06-12 20:00:00', 1),
+                                                                                     (56, 'Excellent work! My guests had a blast!', 5, 'PENDING', false, '2023-06-13 21:00:00', 2);
+
+-- Reviews for "Event Photography"
+INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
+                                                                                     (57, 'The photos came out beautifully, capturing every special moment.', 5, 'PENDING', false, '2023-05-01 10:30:00', 1),
+                                                                                     (58, 'Professional service, but delivery was delayed.', 4, 'PENDING', false, '2023-05-02 11:30:00', 2),
+                                                                                     (59, 'Attention to detail was stunning. Would hire again.', 5, 'PENDING', false, '2023-05-03 12:30:00', 1),
+                                                                                     (60, 'Good quality but a bit pricey.', 4, 'PENDING', false, '2023-05-04 13:30:00', 2);
+
+-- Link Reviews to Merchandise
+INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
+-- DJ Service (merchandise_id: 1)
+(1, 53),
+(1, 54),
+(1, 55),
+(1, 56),
+
+-- Photography Service (merchandise_id: 2)
+(2, 57),
+(2, 58),
+(2, 59),
+(2, 60);
