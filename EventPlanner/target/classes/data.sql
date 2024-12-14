@@ -396,8 +396,8 @@ INSERT INTO merchandise_photo (id, photo) VALUES
 INSERT INTO merchandise_photos (merchandise_id, photo_id) VALUES
 (4,11),
 (4,22),
-(4,33),
-(4,44);
+(11,33),
+(11,44);
 
 -- INSERT INTO public."user"(
 --     active, id, latitude, longitude, "number", role, user_type, authorities, city, company, description, name, password, phone_number, photo, street, surname, username, activation_token, token_expiration)
