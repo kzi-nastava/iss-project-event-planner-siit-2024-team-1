@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -180,8 +181,16 @@ public class EventService {
 
         EventType eventType = eventTypeRepository.findById(dto.getEventTypeId()).orElseThrow();
         event.setType(eventType);
-        List<Merchandise> merchandise = merchandiseRepository.findAllById(dto.getProductIds());
-        merchandise.addAll(merchandiseRepository.findAllById(dto.getServiceIds()));
+        List<Merchandise> products = merchandiseRepository.findAllById(dto.getProductIds());
+        List<Merchandise> services = merchandiseRepository.findAllById(dto.getServiceIds());
+        List<Merchandise> merchandise = new ArrayList<>();
+
+        if(!products.isEmpty()){
+            merchandise.addAll(products);
+        }
+        if(!services.isEmpty()){
+            merchandise.addAll(services);
+        }
         event.setMerchandise(merchandise);
 
         EventOrganizer eventOrganizer = eventOrganizerRepository.findById(dto.getOrganizerId()).orElseThrow();
@@ -291,8 +300,16 @@ public class EventService {
 
         EventType eventType = eventTypeRepository.findById(dto.getEventTypeId()).orElseThrow();
         event.setType(eventType);
-        List<Merchandise> merchandise = merchandiseRepository.findAllById(dto.getProductIds());
-        merchandise.addAll(merchandiseRepository.findAllById(dto.getServiceIds()));
+        List<Merchandise> products = merchandiseRepository.findAllById(dto.getProductIds());
+        List<Merchandise> services = merchandiseRepository.findAllById(dto.getServiceIds());
+        List<Merchandise> merchandise = new ArrayList<>();
+
+        if(!products.isEmpty()){
+            merchandise.addAll(products);
+        }
+        if(!services.isEmpty()){
+            merchandise.addAll(services);
+        }
         event.setMerchandise(merchandise);
 
         Event savedEvent = eventRepository.save(event);
