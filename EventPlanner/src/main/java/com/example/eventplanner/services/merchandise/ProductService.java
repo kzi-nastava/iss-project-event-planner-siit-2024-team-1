@@ -155,7 +155,7 @@ public class ProductService {
 
         // Map the merchandise of the service provider to ProductOverviewDTO
         return serviceProvider.getMerchandise().stream()
-                .filter(merchandise -> merchandise instanceof Product) // Filter by title
+                .filter(merchandise -> merchandise instanceof Product && !merchandise.isDeleted()) 
                 .map(this::mapToProductOverviewDTO)
                 .toList();
     }
@@ -416,7 +416,8 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
 
-        merchandiseRepository.deleteById(product.getId());
+        product.setDeleted(true);
+        merchandiseRepository.save(product);
 
         return true;
     }
