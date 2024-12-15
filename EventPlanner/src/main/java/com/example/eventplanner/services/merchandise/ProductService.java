@@ -69,6 +69,9 @@ public class ProductService {
     public List<MerchandiseOverviewDTO> getAll(){
         return productRepository.findAll().stream().map(this::convertToOverviewDTO).toList();
     }
+    public ProductOverviewDTO getById(int id){
+        return mapToProductOverviewDTO((Product)merchandiseRepository.findById(id).orElseThrow());
+    }
 
     private Specification<Product> createSpecification(ProductFiltersDTO productFiltersDTO, String search) {
         Specification<Product> spec = Specification.where(null);
@@ -151,12 +154,15 @@ public class ProductService {
 
         // Map the merchandise of the service provider to ProductOverviewDTO
         return serviceProvider.getMerchandise().stream()
-                .map(this::mapToProductOverviewDTO).toList();
+                .filter(merchandise -> merchandise instanceof Product && !merchandise.isDeleted()) 
+                .map(this::mapToProductOverviewDTO)
+                .toList();
     }
     // Helper method to map Merchandise to ProductOverviewDTO
     private ProductOverviewDTO mapToProductOverviewDTO(Merchandise savedProduct) {
         ProductOverviewDTO responseDTO = new ProductOverviewDTO();
 
+        responseDTO.setId(savedProduct.getId());
         responseDTO.setTitle(savedProduct.getTitle());
         responseDTO.setDescription(savedProduct.getDescription());
         responseDTO.setSpecificity(savedProduct.getSpecificity());
@@ -215,7 +221,7 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Service provider not found"));
 
         // Step 2: Create a new Product (Merchandise)
-        Merchandise product = new Merchandise();
+        Product product = new Product();
         product.setTitle(createProductRequestDTO.getTitle());
         product.setDescription(createProductRequestDTO.getDescription());
         product.setSpecificity(createProductRequestDTO.getSpecificity());
@@ -246,20 +252,16 @@ public class ProductService {
         List<EventType> eventTypes = eventTypeRepository.findAllById(createProductRequestDTO.getEventTypesIds());
         product.setEventTypes(eventTypes);
 
-        // Step 5: Set Category
-        if (createProductRequestDTO.getCategoryId() != -1) {
-            Category category = categoryRepository.findById(createProductRequestDTO.getCategoryId())
+
+        Category category = categoryRepository.findById(createProductRequestDTO.getCategoryId())
                     .orElseThrow(() -> new RuntimeException("Category not found"));
-            product.setCategory(category);
-            product.setState(MerchandiseState.APPROVED);
-        }else{
-            Category category = new Category();
-            category.setTitle(createProductRequestDTO.getCategory().getTitle());
-            category.setDescription(createProductRequestDTO.getCategory().getDescription());
-            category.setPending(true);
-            product.setCategory(categoryRepository.save(category));
+        product.setCategory(category);
+        if(product.getCategory().isPending()){
             product.setState(MerchandiseState.PENDING);
+        }else{
+            product.setState(MerchandiseState.APPROVED);
         }
+
 
         // Step 6: Set Address
         Address address = new Address();
@@ -277,7 +279,7 @@ public class ProductService {
         serviceProviderDTO.setSurname(serviceProvider.getSurname());
 
         // Step 7: Save the new product (Merchandise)
-        Merchandise savedProduct = merchandiseRepository.save(product);
+        Product savedProduct = productRepository.save(product);
 
         List<Merchandise> merchandise = serviceProvider.getMerchandise();
         merchandise.add(savedProduct);
@@ -290,15 +292,15 @@ public class ProductService {
     }
 
     public CreateProductResponseDTO updateProduct(int productId, UpdateProductRequestDTO updateProductRequestDTO) {
-        Merchandise product = merchandiseRepository.findById(productId)
+        Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         product.setAvailable(false);
-        Merchandise oldProduct = merchandiseRepository.save(product);
-        Merchandise newProduct = new Merchandise();
+        Product oldProduct = productRepository.save(product);
+        Product newProduct = new Product();
 
         // Step 1: Fetch the ServiceProvider
-        User serviceProvider = userRepository.findById(updateProductRequestDTO.getServiceProviderId())
+        ServiceProvider serviceProvider = serviceProviderRepository.findById(updateProductRequestDTO.getServiceProviderId())
                 .orElseThrow(() -> new RuntimeException("Service provider not found"));
         ServiceProviderDTO serviceProviderDTO = new ServiceProviderDTO();
         serviceProviderDTO.setId(serviceProvider.getId());
@@ -347,7 +349,12 @@ public class ProductService {
         newProduct.setCategory(product.getCategory());
 
         // Step 7: Save the new product (Merchandise)
-        Merchandise savedProduct = merchandiseRepository.save(newProduct);
+        Product savedProduct = productRepository.save(newProduct);
+
+        List<Merchandise> merchandise = serviceProvider.getMerchandise();
+        merchandise.add(savedProduct);
+        serviceProvider.setMerchandise(merchandise);
+        ServiceProvider sp = serviceProviderRepository.save(serviceProvider);
 
         // Step 8: Map to CreateProductResponseDTO and return
         return mapToCreateProductResponseDTO(savedProduct, serviceProviderDTO, savedPhotos.stream().map(this::mapToMerchandisePhotoDTO).toList());
@@ -404,10 +411,12 @@ public class ProductService {
 
     public boolean deleteProduct(int productId) {
         // Fetch the existing event
-        Merchandise product = productRepository.findById(productId)
+        Merchandise product = merchandiseRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        productRepository.deleteById(product.getId());
+
+        product.setDeleted(true);
+        merchandiseRepository.save(product);
 
         return true;
     }

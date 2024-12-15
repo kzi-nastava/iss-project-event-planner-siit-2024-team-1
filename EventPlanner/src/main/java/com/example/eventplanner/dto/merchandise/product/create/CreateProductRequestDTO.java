@@ -33,5 +33,4 @@ public class CreateProductRequestDTO {
     private List<Integer> eventTypesIds;
     private AddressDTO address;
     private int categoryId;
-    private CreateCategoryDTO category;
 }

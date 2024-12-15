@@ -624,4 +624,3 @@ INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
 -- INSERT INTO public.merchandise_eventtype(
 --     eventtype_id, merchandise_id)
 -- VALUES (5, 4);
-
