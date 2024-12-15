@@ -1,5 +1,7 @@
 package com.example.eventplanner.model.event;
 
+import com.example.eventplanner.dto.common.AddressDTO;
+import com.example.eventplanner.model.common.Address;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +22,6 @@ public class Activity {
     private String description;
     private LocalTime startTime;
     private LocalTime endTime;
-    private String address;
+    private Address address;
 
 }
