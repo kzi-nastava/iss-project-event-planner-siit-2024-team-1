@@ -34,6 +34,12 @@ public class EventController {
     }
 
 
+    @GetMapping("/{userId}/favorite")
+    public ResponseEntity<List<EventOverviewDTO>> getFavoriteEventsWp(@PathVariable int userId) {
+        return ResponseEntity.ok(eventService.getFavoriteEventsWp(userId));
+    }
+
+
     @GetMapping("/eo/{id}")
     public ResponseEntity<Page<EventOverviewDTO>> getEventsByEo(@PathVariable int id,
             @PageableDefault(size = 10, sort = "date", direction = Sort.Direction.DESC) Pageable eventPage
@@ -46,6 +52,13 @@ public class EventController {
             @RequestParam int userId
     ) {
         return ResponseEntity.ok(eventService.getUserFollowedEvents(userId));
+    }
+
+    @GetMapping("/report/{id}")
+    public ResponseEntity<EventReportDTO> getEventReport(
+            @PathVariable int id
+    ) {
+        return ResponseEntity.ok(eventService.getEventReport(id));
     }
 
     @GetMapping("/search")
@@ -127,5 +140,13 @@ public class EventController {
             @RequestParam int eventId
     ) {
         return ResponseEntity.ok(jwtService.inviteToEvent(eventId,email));
+    }
+
+    @PostMapping("/{eventId}/add-to-favorites/{userId}")
+    public ResponseEntity<Boolean> favorizeEvent(
+            @PathVariable int eventId,
+            @PathVariable int userId
+            ) {
+        return ResponseEntity.ok(eventService.favorizeEvent(eventId, userId));
     }
 }

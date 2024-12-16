@@ -7,13 +7,20 @@ import com.example.eventplanner.dto.event.*;
 import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
 import com.example.eventplanner.dto.merchandise.product.GetProductByIdResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.GetServiceByIdResponseDTO;
+import com.example.eventplanner.dto.review.ReviewDTO;
+import com.example.eventplanner.dto.user.UserOverviewDTO;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.event.Activity;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.Product;
+
 import com.example.eventplanner.model.user.AuthenticatedUser;
+
+import com.example.eventplanner.model.merchandise.Review;
+import com.example.eventplanner.model.merchandise.ReviewStatus;
+
 import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.event.ActivityRepository;
@@ -107,6 +114,7 @@ public class EventService {
         return userRepository.findById(userId).orElse(null);
     }
 
+
     private Page<EventOverviewDTO> fetchAllEvents(Pageable pageable) {
         Page<Event> eventPage = eventRepository.findAll(pageable);
         List<EventOverviewDTO> events = eventPage.getContent().stream()
@@ -128,12 +136,40 @@ public class EventService {
     }
 
 
+    public List<EventOverviewDTO> getFavoriteEventsWp(int userId) {
+        return userRepository.findById(userId).orElseThrow().getFavoriteEvents().stream().map(this::convertToOverviewDTO).collect(Collectors.toList());
+    }
+
     public CreatedEventOverviewDTO getById(int id) {
         return mapToCreatedEventOverviewDTO(eventRepository.findById(id).orElseThrow(), eventRepository.findById(id).orElseThrow().getType(), eventRepository.findById(id).orElseThrow().getMerchandise());
     }
 
     public Page<EventOverviewDTO> getByEo(int id, Pageable pageable) {
         return eventRepository.findByOrganizerId(id, pageable).map(this::convertToOverviewDTO);
+    }
+
+    public EventReportDTO getEventReport(int id){
+        EventReportDTO eventReportDTO = new EventReportDTO();
+        Event event = eventRepository.findById(id).orElseThrow();
+
+        eventReportDTO.setParticipants(event.getParticipants().stream().map(this::convertToUserDTO).toList());
+        eventReportDTO.setReviews(event.getReviews().stream().filter(review -> review.getStatus() == ReviewStatus.APPROVED).map(this::convertToReviewDTO).toList());
+
+        return eventReportDTO;
+    }
+
+    private ReviewDTO convertToReviewDTO(Review review){
+        ReviewDTO reviewDTO = new ReviewDTO();
+        reviewDTO.setId(review.getId());
+        reviewDTO.setComment(review.getComment());
+        reviewDTO.setRating(review.getRating());
+        reviewDTO.setStatus(true);
+        return reviewDTO;
+    }
+
+    private UserOverviewDTO convertToUserDTO(User user){
+        UserOverviewDTO userOverviewDTO = new UserOverviewDTO(user.getId(), user.getUsername(), user.getName(), user.getSurname(), "");
+        return userOverviewDTO;
     }
 
     public List<EventOverviewDTO> getUserFollowedEvents(int userId) {
@@ -220,6 +256,25 @@ public class EventService {
         };
     }
 
+    public Boolean favorizeEvent(int eventId, int userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+
+        if(user.getFavoriteEvents().contains(event)) {
+            user.getFavoriteEvents().remove(event);
+        }
+        else{
+            user.getFavoriteEvents().add(event);
+        }
+
+
+        userRepository.save(user);
+
+        return true;
+    }
+
     private Specification<Event> createSpecification(EventFiltersDTO eventFiltersDTO, String search) {
         Specification<Event> spec = Specification.where(null);
         spec = addDateRangeFilter(spec, eventFiltersDTO);
@@ -279,13 +334,23 @@ public class EventService {
         }
         return spec;
     }
+    private EventTypeOverviewDTO convertToOverviewDTO(EventType eventType) {
+        EventTypeOverviewDTO dto = new EventTypeOverviewDTO();
+        dto.setId(eventType.getId());
+        dto.setTitle(eventType.getTitle());
+        dto.setDescription(eventType.getDescription());
+        dto.setActive(eventType.isActive());
+        dto.setRecommendedCategories(null);
+
+        return dto;
+    }
     public EventDetailsDTO getDetails(int eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
         EventDetailsDTO dto = new EventDetailsDTO();
         dto.setId(event.getId());
-        dto.setType(event.getType() != null ? event.getType().getTitle() : null);
+        dto.setEventType(convertToOverviewDTO(event.getType()));
         dto.setTitle(event.getTitle());
         dto.setDate(event.getDate());
 
