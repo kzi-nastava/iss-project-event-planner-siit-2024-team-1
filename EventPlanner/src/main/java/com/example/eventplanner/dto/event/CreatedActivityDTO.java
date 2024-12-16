@@ -1,5 +1,6 @@
 package com.example.eventplanner.dto.event;
 
+import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.model.event.Activity;
 
 import java.time.LocalTime;
@@ -16,5 +17,5 @@ public class CreatedActivityDTO {
     private String description;
     private LocalTime startTime;
     private LocalTime endTime;
-    private String address;
+    private AddressDTO address;
 }

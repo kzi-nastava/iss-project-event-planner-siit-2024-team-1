@@ -472,7 +472,14 @@ public class EventService {
         activity.setDescription(dto.getDescription());
         activity.setStartTime(dto.getStartTime());
         activity.setEndTime(dto.getEndTime());
-        activity.setAddress(dto.getAddress());
+
+        Address address = new Address();
+        address.setStreet(dto.getAddress().getStreet());
+        address.setCity(dto.getAddress().getCity());
+        address.setNumber(dto.getAddress().getNumber());
+        address.setLatitude(dto.getAddress().getLatitude());
+        address.setLongitude(dto.getAddress().getLongitude());
+        activity.setAddress(address);
 
         // Save the activity (if using a repository for Activity)
         activity = activityRepository.save(activity);
@@ -490,7 +497,14 @@ public class EventService {
         createdActivityDTO.setDescription(activity.getDescription());
         createdActivityDTO.setStartTime(activity.getStartTime());
         createdActivityDTO.setEndTime(activity.getEndTime());
-        createdActivityDTO.setAddress(activity.getAddress());
+
+        AddressDTO addressDTO = new AddressDTO();
+        addressDTO.setStreet(activity.getAddress().getStreet());
+        addressDTO.setCity(activity.getAddress().getCity());
+        addressDTO.setNumber(activity.getAddress().getNumber());
+        addressDTO.setLatitude(activity.getAddress().getLatitude());
+        addressDTO.setLongitude(activity.getAddress().getLongitude());
+        createdActivityDTO.setAddress(addressDTO);
 
         return createdActivityDTO;
     }
@@ -503,6 +517,18 @@ public class EventService {
         return event.getActivities().stream().map(this::mapToActivityOverviewDTO).toList();
     }
 
+    public ActivityOverviewDTO updateActivity(int activityId, CreateActivityDTO dto) {
+        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new RuntimeException("Activity not found"));
+
+        activity.setTitle(dto.getTitle());
+        activity.setDescription(dto.getDescription());
+        activity.setStartTime(dto.getStartTime());
+        activity.setEndTime(dto.getEndTime());
+        activity = activityRepository.save(activity);
+
+        return mapToActivityOverviewDTO(activity);
+    }
+
     private ActivityOverviewDTO mapToActivityOverviewDTO(Activity activity) {
         ActivityOverviewDTO dto = new ActivityOverviewDTO();
         dto.setId(activity.getId());
@@ -510,7 +536,15 @@ public class EventService {
         dto.setDescription(activity.getDescription());
         dto.setStartTime(activity.getStartTime());
         dto.setEndTime(activity.getEndTime());
-        dto.setAddress(activity.getAddress());
+
+        AddressDTO addressDTO = new AddressDTO();
+        addressDTO.setStreet(activity.getAddress().getStreet());
+        addressDTO.setCity(activity.getAddress().getCity());
+        addressDTO.setNumber(activity.getAddress().getNumber());
+        addressDTO.setLatitude(activity.getAddress().getLatitude());
+        addressDTO.setLongitude(activity.getAddress().getLongitude());
+        dto.setAddress(addressDTO);
+
         return dto;
     }
 

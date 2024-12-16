@@ -103,6 +103,15 @@ public class EventController {
         return new ResponseEntity<>(activityDTO, HttpStatus.CREATED);
     }
 
+    @PutMapping("/agenda/{activityId}")
+    public ResponseEntity<ActivityOverviewDTO> updateActivity(@PathVariable int activityId, @RequestBody CreateActivityDTO dto) {
+        // Call the service to create the event
+        ActivityOverviewDTO activityDTO = eventService.updateActivity(activityId, dto);
+
+        // Return the created event DTO
+        return new ResponseEntity<>(activityDTO, HttpStatus.CREATED);
+    }
+
     @DeleteMapping("{eventId}/agenda/{activityId}")
     public ResponseEntity<List<ActivityOverviewDTO>> deleteAgenda(@PathVariable int eventId, @PathVariable int activityId) {
         // Call the service to create the event

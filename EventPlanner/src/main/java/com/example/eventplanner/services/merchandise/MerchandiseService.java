@@ -172,7 +172,7 @@ public class MerchandiseService {
 
     private MerchandiseReviewOverviewDTO mapToMerchandiseReviewDTO(Review review) {
         MerchandiseReviewOverviewDTO dto = new MerchandiseReviewOverviewDTO();
-        dto.setReviewersUsername(review.getReviewersUsername());
+        dto.setReviewersUsername(review.getReviewer().getUsername());
         dto.setComment(review.getComment());
         dto.setRating(review.getRating());
         return dto;

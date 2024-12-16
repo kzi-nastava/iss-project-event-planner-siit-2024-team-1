@@ -619,6 +619,7 @@ INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
 -- VALUES (2, 4);
 -- INSERT INTO public.merchandise_eventtype(
 --     eventtype_id, merchandise_id)
+
 -- VALUES (5, 4);
 
 -- Insert 10 New Products for Goran
@@ -1170,3 +1171,6 @@ INSERT INTO user_merchandise(merchandise_id, service_provider_id)
 SELECT id, 152
 FROM merchandise
 WHERE id BETWEEN 7 AND 25;
+
+insert into event_type (is_active, description, title)
+values (true,'all','all');
