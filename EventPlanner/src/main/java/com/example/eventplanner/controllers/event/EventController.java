@@ -52,6 +52,13 @@ public class EventController {
         return ResponseEntity.ok(eventService.getUserFollowedEvents(userId));
     }
 
+    @GetMapping("/report/{id}")
+    public ResponseEntity<EventReportDTO> getEventReport(
+            @PathVariable int id
+    ) {
+        return ResponseEntity.ok(eventService.getEventReport(id));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<Page<EventOverviewDTO>> filterEvents(
             @RequestParam(required = false) LocalDate startDate,
@@ -130,5 +137,13 @@ public class EventController {
             @RequestParam int eventId
     ) {
         return ResponseEntity.ok(jwtService.inviteToEvent(eventId,email));
+    }
+
+    @PostMapping("/{eventId}/add-to-favorites/{userId}")
+    public ResponseEntity<Boolean> favorizeEvent(
+            @PathVariable int eventId,
+            @PathVariable int userId
+            ) {
+        return ResponseEntity.ok(eventService.favorizeEvent(userId, eventId));
     }
 }
