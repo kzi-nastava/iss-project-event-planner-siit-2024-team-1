@@ -121,6 +121,7 @@ public class ServiceController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<MerchandiseOverviewDTO>> filterServices(
+            @RequestParam int userId,
             @RequestParam(required = false) Double priceMin,
             @RequestParam(required = false) Double priceMax,
             @RequestParam(required = false) String category,
@@ -130,9 +131,9 @@ public class ServiceController {
             @RequestParam(required = false) String search,
             @PageableDefault(size = 10) Pageable pageable) {
 
-        ServiceFiltersDTO productFiltersDTO=new ServiceFiltersDTO(priceMin,priceMax,category,durationMin,durationMax,city);
+        ServiceFiltersDTO serviceFiltersDTO=new ServiceFiltersDTO(priceMin,priceMax,category,durationMin,durationMax,city);
 
-        return ResponseEntity.ok(serviceService.search(productFiltersDTO,search,pageable));
+        return ResponseEntity.ok(serviceService.search(userId,serviceFiltersDTO,search,pageable));
     }
 
 }

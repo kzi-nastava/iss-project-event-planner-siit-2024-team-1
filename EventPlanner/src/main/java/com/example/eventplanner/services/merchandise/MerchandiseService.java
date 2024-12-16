@@ -13,11 +13,18 @@ import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.MerchandisePhoto;
 import com.example.eventplanner.model.merchandise.Review;
+import com.example.eventplanner.model.user.ServiceProvider;
+import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.category.CategoryRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
+import com.example.eventplanner.repositories.user.ServiceProviderRepository;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,19 +37,48 @@ import java.util.stream.Collectors;
 public class MerchandiseService {
     private final MerchandiseRepository merchandiseRepository;
     private final CategoryRepository categoryRepository;
+    private final com.example.eventplanner.repositories.user.UserRepository userRepository;
+    private final ServiceProviderRepository serviceProviderRepository;
 
-    public List<MerchandiseOverviewDTO> getTop() {
-        return merchandiseRepository.findAll().stream()
+    public List<MerchandiseOverviewDTO> getTop(int userId) {
+        User currentUser = fetchUserDetails(userId);
+
+        // User-specific details
+        List<User> blockedUsers = currentUser != null ? currentUser.getBlockedUsers() : List.of();
+        String userCity = currentUser != null && currentUser.getAddress() != null
+                ? currentUser.getAddress().getCity()
+                : null;
+
+        // Fetch all merchandise
+        List<Merchandise> allMerchandise = merchandiseRepository.findAll();
+
+        // Step 1: Apply filters
+        List<Merchandise> filteredMerchandise = allMerchandise.stream()
+                // Include only available merchandise
                 .filter(Merchandise::isAvailable)
-                .map(this::convertToOverviewDTO)
-                .sorted(Comparator.comparing(MerchandiseOverviewDTO::getRating).reversed())
+                // Exclude merchandise provided by blocked users
+                .filter(merchandise -> isNotBlocked(blockedUsers, serviceProviderRepository.findByMerchandiseId(merchandise.getId()).get()))
+                // Filter by city (if user has a city set)
+                .filter(merchandise -> isCityMatching(userCity, merchandise.getAddress().getCity()))
+                .toList();
+
+        // Step 2: Sort and limit to top 5 by rating
+        return filteredMerchandise.stream()
+                .sorted(Comparator.comparing(Merchandise::getRating).reversed())
                 .limit(5)
-                .collect(Collectors.toList());
+                .map(this::convertToOverviewDTO)
+                .toList();
+    }
+    private User fetchUserDetails(int userId) {
+        return userRepository.findById(userId).orElse(null);
     }
 
-    public Page<MerchandiseOverviewDTO> getAll(Pageable pageable) {
-        return merchandiseRepository.findAll(pageable)
-                .map(this::convertToOverviewDTO);
+    private boolean isCityMatching(String userCity, String eventCity) {
+        return userCity == null || userCity.isEmpty() || userCity.equalsIgnoreCase(eventCity);
+    }
+
+    private boolean isNotBlocked(List<User> blockedUsers, User organizer) {
+        return blockedUsers == null || !blockedUsers.contains(organizer);
     }
 
     private MerchandiseOverviewDTO convertToOverviewDTO(Merchandise merchandise) {
@@ -141,4 +177,8 @@ public class MerchandiseService {
         dto.setRating(review.getRating());
         return dto;
     }
+
+
+
+
 }

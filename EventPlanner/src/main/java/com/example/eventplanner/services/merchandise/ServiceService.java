@@ -18,6 +18,7 @@ import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.*;
+import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.category.CategoryRepository;
@@ -31,9 +32,14 @@ import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
 import com.example.eventplanner.services.email.EmailService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -60,10 +66,46 @@ public class ServiceService {
     private final CategoryRepository categoryRepository;
     private final MerchandiseRepository merchandiseRepository;
 
-    public Page<MerchandiseOverviewDTO> search(ServiceFiltersDTO ServiceFiltersDTO, String search, Pageable pageable) {
-        Specification<com.example.eventplanner.model.merchandise.Service> spec = createSpecification(ServiceFiltersDTO, search);
-        Page<com.example.eventplanner.model.merchandise.Service> products = serviceRepository.findAll(spec, pageable);
-        return products.map(this::convertToOverviewDTO);
+    public Page<MerchandiseOverviewDTO> search(int userId, ServiceFiltersDTO serviceFiltersDTO, String search, Pageable pageable) {
+        // Fetch user details
+        User currentUser = fetchUserDetails(userId);
+        List<User> blockedUsers = currentUser != null ? currentUser.getBlockedUsers().stream().filter(u->u instanceof ServiceProvider).toList() : List.of();
+
+        // Create a specification for filtering
+        Specification<com.example.eventplanner.model.merchandise.Service> spec = createSpecification(serviceFiltersDTO, search)
+                .and(excludeBlockedProviders(currentUser, blockedUsers)); // Exclude services by blocked providers
+
+        // Fetch paginated services with the composed specification
+        Page<com.example.eventplanner.model.merchandise.Service> pagedServices = serviceRepository.findAll(spec, pageable);
+
+        // Convert the results to DTOs
+        return pagedServices.map(this::convertToOverviewDTO);
+    }
+
+    private Specification<com.example.eventplanner.model.merchandise.Service> excludeBlockedProviders(User currentUser, List<User> blockedUsers) {
+        return (root, query, criteriaBuilder) -> {
+            if (currentUser == null || blockedUsers == null || blockedUsers.isEmpty()||!(currentUser instanceof EventOrganizer)) {
+                return criteriaBuilder.conjunction(); // No filter if there are no blocked users or no current user
+            }
+
+            // Create a subquery to find services of blocked service providers
+            Subquery<Integer> subquery = query.subquery(Integer.class);
+            Root<ServiceProvider> serviceProviderRoot = subquery.from(ServiceProvider.class);
+
+            // Join service provider's merchandise (services)
+            Join<ServiceProvider, Merchandise> merchandiseJoin = serviceProviderRoot.join("merchandise");
+
+            // Select IDs of services belonging to blocked service providers
+            subquery.select(merchandiseJoin.get("id"))
+                    .where(serviceProviderRoot.in(blockedUsers));
+
+            // Exclude services that are in the subquery of blocked service providers
+            return criteriaBuilder.not(root.get("id").in(subquery));
+        };
+    }
+
+    private User fetchUserDetails(int userId) {
+        return userRepository.findById(userId).orElse(null);
     }
 
     private Specification<com.example.eventplanner.model.merchandise.Service> createSpecification(ServiceFiltersDTO ServiceFiltersDTO, String search) {

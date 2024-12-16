@@ -60,6 +60,7 @@ public class ProductController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<MerchandiseOverviewDTO>> filterProducts(
+            @RequestParam int userId,
             @RequestParam(required = false) Double priceMin,
             @RequestParam(required = false) Double priceMax,
             @RequestParam(required = false) String category,
@@ -71,7 +72,7 @@ public class ProductController {
 
         ProductFiltersDTO productFiltersDTO=new ProductFiltersDTO(priceMin,priceMax,category,durationMin,durationMax,city);
 
-        return ResponseEntity.ok(productService.search(productFiltersDTO,search,pageable));
+        return ResponseEntity.ok(productService.search(userId,productFiltersDTO,search,pageable));
     }
 
     @PutMapping("/{id}")
