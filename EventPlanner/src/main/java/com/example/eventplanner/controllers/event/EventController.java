@@ -27,16 +27,12 @@ public class EventController {
     private final JwtService jwtService;
     @GetMapping("/top")
     public ResponseEntity<Page<EventOverviewDTO>> getTopEvents(
+            @RequestParam int userId,
             @PageableDefault(size = 5, sort = "date", direction = Sort.Direction.DESC) Pageable eventPage
     ) {
-        return ResponseEntity.ok(eventService.getTop(eventPage));
+        return ResponseEntity.ok(eventService.getTop(userId,eventPage));
     }
-    @GetMapping("/all")
-    public ResponseEntity<Page<EventOverviewDTO>> getAllEvents(
-            @PageableDefault(size = 10, sort = "date", direction = Sort.Direction.DESC) Pageable eventPage
-    ) {
-        return ResponseEntity.ok(eventService.getAll(eventPage));
-    }
+
 
     @GetMapping("/eo/{id}")
     public ResponseEntity<Page<EventOverviewDTO>> getEventsByEo(@PathVariable int id,
@@ -54,6 +50,7 @@ public class EventController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<EventOverviewDTO>> filterEvents(
+            @RequestParam int userId,
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate,
             @RequestParam(required = false) String type,
@@ -61,7 +58,7 @@ public class EventController {
             @RequestParam(required = false) String search,
             @PageableDefault(size = 10) Pageable pageable) {
         EventFiltersDTO eventFiltersDTO=new EventFiltersDTO(startDate,endDate,type,city);
-        return ResponseEntity.ok(eventService.search(eventFiltersDTO,search,pageable));
+        return ResponseEntity.ok(eventService.search(userId,eventFiltersDTO,search,pageable));
     }
 
     @GetMapping("/{id}/agenda")

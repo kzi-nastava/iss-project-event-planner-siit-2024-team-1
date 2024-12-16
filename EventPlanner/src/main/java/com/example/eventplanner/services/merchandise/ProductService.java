@@ -6,11 +6,15 @@ import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.product.*;
 import com.example.eventplanner.model.merchandise.*;
+import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.merchandise.ProductRepository;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -60,10 +64,47 @@ public class ProductService {
     private final ServiceProviderRepository serviceProviderRepository;
     private final EventRepository eventRepository;
 
-    public Page<MerchandiseOverviewDTO> search(ProductFiltersDTO productFiltersDTO, String search, Pageable pageable) {
-        Specification<Product> spec = createSpecification(productFiltersDTO, search);
-        Page<Product> products = productRepository.findAll(spec, pageable);
-        return products.map(this::convertToOverviewDTO);
+    public Page<MerchandiseOverviewDTO> search(int userId, ProductFiltersDTO productFiltersDTO, String search, Pageable pageable) {
+        // Fetch user details
+        User currentUser = fetchUserDetails(userId);
+        List<User> blockedUsers = currentUser != null ? currentUser.getBlockedUsers().stream().filter(u->u instanceof ServiceProvider).toList() : List.of();
+
+        // Create a specification for filtering
+        Specification<Product> spec = createSpecification(productFiltersDTO, search)
+                .and(excludeBlockedProviders(currentUser, blockedUsers)); // Exclude products by blocked providers
+
+        // Fetch paginated products with the composed specification
+        Page<Product> pagedProducts = productRepository.findAll(spec, pageable);
+
+        // Convert the results to DTOs
+        return pagedProducts.map(this::convertToOverviewDTO);
+    }
+
+    private Specification<Product> excludeBlockedProviders(User currentUser, List<User> blockedUsers) {
+        return (root, query, criteriaBuilder) -> {
+            if (currentUser == null || blockedUsers == null || blockedUsers.isEmpty()||!(currentUser instanceof EventOrganizer)) {
+                return criteriaBuilder.conjunction(); // No filter if there are no blocked users or no current user
+            }
+
+            // Create a subquery to find services of blocked service providers
+            Subquery<Integer> subquery = query.subquery(Integer.class);
+            Root<ServiceProvider> serviceProviderRoot = subquery.from(ServiceProvider.class);
+
+            // Join service provider's merchandise (services)
+            Join<ServiceProvider, Merchandise> merchandiseJoin = serviceProviderRoot.join("merchandise");
+
+            // Select IDs of services belonging to blocked service providers
+            subquery.select(merchandiseJoin.get("id"))
+                    .where(serviceProviderRoot.in(blockedUsers));
+
+            // Exclude services that are in the subquery of blocked service providers
+            return criteriaBuilder.not(root.get("id").in(subquery));
+        };
+    }
+
+
+    private User fetchUserDetails(int userId) {
+        return userRepository.findById(userId).orElse(null);
     }
 
     public List<MerchandiseOverviewDTO> getAll(){

@@ -26,15 +26,10 @@ public class MerchandiseController {
     private final MerchandiseService merchandiseService;
 
     @GetMapping("/top")
-    public ResponseEntity<List<MerchandiseOverviewDTO>> getTopMerchandise() {
-        return ResponseEntity.ok(merchandiseService.getTop());
+    public ResponseEntity<List<MerchandiseOverviewDTO>> getTopMerchandise(@RequestParam int userId) {
+        return ResponseEntity.ok(merchandiseService.getTop(userId));
     }
-    @GetMapping("/all")
-    public ResponseEntity<Page<MerchandiseOverviewDTO>> getAllMerchandise(
-            @PageableDefault(size = 10, sort = "price", direction = Sort.Direction.DESC) Pageable merchandisePage
-    ) {
-        return ResponseEntity.ok(merchandiseService.getAll(merchandisePage));
-    }
+
 
     @GetMapping("/categories")
     public ResponseEntity<GetAllCategoriesDTO> getAllMerchandise() {
