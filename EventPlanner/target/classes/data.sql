@@ -352,9 +352,6 @@ INSERT INTO merchandise (
 --     (2,1),
 --     (3,1);
 
-insert into user_merchandise(merchandise_id,service_provider_id) values (4,2);
-
-
 -- Reviews for "Tech Innovation Summit 2024"
 INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
                                                                                      (41, 'Amazing experience! Learned so much about cutting-edge technology.', 5, 'PENDING', false, '2023-09-15 10:00:00', 1),
@@ -601,10 +598,10 @@ INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
 -- --     (2,1),
 -- --     (3,1);
 --
--- insert into user_merchandise(merchandise_id,service_provider_id) values (1,2);
--- insert into user_merchandise(merchandise_id,service_provider_id) values (2,2);
--- insert into user_merchandise(merchandise_id,service_provider_id) values (3,2);
--- insert into user_merchandise(merchandise_id,service_provider_id) values (4,2);
+insert into user_merchandise(merchandise_id,service_provider_id) values (1,2);
+insert into user_merchandise(merchandise_id,service_provider_id) values (2,2);
+insert into user_merchandise(merchandise_id,service_provider_id) values (3,2);
+insert into user_merchandise(merchandise_id,service_provider_id) values (4,2);
 --
 -- INSERT INTO public.merchandise_eventtype(
 --     eventtype_id, merchandise_id)

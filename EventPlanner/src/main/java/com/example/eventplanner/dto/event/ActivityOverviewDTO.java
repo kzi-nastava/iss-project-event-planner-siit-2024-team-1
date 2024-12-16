@@ -1,6 +1,8 @@
 package com.example.eventplanner.dto.event;
 
 import java.time.LocalTime;
+
+import com.example.eventplanner.dto.common.AddressDTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,5 +16,5 @@ public class ActivityOverviewDTO {
     private String description;
     private LocalTime startTime;
     private LocalTime endTime;
-    private String address;
+    private AddressDTO address;
 }
