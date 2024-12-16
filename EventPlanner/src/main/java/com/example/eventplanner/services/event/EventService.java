@@ -58,6 +58,10 @@ public class EventService {
                 .map(this::convertToOverviewDTO);
     }
 
+    public List<EventOverviewDTO> getFavoriteEventsWp(int userId) {
+        return userRepository.findById(userId).orElseThrow().getFavoriteEvents().stream().map(this::convertToOverviewDTO).collect(Collectors.toList());
+    }
+
     public CreatedEventOverviewDTO getById(int id) {
         return mapToCreatedEventOverviewDTO(eventRepository.findById(id).orElseThrow(), eventRepository.findById(id).orElseThrow().getType(), eventRepository.findById(id).orElseThrow().getMerchandise());
     }

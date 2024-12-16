@@ -38,6 +38,11 @@ public class EventController {
         return ResponseEntity.ok(eventService.getAll(eventPage));
     }
 
+    @GetMapping("/{userId}/favorite")
+    public ResponseEntity<List<EventOverviewDTO>> getFavoriteEventsWp(@PathVariable int userId) {
+        return ResponseEntity.ok(eventService.getFavoriteEventsWp(userId));
+    }
+
     @GetMapping("/eo/{id}")
     public ResponseEntity<Page<EventOverviewDTO>> getEventsByEo(@PathVariable int id,
             @PageableDefault(size = 10, sort = "date", direction = Sort.Direction.DESC) Pageable eventPage
@@ -144,6 +149,6 @@ public class EventController {
             @PathVariable int eventId,
             @PathVariable int userId
             ) {
-        return ResponseEntity.ok(eventService.favorizeEvent(userId, eventId));
+        return ResponseEntity.ok(eventService.favorizeEvent(eventId, userId));
     }
 }
