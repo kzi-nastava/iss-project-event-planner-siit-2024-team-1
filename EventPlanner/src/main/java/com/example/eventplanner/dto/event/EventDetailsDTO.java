@@ -14,7 +14,6 @@ import java.util.Date;
 @NoArgsConstructor
 public class  EventDetailsDTO {
     private int id;
-    private String type;
     private String title;
     private LocalDateTime date;
     private AddressDTO address;
