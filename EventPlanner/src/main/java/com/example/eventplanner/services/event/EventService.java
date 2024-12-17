@@ -137,7 +137,37 @@ public class EventService {
 
 
     public List<EventOverviewDTO> getFavoriteEventsWp(int userId) {
-        return userRepository.findById(userId).orElseThrow().getFavoriteEvents().stream().map(this::convertToOverviewDTO).collect(Collectors.toList());
+        // Fetch user details
+        User currentUser = fetchUserDetails(userId);
+
+        // Gracefully handle the case where the user does not exist
+        if (currentUser == null) {
+            return List.of(); // Return an empty list if the user is not found or null
+        }
+
+        // Determine if the user is an authenticated user
+        boolean isAuthenticatedUser = currentUser instanceof AuthenticatedUser;
+
+        // Get blocked users and favorite events
+        List<User> blockedUsers = currentUser.getBlockedUsers();
+        List<Event> favoriteEvents = currentUser.getFavoriteEvents();
+
+        // Filter favorite events using the same logic as in `getTop` and `search`
+        return favoriteEvents.stream()
+                // Exclude events blocked by the user
+                .filter(event -> isNotBlocked(blockedUsers, event.getOrganizer()))
+                // Ensure the organizer has not blocked the user (only for authenticated users)
+                .filter(event -> {
+                    if (isAuthenticatedUser) {
+                        // Only check if the organizer has not blocked the user when authenticated
+                        return isOrganizerNotBlockingUser(currentUser, event);
+                    }
+                    // If the user is not authenticated, include the event
+                    return true;
+                })
+                // Convert to DTO
+                .map(this::convertToOverviewDTO)
+                .toList();
     }
 
     public CreatedEventOverviewDTO getById(int id) {
