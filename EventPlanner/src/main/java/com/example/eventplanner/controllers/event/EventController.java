@@ -85,8 +85,8 @@ public class EventController {
     }
 
     @GetMapping("/{id}/details")
-    public ResponseEntity<EventDetailsDTO> getDetails(@PathVariable int id) {
-        return ResponseEntity.ok(eventService.getDetails(id));
+    public ResponseEntity<EventDetailsDTO> getDetails(@PathVariable int id,@RequestParam int userId) {
+        return ResponseEntity.ok(eventService.getDetails(userId,id));
     }
 
     @PostMapping

@@ -116,6 +116,9 @@ public class ProductService {
 
     private Specification<Product> createSpecification(ProductFiltersDTO productFiltersDTO, String search) {
         Specification<Product> spec = Specification.where(null);
+        spec = spec.and((root, query, criteriaBuilder) ->
+                criteriaBuilder.isFalse(root.get("deleted"))
+        );
         spec = addPriceRangeFilter(spec, productFiltersDTO);
         spec = addCategoryFilter(spec, productFiltersDTO);
         spec = addCityFilter(spec, productFiltersDTO);

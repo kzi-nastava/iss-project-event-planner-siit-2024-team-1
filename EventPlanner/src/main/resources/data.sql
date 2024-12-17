@@ -1174,3 +1174,8 @@ WHERE id BETWEEN 7 AND 25;
 
 insert into event_type (is_active, description, title)
 values (true,'all','all');
+
+insert into user_favorite_merchandises (merchandise_id, user_id)
+select id,54
+from merchandise
+where id between 6 and 15;

@@ -37,8 +37,13 @@ public class MerchandiseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MerchandiseDetailDTO> getMerchandiseById(@PathVariable int id) {
-        MerchandiseDetailDTO merchandiseDetail = this.merchandiseService.getMerchandiseById(id);
+    public ResponseEntity<MerchandiseDetailDTO> getMerchandiseById(@PathVariable int id,@RequestParam int userId) {
+        MerchandiseDetailDTO merchandiseDetail = this.merchandiseService.getMerchandiseById(userId,id);
         return ResponseEntity.ok(merchandiseDetail);
+    }
+
+    @GetMapping("/{userId}/favorite")
+    public ResponseEntity<List<MerchandiseOverviewDTO>>  getFavoriteMerchandise(@PathVariable int userId) {
+        return ResponseEntity.ok(merchandiseService.getFavoriteMerchandises(userId));
     }
 }
