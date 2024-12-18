@@ -146,6 +146,7 @@ public class MerchandiseService {
         merchandiseDetails.setCancellationDeadline(merchandise.getCancellationDeadline());
         merchandiseDetails.setMerchandisePhotos(merchandise.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
         merchandiseDetails.setReviews(merchandise.getReviews().stream().map(this::mapToMerchandiseReviewDTO).toList());
+        merchandiseDetails.setType(merchandise.getClass().getSimpleName());
 
         AddressDTO addressDTO = new AddressDTO();
         addressDTO.setCity(merchandise.getAddress().getCity());
