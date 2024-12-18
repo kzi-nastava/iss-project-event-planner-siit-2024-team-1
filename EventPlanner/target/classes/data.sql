@@ -1179,3 +1179,214 @@ insert into user_favorite_merchandises (merchandise_id, user_id)
 select id,54
 from merchandise
 where id between 6 and 15;
+
+
+-- Unique addresses for users
+UPDATE public."user" SET
+                         street = '9 Svetosavska',
+                         city = 'Novi Sad',
+                         latitude = 45.26186379833459,
+                         longitude = 19.846108584039364
+WHERE id = 1;
+
+UPDATE public."user" SET
+                         street = 'Bulevar kralju Petra I',
+                         city = 'Novi Sad',
+                         latitude = 45.26195441843065,
+                         longitude = 19.83795229186215
+WHERE id = 54;
+
+UPDATE public."user" SET
+                         street = '6 Vojvode Supljikca',
+                         city = 'Novi Sad',
+                         latitude = 45.25899408714758,
+                         longitude = 19.83885377678698
+WHERE id = 152;
+
+-- Unique addresses for events
+UPDATE event SET
+                 street = 'Futoska',
+                 city = 'Novi Sad',
+                 latitude = 45.2508322379121,
+                 longitude = 19.827040712765598
+WHERE id = 9;
+
+UPDATE event SET
+                 street = '45a Djordja Magarasevica',
+                 city = 'Novi Sad',
+                 latitude = 45.245272849009446,
+                 longitude = 19.8206015347309
+WHERE id = 10;
+
+UPDATE event SET
+                 street = '40 Bogdana Suputa',
+                 city = 'Novi Sad',
+                 latitude = 45.244487239311034,
+                 longitude = 19.811500829775266
+WHERE id = 11;
+
+UPDATE event SET
+                 street = '12 Stevana Dejanova',
+                 city = 'Novi Sad',
+                 latitude = 45.24829432352203,
+                 longitude = 19.80428895037643
+WHERE id = 12;
+
+-- Unique addresses for merchandise
+UPDATE merchandise SET
+                       street = '14a Todora Toze jovanovica',
+                       city = 'Novi Sad',
+                       latitude = 45.25451805447678,
+                       longitude = 19.806006064519025
+WHERE id = 7;
+
+UPDATE merchandise SET
+                       street = '24 Koste Abrasevica',
+                       city = 'Novi Sad',
+                       latitude = 45.244487239311034,
+                       longitude = 19.806778765883163
+WHERE id = 8;
+
+UPDATE merchandise SET
+                       street = '96 Suboticka',
+                       city = 'Novi Sad',
+                       latitude = 45.24164686745039,
+                       longitude = 19.81536433659605
+WHERE id = 9;
+
+UPDATE merchandise SET
+                       street = '12 Kolo srpskih sestara',
+                       city = 'Novi Sad',
+                       latitude = 45.242130345029764,
+                       longitude = 19.826096299987174
+WHERE id = 10;
+
+UPDATE merchandise SET
+                       street = '26 Alekse Santica',
+                       city = 'Novi Sad',
+                       latitude = 45.243580753082036,
+                       longitude = 19.835111149235704
+WHERE id = 11;
+
+UPDATE merchandise SET
+                       street = '31 Antona Cehova',
+                       city = 'Novi Sad',
+                       latitude = 45.24666274724605,
+                       longitude = 19.830045662515108
+WHERE id = 12;
+
+UPDATE merchandise SET
+                       street = 'National employment service, 2 Alberta Tome',
+                       city = 'Novi Sad',
+                       latitude = 45.24708575300279,
+                       longitude = 19.84060591449194
+WHERE id = 13;
+
+UPDATE merchandise SET
+                       street = '5 Bulevar Cara Lazara',
+                       city = 'Novi Sad',
+                       latitude = 45.246421028256464,
+                       longitude = 19.84816121671927
+WHERE id = 14;
+
+UPDATE merchandise SET
+                       street = '39 Radnicka',
+                       city = 'Novi Sad',
+                       latitude = 45.25010713108641,
+                       longitude = 19.850050042276113
+WHERE id = 15;
+
+UPDATE merchandise SET
+                       street = '7 Miroslava Antica',
+                       city = 'Novi Sad',
+                       latitude = 45.25179903261297,
+                       longitude = 19.84661581399096
+WHERE id = 16;
+
+-- Service-specific addresses
+UPDATE merchandise SET
+                       street = '34 Jevrejska',
+                       city = 'Novi Sad',
+                       latitude = 45.252765810856665,
+                       longitude = 19.838116098985214
+WHERE id = 17;
+
+UPDATE merchandise SET
+                       street = '11 Futoska',
+                       city = 'Novi Sad',
+                       latitude = 45.250892663063055,
+                       longitude = 19.83519700494281
+WHERE id = 18;
+
+UPDATE merchandise SET
+                       street = 'Skolska',
+                       city = 'Novi Sad',
+                       latitude = 45.249140307585435,
+                       longitude = 19.836398984842617
+WHERE id = 19;
+
+UPDATE merchandise SET
+                       street = 'Turgenjeva',
+                       city = 'Novi Sad',
+                       latitude = 45.25506184322807,
+                       longitude = 19.832363766607585
+WHERE id = 20;
+
+UPDATE merchandise SET
+                       street = '8 Milesevska',
+                       city = 'Novi Sad',
+                       latitude = 45.255545206635574,
+                       longitude = 19.828414404079652
+WHERE id = 21;
+
+UPDATE merchandise SET
+                       street = 'Galeriaj podova, 11 Hajduk Veljkova',
+                       city = 'Novi Sad',
+                       latitude = 45.25482015998148,
+                       longitude = 19.82240450458064
+WHERE id = 22;
+
+UPDATE merchandise SET
+                       street = 'Paje Marganovica',
+                       city = 'Novi Sad',
+                       latitude = 45.25222200011958,
+                       longitude = 19.821288380387923
+WHERE id = 23;
+
+UPDATE merchandise SET
+                       street = 'Bulevar kralja Petra I',
+                       city = 'Novi Sad',
+                       latitude = 45.25965362948473,
+                       longitude = 19.829616383979427
+WHERE id = 24;
+
+UPDATE merchandise SET
+                       street = '17 Paje Markovica Adamova',
+                       city = 'Novi Sad',
+                       latitude = 45.26134524661078,
+                       longitude = 19.826525578522812
+WHERE id = 25;
+
+UPDATE merchandise SET
+                       street = 'Save Kovacevica',
+                       number='7',
+                       city = 'Novi Sad',
+                       latitude = 45.26315763760297,
+                       longitude = 19.832793045143227
+WHERE id = 26;
+
+UPDATE event SET
+                 street = 'Futoski put',
+                 city = 'Novi Sad',
+                 number='2',
+                 latitude = 45.246239738339256,
+                 longitude = 19.798622473705908
+WHERE id between 1 and 9;
+
+UPDATE merchandise SET
+                       street = 'Hajduk Veljkova',
+                       city = 'Novi Sad',
+                       number='7',
+                       latitude = 45.25482015998148,
+                       longitude = 19.82240450458064
+WHERE id between 1 and 6;
