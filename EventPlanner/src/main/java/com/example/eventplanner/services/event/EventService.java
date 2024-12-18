@@ -380,12 +380,13 @@ public class EventService {
 
         // User-specific details
         List<User> blockedUsers = currentUser != null ? currentUser.getBlockedUsers() : List.of();
+        boolean isAuthenticated=currentUser!=null?currentUser instanceof AuthenticatedUser:false;
 
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
         if(blockedUsers.contains(event.getOrganizer()))
             throw new BlockedMerchandiseException("Event with id " + eventId + " is blocked");
-        if(!isOrganizerNotBlockingUser(currentUser, event))
+        if(isAuthenticated && !isOrganizerNotBlockingUser(currentUser, event))
             throw new BlockedMerchandiseException("Event with id " + eventId + " is blocked");
 
         EventDetailsDTO dto = new EventDetailsDTO();
