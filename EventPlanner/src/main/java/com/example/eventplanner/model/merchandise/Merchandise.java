@@ -45,7 +45,7 @@ public class  Merchandise {
 
     private MerchandiseState state;
 
-    @OneToMany
+    @ManyToMany
     @JoinTable(inverseJoinColumns = @JoinColumn(name = "photo_id"))
     private List<MerchandisePhoto> photos;
 

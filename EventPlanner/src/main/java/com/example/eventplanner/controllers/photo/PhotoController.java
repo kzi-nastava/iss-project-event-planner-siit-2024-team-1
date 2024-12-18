@@ -45,20 +45,22 @@ public class PhotoController {
         return ResponseEntity.ok(photoId);
     }
 
-    @RequestMapping(value = "/merchandise/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Integer> deleteMerchandisePhoto(@PathVariable int id) {
+    @RequestMapping(value = "/{mercId}/merchandise/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Integer> deleteMerchandisePhoto(@PathVariable int id, @PathVariable int mercId,
+                                                          @RequestParam boolean edit) {
         try {
-            photoService.deleteMercById(id);
+            photoService.deleteMercById(id, mercId, edit);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @RequestMapping(value = "/business/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Integer> deleteBusinessPhoto(@PathVariable int id) {
+    @RequestMapping(value = "/{spId}/business/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Integer> deleteBusinessPhoto(@PathVariable int id, @PathVariable int spId,
+                                                       @RequestParam boolean edit) {
         try {
-            photoService.deleteBusinessById(id);
+            photoService.deleteBusinessById(id, spId, edit);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
