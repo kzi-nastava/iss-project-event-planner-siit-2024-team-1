@@ -17,7 +17,8 @@ public class ServiceProvider extends User {
     private String company;
     private String description;
 
-    @OneToMany(mappedBy = "serviceProvider")
+    @ManyToMany
+    @JoinTable(inverseJoinColumns = @JoinColumn(name = "photo_id"))
     private List<BusinessPhoto> photos;
 
     @OneToMany

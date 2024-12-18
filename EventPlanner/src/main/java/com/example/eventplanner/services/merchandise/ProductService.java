@@ -278,19 +278,7 @@ public class ProductService {
         product.setReservationDeadline(createProductRequestDTO.getReservationDeadline());
         product.setCancellationDeadline(createProductRequestDTO.getCancellationDeadline());
         product.setAutomaticReservation(createProductRequestDTO.isAutomaticReservation());
-
-        // Step 3: Create and map Merchandise Photos
-        List<MerchandisePhoto> photos = createProductRequestDTO.getMerchandisePhotos().stream()
-                .map(photoDto -> {
-                    MerchandisePhoto newPhoto = new MerchandisePhoto();
-                    newPhoto.setPhoto(photoDto.getPhoto());// Assuming the photo ID is passed as part of DTO
-                    return newPhoto;
-                })
-                .collect(Collectors.toList());
-
-        // Save photos to the database first, before associating them with the product
-        List<MerchandisePhoto> savedPhotos = merchandisePhotoRepository.saveAll(photos);
-        product.setPhotos(savedPhotos);
+        product.setPhotos(merchandisePhotoRepository.findAllById(createProductRequestDTO.getMerchandisePhotos()));
 
         // Step 4: Map Event Types
         List<EventType> eventTypes = eventTypeRepository.findAllById(createProductRequestDTO.getEventTypesIds());
@@ -332,7 +320,7 @@ public class ProductService {
 
 
         // Step 8: Map to CreateProductResponseDTO and return
-        return mapToCreateProductResponseDTO(savedProduct, serviceProviderDTO, savedPhotos.stream().map(this::mapToMerchandisePhotoDTO).toList());
+        return mapToCreateProductResponseDTO(savedProduct, serviceProviderDTO, savedProduct.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
     }
 
     public CreateProductResponseDTO updateProduct(int productId, UpdateProductRequestDTO updateProductRequestDTO) {
@@ -363,19 +351,7 @@ public class ProductService {
         newProduct.setReservationDeadline(updateProductRequestDTO.getReservationDeadline());
         newProduct.setCancellationDeadline(updateProductRequestDTO.getCancellationDeadline());
         newProduct.setAutomaticReservation(updateProductRequestDTO.isAutomaticReservation());
-
-        // Step 3: Create and map Merchandise Photos
-        List<MerchandisePhoto> photos = updateProductRequestDTO.getMerchandisePhotos().stream()
-                .map(photoDto -> {
-                    MerchandisePhoto newPhoto = new MerchandisePhoto();
-                    newPhoto.setPhoto(photoDto.getPhoto() );// Assuming the photo ID is passed as part of DTO
-                    return newPhoto;
-                })
-                .collect(Collectors.toList());
-
-        // Save photos to the database first, before associating them with the product
-        List<MerchandisePhoto> savedPhotos = merchandisePhotoRepository.saveAll(photos);
-        newProduct.setPhotos(savedPhotos);
+        newProduct.setPhotos(merchandisePhotoRepository.findAllById(updateProductRequestDTO.getMerchandisePhotos()));
 
         // Step 4: Map Event Types
         List<EventType> eventTypes = eventTypeRepository.findAllById(updateProductRequestDTO.getEventTypesIds());
@@ -401,7 +377,7 @@ public class ProductService {
         ServiceProvider sp = serviceProviderRepository.save(serviceProvider);
 
         // Step 8: Map to CreateProductResponseDTO and return
-        return mapToCreateProductResponseDTO(savedProduct, serviceProviderDTO, savedPhotos.stream().map(this::mapToMerchandisePhotoDTO).toList());
+        return mapToCreateProductResponseDTO(savedProduct, serviceProviderDTO, savedProduct.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
     }
 
     public MerchandisePhotoDTO mapToMerchandisePhotoDTO(MerchandisePhoto merchandisePhoto) {

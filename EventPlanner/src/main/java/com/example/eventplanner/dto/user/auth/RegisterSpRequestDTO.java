@@ -22,5 +22,5 @@ public class RegisterSpRequestDTO {
 
     private String company;
     private String description;
-    private List<String> photos;
+    private List<Integer> photos;
 }

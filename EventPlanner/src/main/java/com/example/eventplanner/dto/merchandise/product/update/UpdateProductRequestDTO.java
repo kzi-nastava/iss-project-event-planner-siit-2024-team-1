@@ -28,7 +28,7 @@ public class UpdateProductRequestDTO {
     private boolean automaticReservation;
 
     private int serviceProviderId;
-    private List<CreateMerchandisePhotoDTO> merchandisePhotos;
+    private List<Integer> merchandisePhotos;
     private List<Integer> eventTypesIds;
     private AddressDTO address;
 }

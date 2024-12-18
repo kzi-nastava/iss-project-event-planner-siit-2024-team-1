@@ -11,6 +11,7 @@ import com.example.eventplanner.model.auth.Token;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.user.*;
 import com.example.eventplanner.repositories.auth.TokenRepository;
+import com.example.eventplanner.repositories.user.BusinessPhotoRepository;
 import com.example.eventplanner.repositories.user.EventOrganizerRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
@@ -20,6 +21,7 @@ import com.example.eventplanner.services.userreport.UserReportService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +49,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final UserReportService userReportService;
-
+    private final BusinessPhotoRepository businessPhotoRepository;
 
 //    public RegisterAuUserResponseRequestDTO registerAu(RegisterAuUserRequestDTO request) {
 //
@@ -168,7 +170,7 @@ public class AuthenticationService {
 
         user.setCompany(request.getCompany());
         user.setDescription(request.getDescription());
-
+        user.setPhotos(businessPhotoRepository.findAllById(request.getPhotos()));
 
         long activationTokenExpire = 24 * 60 * 60 * 1000;
         String activationToken = jwtService.generateActivationToken(user, activationTokenExpire);

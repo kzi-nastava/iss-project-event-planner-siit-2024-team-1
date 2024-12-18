@@ -14,6 +14,7 @@ import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.user.*;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.message.MessageRepository;
+import com.example.eventplanner.repositories.user.BusinessPhotoRepository;
 import com.example.eventplanner.repositories.user.EventOrganizerRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
@@ -35,6 +36,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final EventOrganizerRepository eventOrganizerRepository;
     private final MessageRepository messageRepository;
+    private final BusinessPhotoRepository businessPhotoRepository;
 
     public GetAuByIdResponseDTO getAuById(int id){
         User user = userRepository.findById(id)
@@ -159,7 +161,7 @@ public class UserService {
         user.setPhoto(request.getPhoto());
 
         user.setDescription(request.getDescription());
-        //Auser.setPhotos(request.getPhotos());
+        user.setPhotos(businessPhotoRepository.findAllById(request.getPhotos()));
 
 
         user = userRepository.save(user);
