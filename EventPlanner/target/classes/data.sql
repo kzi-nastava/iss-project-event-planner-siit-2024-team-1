@@ -227,198 +227,198 @@ INSERT INTO category (title,description,pending) VALUES ('Entertainment','Entert
                                                         ('Protest','Entertainment description',false);
 
 
-INSERT INTO merchandise (
-    merchandise_type,
-    id,
-    title,
-    description,
-    specificity,
-    price,
-    discount,
-    visible,
-    available,
-    min_duration,
-    max_duration,
-    reservation_deadline,
-    cancellation_deadline,
-    automatic_reservation,
-    deleted,
-    street,
-    city,
-    number,
-    longitude,
-    latitude,
-    category_id,
-    state
-) VALUES
--- DJ Service
-('Product',1,  'Professional DJ Services',
- 'Experienced DJ for your events',
- 'Top-quality sound equipment included',
- 500.00, 0, true, true,
- 2, 8, 48, 24, true, false,
- 'Security Street',
- 'Chicago',
- 901,
- -77.0369,
- 38.9072, 1, 0),
+-- INSERT INTO merchandise (
+--     merchandise_type,
+--     id,
+--     title,
+--     description,
+--     specificity,
+--     price,
+--     discount,
+--     visible,
+--     available,
+--     min_duration,
+--     max_duration,
+--     reservation_deadline,
+--     cancellation_deadline,
+--     automatic_reservation,
+--     deleted,
+--     street,
+--     city,
+--     number,
+--     longitude,
+--     latitude,
+--     category_id,
+--     state
+-- ) VALUES
+-- -- DJ Service
+-- ('Product',1,  'Professional DJ Services',
+--  'Experienced DJ for your events',
+--  'Top-quality sound equipment included',
+--  500.00, 0, true, true,
+--  2, 8, 48, 24, true, false,
+--  'Security Street',
+--  'Chicago',
+--  901,
+--  -77.0369,
+--  38.9072, 1, 0),
+--
+-- -- Photography Service
+-- ('Product', 2, 'Event Photography',
+--  'Professional event photography service',
+--  'High-resolution photos, digital delivery within 1 week',
+--  800.00, 10, true, true,
+--  3, 12, 72, 48, false, false,
+--  'Security Street',
+--  'Chicago',
+--  901,
+--  -77.0369,
+--  38.9072, 1, 0),
+--
+-- -- Catering Service
+-- ('Product', 3,'Gourmet Catering',
+--  'Premium catering service for all events',
+--  'Custom menu options available, includes staff',
+--  1200.00, 5, true, true,
+--  4, 8, 96, 72, false, false,
+--  'Security Street',
+--  'Chicago',
+--  901,
+--  -77.0369,
+--  38.9072, 1, 0),
+--
+-- -- Event Planning Service
+-- ('Service',  4,'Full Event Planning',
+--  'Comprehensive event planning and coordination',
+--  'Includes venue selection, vendor coordination, and day-of management',
+--  2000.00, 0, true, true,
+--  10, 121, 43200, 120, false, false,
+--  'Security Street',
+--  'Washington DC',
+--  901,
+--  -77.0369,
+--  38.9072, 1, 0),
+-- ('Product',  5,'Kasandrina Torta',
+--  'Torta sa mlevenim orajima',
+--  'Includes venue selection, vendor coordination, and day-of management',
+--  2000.00, 0, true, true,
+--  10, 40, 5000, 120, false, false,
+--  'Nova',
+--  'Klisa',
+--  1,
+--  -77.0369,
+--  38.9072, 1, 0),
+--
+-- -- Decoration Service
+-- ('Service',  6,'Event Decoration',
+--  'Professional decoration and setup service',
+--  'Custom themes and designs available',
+--  600.00, 15, true, true,
+--  2, 6, 72, 48, true, false,
+--  'Security Street',
+--  'Chicago',
+--  901,
+--  -77.0369,
+--  38.9072, 1, 0);
+--
+--
+-- -- INSERT INTO public."user"(
+-- --     active, id, latitude, longitude, "number", role, user_type, authorities, city, company, description, name, password, phone_number, photo, street, surname, username, activation_token, token_expiration)
+-- -- VALUES
+-- --     (true, 1, 40.7128, -74.0060, 123, '0', 'authenticatedUser', 'USER', 'New York', 'TechCorp', 'Software engineer', 'John', '$2a$10$3TYrKiXr/LEDyMPvjtvqU.VApcWoOrpUetE8PaiW6DXkB4I0kCYYm', '555-1234', 'john_doe.jpg', '5th Ave', 'Doe', 'john.doe@gmail.com', '', '2024-12-31'),
+-- --     (true, 2, 34.0522, -118.2437, 456, '2', 'ServiceProvider', 'USER', 'Los Angeles', 'Creative Solutions', 'Graphic designer', 'Jane', 'password456', '555-5678', 'jane_smith.jpg', 'Sunset Blvd', 'Smith', 'jane.smith@example.com', null, null),
+-- --     (true, 3, 51.5074, -0.1278, 789, '1', 'event_organizer', 'USER', 'London', 'Innovate Ltd', 'Marketing manager', 'Alice', 'password789', '555-8765', 'alice_white.jpg', 'Oxford St', 'White', 'alice.white@gmail.com', null, null),
+-- --     (true, 4, 48.8566, 2.3522, 101, '1', 'event_organizer', 'USER', 'Paris', 'Design Works', 'Product designer', 'Bob', 'password101', '555-1122', 'bob_brown.jpg', 'Champs-Elysees', 'Brown', 'bob.brown@example.com', null, null),
+-- --     (true, 5, 40.7306, -73.9352, 202, '0', 'authenticated_user', 'USER', 'New York', 'Tech Innovators', 'Frontend developer', 'Charlie', 'password202', '555-3344', 'charlie_green.jpg', 'Broadway', 'Green', 'charlie.green@gmail.com', null, null),
+-- --     (true, 6, 37.7749, -122.4194, 303, '0', 'authenticated_user', 'USER', 'San Francisco', 'EcoSolutions', 'Project manager', 'Dave', 'password303', '555-5566', 'dave_young.jpg', 'Market St', 'Young', 'dave.young@example.com', null, null),
+-- --     (true, 7, 39.9042, 116.4074, 404, '1', 'event_organizer', 'USER', 'Beijing', 'Global Innovations', 'Business analyst', 'Eve', 'password404', '555-6677', 'eve_liu.jpg', 'Wangfujing', 'Liu', 'eve.liu@gmail.com', null, null),
+-- --     (true, 8, 34.0522, -118.2437, 505, '1', 'service_provider', 'USER', 'Los Angeles', 'Tech Synergy', 'Software architect', 'Frank', 'password505', '555-7788', 'frank_lee.jpg', 'Wilshire Blvd', 'Lee', 'frank.lee@example.com', null, null),
+-- --     (true, 9, 35.6895, 139.6917, 606, '2', 'event_organizer', 'USER', 'Tokyo', 'Creative Minds', 'Data scientist', 'Grace', 'password606', '555-8899', 'grace_kim.jpg', 'Shibuya', 'Kim', 'grace.kim@gmail.com', null, null),
+-- --     (true, 10, 40.7306, -73.9352, 707, '2', 'service_provider', 'USER', 'New York', 'DesignHub', 'UX designer', 'Hank', 'password707', '555-9900', 'hank_jones.jpg', 'Park Ave', 'Jones', 'hank.jones@example.com', null, null);
+--
+--
+-- -- insert into user_followed_events(event_id,user_id)
+-- -- values
+-- --     (1,1),
+-- --     (2,1),
+-- --     (3,1);
+--
+-- insert into user_merchandise(merchandise_id,service_provider_id) values (1,2),
+--                                                                         (2,2),
+--     (3,2),
+--                                                                         (4,2),
+--                                                                         (5,2),
+--                                                                         (6,2);
+--
+--
+-- -- Reviews for "Tech Innovation Summit 2024"
+-- INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
+--                                                                                      (41, 'Amazing experience! Learned so much about cutting-edge technology.', 5, 'PENDING', false, '2023-09-15 10:00:00', 1),
+--                                                                                      (42, 'Well-organized but I felt the sessions were too long.', 4, 'PENDING', false, '2023-09-16 11:00:00', 2),
+--                                                                                      (43, 'The location was too crowded for the number of attendees.', 3, 'PENDING', false, '2023-09-17 12:00:00', 1),
+--                                                                                      (44, 'Great event! Excellent speakers and engaging sessions.', 5, 'PENDING', false, '2023-09-18 13:00:00', 1);
+--
+-- -- Reviews for "AI & Machine Learning Forum"
+-- INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
+--                                                                                      (45, 'Fantastic forum for AI enthusiasts. Great networking opportunities.', 5, 'PENDING', false, '2023-08-10 09:00:00', 2),
+--                                                                                      (46, 'Loved the hands-on workshops. Very informative.', 5, 'PENDING', false, '2023-08-11 10:00:00', 2),
+--                                                                                      (47, 'Would have liked more beginner-friendly content.', 3, 'PENDING', false, '2023-08-12 11:00:00', 1),
+--                                                                                      (48, 'Keynote speaker was excellent! Very inspiring.', 4, 'PENDING', false, '2023-08-13 12:00:00', 2);
+--
+-- -- Reviews for "Startup Networking Night"
+-- INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
+--                                                                                      (49, 'Met a lot of amazing people. Great for entrepreneurs!', 5, 'PENDING', false, '2023-07-20 14:00:00', 2),
+--                                                                                      (50, 'Good opportunity, but the event seemed too short.', 4, 'PENDING', false, '2023-07-21 15:00:00', 2),
+--                                                                                      (51, 'Loved the casual atmosphere, and it was easy to connect with others.', 5, 'PENDING', false, '2023-07-22 16:00:00', 1),
+--                                                                                      (52, 'Food options were limited, but overall a good experience.', 3, 'PENDING', false, '2023-07-23 17:00:00', 1);
+--
+-- -- Link Reviews to Events
+-- INSERT INTO event_reviews (event_id, review_id) VALUES
+-- -- Tech Innovation Summit (event_id: 1)
+-- (1, 41),
+-- (1, 42),
+-- (1, 43),
+-- (1, 44),
+--
+-- -- AI & Machine Learning Forum (event_id: 4)
+-- (4, 45),
+-- (4, 46),
+-- (4, 47),
+-- (4, 48),
+--
+-- -- Startup Networking Night (event_id: 3)
+-- (3, 49),
+-- (3, 50),
+-- (3, 51),
+-- (3, 52);
+--
+-- -- Reviews for "Professional DJ Services"
+-- INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
+--                                                                                      (53, 'The DJ played great music and kept the energy high throughout the event.', 5, 'PENDING', false, '2023-06-10 18:00:00', 2),
+--                                                                                      (54, 'Good service but arrived slightly late.', 4, 'PENDING', false, '2023-06-11 19:00:00', 2),
+--                                                                                      (55, 'Decent performance, but I expected more variety in the playlist.', 3, 'PENDING', false, '2023-06-12 20:00:00', 1),
+--                                                                                      (56, 'Excellent work! My guests had a blast!', 5, 'PENDING', false, '2023-06-13 21:00:00', 2);
+--
+-- -- Reviews for "Event Photography"
+-- INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
+--                                                                                      (57, 'The photos came out beautifully, capturing every special moment.', 5, 'PENDING', false, '2023-05-01 10:30:00', 1),
+--                                                                                      (58, 'Professional service, but delivery was delayed.', 4, 'PENDING', false, '2023-05-02 11:30:00', 2),
+--                                                                                      (59, 'Attention to detail was stunning. Would hire again.', 5, 'PENDING', false, '2023-05-03 12:30:00', 1),
+--                                                                                      (60, 'Good quality but a bit pricey.', 4, 'PENDING', false, '2023-05-04 13:30:00', 2);
 
--- Photography Service
-('Product', 2, 'Event Photography',
- 'Professional event photography service',
- 'High-resolution photos, digital delivery within 1 week',
- 800.00, 10, true, true,
- 3, 12, 72, 48, false, false,
- 'Security Street',
- 'Chicago',
- 901,
- -77.0369,
- 38.9072, 1, 0),
-
--- Catering Service
-('Product', 3,'Gourmet Catering',
- 'Premium catering service for all events',
- 'Custom menu options available, includes staff',
- 1200.00, 5, true, true,
- 4, 8, 96, 72, false, false,
- 'Security Street',
- 'Chicago',
- 901,
- -77.0369,
- 38.9072, 1, 0),
-
--- Event Planning Service
-('Service',  4,'Full Event Planning',
- 'Comprehensive event planning and coordination',
- 'Includes venue selection, vendor coordination, and day-of management',
- 2000.00, 0, true, true,
- 10, 121, 43200, 120, false, false,
- 'Security Street',
- 'Washington DC',
- 901,
- -77.0369,
- 38.9072, 1, 0),
-('Product',  5,'Kasandrina Torta',
- 'Torta sa mlevenim orajima',
- 'Includes venue selection, vendor coordination, and day-of management',
- 2000.00, 0, true, true,
- 10, 40, 5000, 120, false, false,
- 'Nova',
- 'Klisa',
- 1,
- -77.0369,
- 38.9072, 1, 0),
-
--- Decoration Service
-('Service',  6,'Event Decoration',
- 'Professional decoration and setup service',
- 'Custom themes and designs available',
- 600.00, 15, true, true,
- 2, 6, 72, 48, true, false,
- 'Security Street',
- 'Chicago',
- 901,
- -77.0369,
- 38.9072, 1, 0);
-
-
--- INSERT INTO public."user"(
---     active, id, latitude, longitude, "number", role, user_type, authorities, city, company, description, name, password, phone_number, photo, street, surname, username, activation_token, token_expiration)
--- VALUES
---     (true, 1, 40.7128, -74.0060, 123, '0', 'authenticatedUser', 'USER', 'New York', 'TechCorp', 'Software engineer', 'John', '$2a$10$3TYrKiXr/LEDyMPvjtvqU.VApcWoOrpUetE8PaiW6DXkB4I0kCYYm', '555-1234', 'john_doe.jpg', '5th Ave', 'Doe', 'john.doe@gmail.com', '', '2024-12-31'),
---     (true, 2, 34.0522, -118.2437, 456, '2', 'ServiceProvider', 'USER', 'Los Angeles', 'Creative Solutions', 'Graphic designer', 'Jane', 'password456', '555-5678', 'jane_smith.jpg', 'Sunset Blvd', 'Smith', 'jane.smith@example.com', null, null),
---     (true, 3, 51.5074, -0.1278, 789, '1', 'event_organizer', 'USER', 'London', 'Innovate Ltd', 'Marketing manager', 'Alice', 'password789', '555-8765', 'alice_white.jpg', 'Oxford St', 'White', 'alice.white@gmail.com', null, null),
---     (true, 4, 48.8566, 2.3522, 101, '1', 'event_organizer', 'USER', 'Paris', 'Design Works', 'Product designer', 'Bob', 'password101', '555-1122', 'bob_brown.jpg', 'Champs-Elysees', 'Brown', 'bob.brown@example.com', null, null),
---     (true, 5, 40.7306, -73.9352, 202, '0', 'authenticated_user', 'USER', 'New York', 'Tech Innovators', 'Frontend developer', 'Charlie', 'password202', '555-3344', 'charlie_green.jpg', 'Broadway', 'Green', 'charlie.green@gmail.com', null, null),
---     (true, 6, 37.7749, -122.4194, 303, '0', 'authenticated_user', 'USER', 'San Francisco', 'EcoSolutions', 'Project manager', 'Dave', 'password303', '555-5566', 'dave_young.jpg', 'Market St', 'Young', 'dave.young@example.com', null, null),
---     (true, 7, 39.9042, 116.4074, 404, '1', 'event_organizer', 'USER', 'Beijing', 'Global Innovations', 'Business analyst', 'Eve', 'password404', '555-6677', 'eve_liu.jpg', 'Wangfujing', 'Liu', 'eve.liu@gmail.com', null, null),
---     (true, 8, 34.0522, -118.2437, 505, '1', 'service_provider', 'USER', 'Los Angeles', 'Tech Synergy', 'Software architect', 'Frank', 'password505', '555-7788', 'frank_lee.jpg', 'Wilshire Blvd', 'Lee', 'frank.lee@example.com', null, null),
---     (true, 9, 35.6895, 139.6917, 606, '2', 'event_organizer', 'USER', 'Tokyo', 'Creative Minds', 'Data scientist', 'Grace', 'password606', '555-8899', 'grace_kim.jpg', 'Shibuya', 'Kim', 'grace.kim@gmail.com', null, null),
---     (true, 10, 40.7306, -73.9352, 707, '2', 'service_provider', 'USER', 'New York', 'DesignHub', 'UX designer', 'Hank', 'password707', '555-9900', 'hank_jones.jpg', 'Park Ave', 'Jones', 'hank.jones@example.com', null, null);
-
-
--- insert into user_followed_events(event_id,user_id)
--- values
---     (1,1),
---     (2,1),
---     (3,1);
-
-insert into user_merchandise(merchandise_id,service_provider_id) values (1,2),
-                                                                        (2,2),
-    (3,2),
-                                                                        (4,2),
-                                                                        (5,2),
-                                                                        (6,2);
-
-
--- Reviews for "Tech Innovation Summit 2024"
-INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
-                                                                                     (41, 'Amazing experience! Learned so much about cutting-edge technology.', 5, 'PENDING', false, '2023-09-15 10:00:00', 1),
-                                                                                     (42, 'Well-organized but I felt the sessions were too long.', 4, 'PENDING', false, '2023-09-16 11:00:00', 2),
-                                                                                     (43, 'The location was too crowded for the number of attendees.', 3, 'PENDING', false, '2023-09-17 12:00:00', 1),
-                                                                                     (44, 'Great event! Excellent speakers and engaging sessions.', 5, 'PENDING', false, '2023-09-18 13:00:00', 1);
-
--- Reviews for "AI & Machine Learning Forum"
-INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
-                                                                                     (45, 'Fantastic forum for AI enthusiasts. Great networking opportunities.', 5, 'PENDING', false, '2023-08-10 09:00:00', 2),
-                                                                                     (46, 'Loved the hands-on workshops. Very informative.', 5, 'PENDING', false, '2023-08-11 10:00:00', 2),
-                                                                                     (47, 'Would have liked more beginner-friendly content.', 3, 'PENDING', false, '2023-08-12 11:00:00', 1),
-                                                                                     (48, 'Keynote speaker was excellent! Very inspiring.', 4, 'PENDING', false, '2023-08-13 12:00:00', 2);
-
--- Reviews for "Startup Networking Night"
-INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
-                                                                                     (49, 'Met a lot of amazing people. Great for entrepreneurs!', 5, 'PENDING', false, '2023-07-20 14:00:00', 2),
-                                                                                     (50, 'Good opportunity, but the event seemed too short.', 4, 'PENDING', false, '2023-07-21 15:00:00', 2),
-                                                                                     (51, 'Loved the casual atmosphere, and it was easy to connect with others.', 5, 'PENDING', false, '2023-07-22 16:00:00', 1),
-                                                                                     (52, 'Food options were limited, but overall a good experience.', 3, 'PENDING', false, '2023-07-23 17:00:00', 1);
-
--- Link Reviews to Events
-INSERT INTO event_reviews (event_id, review_id) VALUES
--- Tech Innovation Summit (event_id: 1)
-(1, 41),
-(1, 42),
-(1, 43),
-(1, 44),
-
--- AI & Machine Learning Forum (event_id: 4)
-(4, 45),
-(4, 46),
-(4, 47),
-(4, 48),
-
--- Startup Networking Night (event_id: 3)
-(3, 49),
-(3, 50),
-(3, 51),
-(3, 52);
-
--- Reviews for "Professional DJ Services"
-INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
-                                                                                     (53, 'The DJ played great music and kept the energy high throughout the event.', 5, 'PENDING', false, '2023-06-10 18:00:00', 2),
-                                                                                     (54, 'Good service but arrived slightly late.', 4, 'PENDING', false, '2023-06-11 19:00:00', 2),
-                                                                                     (55, 'Decent performance, but I expected more variety in the playlist.', 3, 'PENDING', false, '2023-06-12 20:00:00', 1),
-                                                                                     (56, 'Excellent work! My guests had a blast!', 5, 'PENDING', false, '2023-06-13 21:00:00', 2);
-
--- Reviews for "Event Photography"
-INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
-                                                                                     (57, 'The photos came out beautifully, capturing every special moment.', 5, 'PENDING', false, '2023-05-01 10:30:00', 1),
-                                                                                     (58, 'Professional service, but delivery was delayed.', 4, 'PENDING', false, '2023-05-02 11:30:00', 2),
-                                                                                     (59, 'Attention to detail was stunning. Would hire again.', 5, 'PENDING', false, '2023-05-03 12:30:00', 1),
-                                                                                     (60, 'Good quality but a bit pricey.', 4, 'PENDING', false, '2023-05-04 13:30:00', 2);
-
--- Link Reviews to Merchandise
-INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
--- DJ Service (merchandise_id: 1)
-(1, 53),
-(1, 54),
-(1, 55),
-(1, 56),
-
--- Photography Service (merchandise_id: 2)
-(2, 57),
-(2, 58),
-(2, 59),
-(2, 60);
+-- -- Link Reviews to Merchandise
+-- INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
+-- -- DJ Service (merchandise_id: 1)
+-- (1, 53),
+-- (1, 54),
+-- (1, 55),
+-- (1, 56),
+--
+-- -- Photography Service (merchandise_id: 2)
+-- (2, 57),
+-- (2, 58),
+-- (2, 59),
+-- (2, 60);
 
 -- INSERT INTO merchandise (
 --     merchandise_type,
@@ -623,559 +623,559 @@ INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
 -- VALUES (5, 4);
 
 -- Insert 10 New Products for Goran
-INSERT INTO merchandise (
-    merchandise_type,
-    id,
-    title,
-    description,
-    specificity,
-    price,
-    discount,
-    visible,
-    available,
-    min_duration,
-    max_duration,
-    reservation_deadline,
-    cancellation_deadline,
-    automatic_reservation,
-    deleted,
-    street,
-    city,
-    number,
-    longitude,
-    latitude,
-    category_id,
-    state
-) VALUES
--- Product 1: Vintage Photo Booth
-(
-    'Product',
-    7,
-    'Retro Photo Booth Rental',
-    'Vintage-style photo booth for weddings and events',
-    'Includes unlimited prints and digital copies',
-    350.00,
-    5,
-    true,
-    true,
-    2,
-    8,
-    72,
-    48,
-    true,
-    false,
-    'Innovation Way',
-    'Chicago',
-    234,
-    -122.3321,
-    47.6062,
-    1,
-    0
-),
-
--- Product 2: Custom Cake Design
-(
-    'Product',
-    8,
-    'Artisan Custom Cake',
-    'Handcrafted gourmet cake for special occasions',
-    'Personalized design and flavor selection',
-    250.00,
-    10,
-    true,
-    true,
-    1,
-    2,
-    120,
-    72,
-    false,
-    false,
-    'Pastry Lane',
-    'Portland',
-    456,
-    -122.6784,
-    45.5155,
-    1,
-    0
-),
-
--- Product 3: Lighting Equipment Rental
-(
-    'Product',
-    9,
-    'Professional Event Lighting',
-    'High-end lighting equipment for events',
-    'LED par lights, moving heads, and control system included',
-    600.00,
-    0,
-    true,
-    true,
-    1,
-    3,
-    96,
-    72,
-    true,
-    false,
-    'Tech Boulevard',
-    'Denver',
-    789,
-    -104.9903,
-    39.7392,
-    1,
-    0
-),
-
--- Product 4: Vintage Car Rental
-(
-    'Product',
-    10,
-    'Classic Car for Events',
-    'Vintage car rental for weddings and photo shoots',
-    'Multiple classic models available, professional driver included',
-    500.00,
-    15,
-    true,
-    true,
-    4,
-    24,
-    168,
-    120,
-    false,
-    false,
-    'Classic Avenue',
-    'Los Angeles',
-    321,
-    -118.2437,
-    34.0522,
-    1,
-    0
-),
-
--- Product 5: Balloon Decoration Kit
-(
-    'Product',
-    11,
-    'Event Balloon Decor Package',
-    'Professional balloon decoration and setup',
-    'Custom color schemes, arch, columns, and custom shapes',
-    200.00,
-    5,
-    true,
-    true,
-    1,
-    2,
-    48,
-    24,
-    true,
-    false,
-    'Party Street',
-    'Chicago',
-    567,
-    -87.6298,
-    41.8781,
-    1,
-    0
-),
-
--- Product 6: Sound System Rental
-(
-    'Product',
-    12,
-    'Professional Audio Equipment',
-    'High-quality sound system for events',
-    'Speakers, mixers, microphones, and setup included',
-    450.00,
-    10,
-    true,
-    true,
-    1,
-    2,
-    72,
-    48,
-    true,
-    false,
-    'Sound Avenue',
-    'Seattle',
-    890,
-    -122.3321,
-    47.6062,
-    1,
-    0
-),
-
--- Product 7: Flower Wall Backdrop
-(
-    'Product',
-    13,
-    'Luxury Flower Wall',
-    'Stunning floral backdrop for events and photos',
-    'Customizable flower colors and sizes',
-    300.00,
-    0,
-    true,
-    true,
-    1,
-    1,
-    120,
-    72,
-    false,
-    false,
-    'Bloom Street',
-    'San Francisco',
-    234,
-    -122.4194,
-    37.7749,
-    1,
-    0
-),
-
--- Product 8: Themed Prop Collection
-(
-    'Product',
-    14,
-    'Event Theme Prop Set',
-    'Comprehensive collection of themed props',
-    'Various themes: Gatsby, Tropical, Vintage, Sci-Fi',
-    400.00,
-    15,
-    true,
-    true,
-    1,
-    2,
-    96,
-    48,
-    true,
-    false,
-    'Props Lane',
-    'Austin',
-    456,
-    -97.7431,
-    30.2672,
-    1,
-    0
-),
-
--- Product 9: Interactive Digital Guestbook
-(
-    'Product',
-    15,
-    'Digital Memories Guestbook',
-    'Interactive digital guestbook for events',
-    'Touchscreen display, instant photo and message capture',
-    275.00,
-    5,
-    true,
-    true,
-    1,
-    1,
-    48,
-    24,
-    false,
-    false,
-    'Tech Plaza',
-    'Boston',
-    678,
-    -71.0589,
-    42.3601,
-    1,
-    0
-),
-
--- Product 10: Projection Mapping Kit
-(
-    'Product',
-    16,
-    'Event Projection Mapping',
-    'Advanced projection mapping technology',
-    'Custom visual effects for venues and stages',
-    750.00,
-    0,
-    true,
-    true,
-    2,
-    4,
-    168,
-    120,
-    true,
-    false,
-    'Digital Avenue',
-    'Miami',
-    901,
-    -80.1918,
-    25.7617,
-    1,
-    0
-);
-
--- Insert 10 New Services for Goran
-INSERT INTO merchandise (
-    merchandise_type,
-    id,
-    title,
-    description,
-    specificity,
-    price,
-    discount,
-    visible,
-    available,
-    min_duration,
-    max_duration,
-    reservation_deadline,
-    cancellation_deadline,
-    automatic_reservation,
-    deleted,
-    street,
-    city,
-    number,
-    longitude,
-    latitude,
-    category_id,
-    state
-) VALUES
--- Service 1: Virtual Event Coordination
-(
-    'Service',
-    17,
-    'Virtual Event Management',
-    'Comprehensive online event planning and execution',
-    'Platform selection, technical setup, and virtual host services',
-    1500.00,
-    0,
-    true,
-    true,
-    10,
-    120,
-    720,
-    240,
-    false,
-    false,
-    'Digital Street',
-    'Chicago',
-    123,
-    -87.6298,
-    41.8781,
-    1,
-    0
-),
-
--- Service 2: Performer Booking
-(
-    'Service',
-    18,
-    'Entertainment Talent Booking',
-    'Professional performer and artist booking service',
-    'Musicians, comedians, magicians, and specialty acts',
-    2000.00,
-    10,
-    true,
-    true,
-    24,
-    168,
-    1440,
-    480,
-    true,
-    false,
-    'Stage Avenue',
-    'Los Angeles',
-    456,
-    -118.2437,
-    34.0522,
-    1,
-    0
-),
-
--- Service 3: Corporate Team Building
-(
-    'Service',
-    19,
-    'Team Building Experience',
-    'Custom corporate team development programs',
-    'Indoor and outdoor activities, professional facilitators',
-    3000.00,
-    5,
-    true,
-    true,
-    8,
-    40,
-    720,
-    240,
-    false,
-    false,
-    'Leadership Road',
-    'Seattle',
-    789,
-    -122.3321,
-    47.6062,
-    1,
-    0
-),
-
--- Service 4: Wedding Coordination
-(
-    'Service',
-    20,
-    'Full Wedding Planning',
-    'Comprehensive wedding planning from concept to execution',
-    'Vendor management, design, timeline coordination',
-    5000.00,
-    0,
-    true,
-    true,
-    60,
-    365,
-    1440,
-    720,
-    true,
-    false,
-    'Romance Lane',
-    'San Francisco',
-    234,
-    -122.4194,
-    37.7749,
-    1,
-    0
-),
-
--- Service 5: Event Technology Consulting
-(
-    'Service',
-    21,
-    'Event Tech Strategy',
-    'Technology consulting for event innovation',
-    'Digital transformation, tech integration, innovation workshops',
-    2500.00,
-    15,
-    true,
-    true,
-    16,
-    80,
-    480,
-    120,
-    false,
-    false,
-    'Innovation Boulevard',
-    'Austin',
-    567,
-    -97.7431,
-    30.2672,
-    1,
-    0
-),
-
--- Service 6: Sustainable Event Design
-(
-    'Service',
-    22,
-    'Eco-Friendly Event Planning',
-    'Green event design and sustainability consulting',
-    'Carbon-neutral strategies, eco-friendly vendor selection',
-    1800.00,
-    0,
-    true,
-    true,
-    24,
-    120,
-    720,
-    240,
-    true,
-    false,
-    'Green Street',
-    'Portland',
-    890,
-    -122.6784,
-    45.5155,
-    1,
-    0
-),
-
--- Service 7: International Event Management
-(
-    'Service',
-    23,
-    'Global Event Coordination',
-    'International event planning and logistics',
-    'Cross-cultural consulting, international vendor management',
-    4000.00,
-    10,
-    true,
-    true,
-    40,
-    240,
-    1440,
-    720,
-    false,
-    false,
-    'Global Avenue',
-    'New York',
-    321,
-    -74.0060,
-    40.7128,
-    1,
-    0
-),
-
--- Service 8: Event Brand Strategy
-(
-    'Service',
-    24,
-    'Event Branding Consultancy',
-    'Strategic branding for events and experiences',
-    'Brand identity, marketing strategy, experiential design',
-    2200.00,
-    5,
-    true,
-    true,
-    16,
-    80,
-    480,
-    120,
-    true,
-    false,
-    'Creative Plaza',
-    'Miami',
-    456,
-    -80.1918,
-    25.7617,
-    1,
-    0
-),
-
--- Service 9: VIP Guest Experience
-(
-    'Service',
-    25,
-    'Premium Guest Management',
-    'White-glove service for high-profile event guests',
-    'Concierge services, VIP coordination, luxury experience design',
-    3500.00,
-    0,
-    true,
-    true,
-    24,
-    120,
-    720,
-    240,
-    false,
-    false,
-    'Luxury Lane',
-    'Las Vegas',
-    678,
-    -115.1398,
-    36.1699,
-    1,
-    0
-);
-
--- Link these new merchandise items to Goran (user_id 152)
-INSERT INTO user_merchandise(merchandise_id, service_provider_id)
-SELECT id, 152
-FROM merchandise
-WHERE id BETWEEN 7 AND 25;
-
-insert into event_type (is_active, description, title)
-values (true,'all','all');
-
-insert into user_favorite_merchandises (merchandise_id, user_id)
-select id,54
-from merchandise
-where id between 6 and 15;
+-- INSERT INTO merchandise (
+--     merchandise_type,
+--     id,
+--     title,
+--     description,
+--     specificity,
+--     price,
+--     discount,
+--     visible,
+--     available,
+--     min_duration,
+--     max_duration,
+--     reservation_deadline,
+--     cancellation_deadline,
+--     automatic_reservation,
+--     deleted,
+--     street,
+--     city,
+--     number,
+--     longitude,
+--     latitude,
+--     category_id,
+--     state
+-- ) VALUES
+-- -- Product 1: Vintage Photo Booth
+-- (
+--     'Product',
+--     7,
+--     'Retro Photo Booth Rental',
+--     'Vintage-style photo booth for weddings and events',
+--     'Includes unlimited prints and digital copies',
+--     350.00,
+--     5,
+--     true,
+--     true,
+--     2,
+--     8,
+--     72,
+--     48,
+--     true,
+--     false,
+--     'Innovation Way',
+--     'Chicago',
+--     234,
+--     -122.3321,
+--     47.6062,
+--     1,
+--     0
+-- ),
+--
+-- -- Product 2: Custom Cake Design
+-- (
+--     'Product',
+--     8,
+--     'Artisan Custom Cake',
+--     'Handcrafted gourmet cake for special occasions',
+--     'Personalized design and flavor selection',
+--     250.00,
+--     10,
+--     true,
+--     true,
+--     1,
+--     2,
+--     120,
+--     72,
+--     false,
+--     false,
+--     'Pastry Lane',
+--     'Portland',
+--     456,
+--     -122.6784,
+--     45.5155,
+--     1,
+--     0
+-- ),
+--
+-- -- Product 3: Lighting Equipment Rental
+-- (
+--     'Product',
+--     9,
+--     'Professional Event Lighting',
+--     'High-end lighting equipment for events',
+--     'LED par lights, moving heads, and control system included',
+--     600.00,
+--     0,
+--     true,
+--     true,
+--     1,
+--     3,
+--     96,
+--     72,
+--     true,
+--     false,
+--     'Tech Boulevard',
+--     'Denver',
+--     789,
+--     -104.9903,
+--     39.7392,
+--     1,
+--     0
+-- ),
+--
+-- -- Product 4: Vintage Car Rental
+-- (
+--     'Product',
+--     10,
+--     'Classic Car for Events',
+--     'Vintage car rental for weddings and photo shoots',
+--     'Multiple classic models available, professional driver included',
+--     500.00,
+--     15,
+--     true,
+--     true,
+--     4,
+--     24,
+--     168,
+--     120,
+--     false,
+--     false,
+--     'Classic Avenue',
+--     'Los Angeles',
+--     321,
+--     -118.2437,
+--     34.0522,
+--     1,
+--     0
+-- ),
+--
+-- -- Product 5: Balloon Decoration Kit
+-- (
+--     'Product',
+--     11,
+--     'Event Balloon Decor Package',
+--     'Professional balloon decoration and setup',
+--     'Custom color schemes, arch, columns, and custom shapes',
+--     200.00,
+--     5,
+--     true,
+--     true,
+--     1,
+--     2,
+--     48,
+--     24,
+--     true,
+--     false,
+--     'Party Street',
+--     'Chicago',
+--     567,
+--     -87.6298,
+--     41.8781,
+--     1,
+--     0
+-- ),
+--
+-- -- Product 6: Sound System Rental
+-- (
+--     'Product',
+--     12,
+--     'Professional Audio Equipment',
+--     'High-quality sound system for events',
+--     'Speakers, mixers, microphones, and setup included',
+--     450.00,
+--     10,
+--     true,
+--     true,
+--     1,
+--     2,
+--     72,
+--     48,
+--     true,
+--     false,
+--     'Sound Avenue',
+--     'Seattle',
+--     890,
+--     -122.3321,
+--     47.6062,
+--     1,
+--     0
+-- ),
+--
+-- -- Product 7: Flower Wall Backdrop
+-- (
+--     'Product',
+--     13,
+--     'Luxury Flower Wall',
+--     'Stunning floral backdrop for events and photos',
+--     'Customizable flower colors and sizes',
+--     300.00,
+--     0,
+--     true,
+--     true,
+--     1,
+--     1,
+--     120,
+--     72,
+--     false,
+--     false,
+--     'Bloom Street',
+--     'San Francisco',
+--     234,
+--     -122.4194,
+--     37.7749,
+--     1,
+--     0
+-- ),
+--
+-- -- Product 8: Themed Prop Collection
+-- (
+--     'Product',
+--     14,
+--     'Event Theme Prop Set',
+--     'Comprehensive collection of themed props',
+--     'Various themes: Gatsby, Tropical, Vintage, Sci-Fi',
+--     400.00,
+--     15,
+--     true,
+--     true,
+--     1,
+--     2,
+--     96,
+--     48,
+--     true,
+--     false,
+--     'Props Lane',
+--     'Austin',
+--     456,
+--     -97.7431,
+--     30.2672,
+--     1,
+--     0
+-- ),
+--
+-- -- Product 9: Interactive Digital Guestbook
+-- (
+--     'Product',
+--     15,
+--     'Digital Memories Guestbook',
+--     'Interactive digital guestbook for events',
+--     'Touchscreen display, instant photo and message capture',
+--     275.00,
+--     5,
+--     true,
+--     true,
+--     1,
+--     1,
+--     48,
+--     24,
+--     false,
+--     false,
+--     'Tech Plaza',
+--     'Boston',
+--     678,
+--     -71.0589,
+--     42.3601,
+--     1,
+--     0
+-- ),
+--
+-- -- Product 10: Projection Mapping Kit
+-- (
+--     'Product',
+--     16,
+--     'Event Projection Mapping',
+--     'Advanced projection mapping technology',
+--     'Custom visual effects for venues and stages',
+--     750.00,
+--     0,
+--     true,
+--     true,
+--     2,
+--     4,
+--     168,
+--     120,
+--     true,
+--     false,
+--     'Digital Avenue',
+--     'Miami',
+--     901,
+--     -80.1918,
+--     25.7617,
+--     1,
+--     0
+-- );
+--
+-- -- Insert 10 New Services for Goran
+-- INSERT INTO merchandise (
+--     merchandise_type,
+--     id,
+--     title,
+--     description,
+--     specificity,
+--     price,
+--     discount,
+--     visible,
+--     available,
+--     min_duration,
+--     max_duration,
+--     reservation_deadline,
+--     cancellation_deadline,
+--     automatic_reservation,
+--     deleted,
+--     street,
+--     city,
+--     number,
+--     longitude,
+--     latitude,
+--     category_id,
+--     state
+-- ) VALUES
+-- -- Service 1: Virtual Event Coordination
+-- (
+--     'Service',
+--     17,
+--     'Virtual Event Management',
+--     'Comprehensive online event planning and execution',
+--     'Platform selection, technical setup, and virtual host services',
+--     1500.00,
+--     0,
+--     true,
+--     true,
+--     10,
+--     120,
+--     720,
+--     240,
+--     false,
+--     false,
+--     'Digital Street',
+--     'Chicago',
+--     123,
+--     -87.6298,
+--     41.8781,
+--     1,
+--     0
+-- ),
+--
+-- -- Service 2: Performer Booking
+-- (
+--     'Service',
+--     18,
+--     'Entertainment Talent Booking',
+--     'Professional performer and artist booking service',
+--     'Musicians, comedians, magicians, and specialty acts',
+--     2000.00,
+--     10,
+--     true,
+--     true,
+--     24,
+--     168,
+--     1440,
+--     480,
+--     true,
+--     false,
+--     'Stage Avenue',
+--     'Los Angeles',
+--     456,
+--     -118.2437,
+--     34.0522,
+--     1,
+--     0
+-- ),
+--
+-- -- Service 3: Corporate Team Building
+-- (
+--     'Service',
+--     19,
+--     'Team Building Experience',
+--     'Custom corporate team development programs',
+--     'Indoor and outdoor activities, professional facilitators',
+--     3000.00,
+--     5,
+--     true,
+--     true,
+--     8,
+--     40,
+--     720,
+--     240,
+--     false,
+--     false,
+--     'Leadership Road',
+--     'Seattle',
+--     789,
+--     -122.3321,
+--     47.6062,
+--     1,
+--     0
+-- ),
+--
+-- -- Service 4: Wedding Coordination
+-- (
+--     'Service',
+--     20,
+--     'Full Wedding Planning',
+--     'Comprehensive wedding planning from concept to execution',
+--     'Vendor management, design, timeline coordination',
+--     5000.00,
+--     0,
+--     true,
+--     true,
+--     60,
+--     365,
+--     1440,
+--     720,
+--     true,
+--     false,
+--     'Romance Lane',
+--     'San Francisco',
+--     234,
+--     -122.4194,
+--     37.7749,
+--     1,
+--     0
+-- ),
+--
+-- -- Service 5: Event Technology Consulting
+-- (
+--     'Service',
+--     21,
+--     'Event Tech Strategy',
+--     'Technology consulting for event innovation',
+--     'Digital transformation, tech integration, innovation workshops',
+--     2500.00,
+--     15,
+--     true,
+--     true,
+--     16,
+--     80,
+--     480,
+--     120,
+--     false,
+--     false,
+--     'Innovation Boulevard',
+--     'Austin',
+--     567,
+--     -97.7431,
+--     30.2672,
+--     1,
+--     0
+-- ),
+--
+-- -- Service 6: Sustainable Event Design
+-- (
+--     'Service',
+--     22,
+--     'Eco-Friendly Event Planning',
+--     'Green event design and sustainability consulting',
+--     'Carbon-neutral strategies, eco-friendly vendor selection',
+--     1800.00,
+--     0,
+--     true,
+--     true,
+--     24,
+--     120,
+--     720,
+--     240,
+--     true,
+--     false,
+--     'Green Street',
+--     'Portland',
+--     890,
+--     -122.6784,
+--     45.5155,
+--     1,
+--     0
+-- ),
+--
+-- -- Service 7: International Event Management
+-- (
+--     'Service',
+--     23,
+--     'Global Event Coordination',
+--     'International event planning and logistics',
+--     'Cross-cultural consulting, international vendor management',
+--     4000.00,
+--     10,
+--     true,
+--     true,
+--     40,
+--     240,
+--     1440,
+--     720,
+--     false,
+--     false,
+--     'Global Avenue',
+--     'New York',
+--     321,
+--     -74.0060,
+--     40.7128,
+--     1,
+--     0
+-- ),
+--
+-- -- Service 8: Event Brand Strategy
+-- (
+--     'Service',
+--     24,
+--     'Event Branding Consultancy',
+--     'Strategic branding for events and experiences',
+--     'Brand identity, marketing strategy, experiential design',
+--     2200.00,
+--     5,
+--     true,
+--     true,
+--     16,
+--     80,
+--     480,
+--     120,
+--     true,
+--     false,
+--     'Creative Plaza',
+--     'Miami',
+--     456,
+--     -80.1918,
+--     25.7617,
+--     1,
+--     0
+-- ),
+--
+-- -- Service 9: VIP Guest Experience
+-- (
+--     'Service',
+--     25,
+--     'Premium Guest Management',
+--     'White-glove service for high-profile event guests',
+--     'Concierge services, VIP coordination, luxury experience design',
+--     3500.00,
+--     0,
+--     true,
+--     true,
+--     24,
+--     120,
+--     720,
+--     240,
+--     false,
+--     false,
+--     'Luxury Lane',
+--     'Las Vegas',
+--     678,
+--     -115.1398,
+--     36.1699,
+--     1,
+--     0
+-- );
+--
+-- -- Link these new merchandise items to Goran (user_id 152)
+-- INSERT INTO user_merchandise(merchandise_id, service_provider_id)
+-- SELECT id, 152
+-- FROM merchandise
+-- WHERE id BETWEEN 7 AND 25;
+--
+-- insert into event_type (is_active, description, title)
+-- values (true,'all','all');
+--
+-- insert into user_favorite_merchandises (merchandise_id, user_id)
+-- select id,54
+-- from merchandise
+-- where id between 6 and 15;

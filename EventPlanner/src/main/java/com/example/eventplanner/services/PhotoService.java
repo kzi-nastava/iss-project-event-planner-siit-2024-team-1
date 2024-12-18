@@ -1,5 +1,6 @@
 package com.example.eventplanner.services;
 
+import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.MerchandisePhoto;
 import com.example.eventplanner.model.user.BusinessPhoto;
 import com.example.eventplanner.model.user.ServiceProvider;
@@ -111,14 +112,52 @@ public class PhotoService {
         }
     }
 
-    public int deleteMercById(int id){
-        MerchandisePhoto merchandisePhoto = merchandisePhotoRepository.findById(id).orElseThrow();
-        merchandisePhotoRepository.delete(merchandisePhoto);
+    public int deleteMercById(int id, int mercId, boolean edit) {
+        MerchandisePhoto merchandisePhoto = merchandisePhotoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Merchandise photo not found with id: " + id));
+
+        if(mercId != -1 && !edit){
+            Merchandise merchandise = merchandiseRepository.findById(mercId).orElseThrow(() -> new RuntimeException("Merchandise not found with id: " + mercId));
+            merchandise.getPhotos().remove(merchandisePhoto);
+            merchandiseRepository.save(merchandise);
+        }
+
+        if(mercId == -1 && !merchandiseRepository.existsByPhotoId(merchandisePhoto.getId())){
+            // Delete the photo file
+            Path photoPath = Paths.get(photoStoragePath).resolve(merchandisePhoto.getPhoto());
+            try {
+                Files.deleteIfExists(photoPath);
+                merchandisePhotoRepository.delete(merchandisePhoto);
+            } catch (IOException e) {
+                throw new RuntimeException("Could not delete file: " + photoPath, e);
+            }
+        }
+
+        // Delete from the database
         return merchandisePhoto.getId();
     }
 
-    public int deleteBusinessById(int id){
-        BusinessPhoto businessPhoto = businessPhotoRepository.findById(id).orElseThrow();
+    public int deleteBusinessById(int id, int spId, boolean edit) {
+        BusinessPhoto businessPhoto = businessPhotoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Business photo not found with id: " + id));
+
+        if(!(spId != -1 && edit)){
+            ServiceProvider serviceProvider = serviceProviderRepository.findById(spId).orElseThrow(() -> new RuntimeException("Service provider not found with id: " + spId));
+            serviceProvider.getPhotos().remove(businessPhoto);
+            serviceProviderRepository.save(serviceProvider);
+        }
+
+        if(spId == -1 && !businessPhotoRepository.existsByPhotoId(businessPhoto.getId())){
+            // Delete the photo file
+            Path photoPath = Paths.get(photoStoragePath).resolve(businessPhoto.getPhoto());
+            try {
+                Files.deleteIfExists(photoPath);
+            } catch (IOException e) {
+                throw new RuntimeException("Could not delete file: " + photoPath, e);
+            }
+        }
+
+        // Delete from the database
         businessPhotoRepository.delete(businessPhoto);
         return businessPhoto.getId();
     }
