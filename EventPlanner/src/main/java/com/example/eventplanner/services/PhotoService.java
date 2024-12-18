@@ -116,12 +116,6 @@ public class PhotoService {
         MerchandisePhoto merchandisePhoto = merchandisePhotoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Merchandise photo not found with id: " + id));
 
-        if(mercId != -1 && !edit){
-            Merchandise merchandise = merchandiseRepository.findById(mercId).orElseThrow(() -> new RuntimeException("Merchandise not found with id: " + mercId));
-            merchandise.getPhotos().remove(merchandisePhoto);
-            merchandiseRepository.save(merchandise);
-        }
-
         if(mercId == -1 && !merchandiseRepository.existsByPhotoId(merchandisePhoto.getId())){
             // Delete the photo file
             Path photoPath = Paths.get(photoStoragePath).resolve(merchandisePhoto.getPhoto());
@@ -132,7 +126,6 @@ public class PhotoService {
                 throw new RuntimeException("Could not delete file: " + photoPath, e);
             }
         }
-
         // Delete from the database
         return merchandisePhoto.getId();
     }
