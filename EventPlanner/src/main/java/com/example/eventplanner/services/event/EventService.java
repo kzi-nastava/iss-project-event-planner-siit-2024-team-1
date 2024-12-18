@@ -9,6 +9,7 @@ import com.example.eventplanner.dto.merchandise.product.GetProductByIdResponseDT
 import com.example.eventplanner.dto.merchandise.service.GetServiceByIdResponseDTO;
 import com.example.eventplanner.dto.review.ReviewDTO;
 import com.example.eventplanner.dto.user.UserOverviewDTO;
+import com.example.eventplanner.exceptions.BlockedMerchandiseException;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.event.Activity;
 import com.example.eventplanner.model.event.Event;
@@ -374,9 +375,18 @@ public class EventService {
 
         return dto;
     }
-    public EventDetailsDTO getDetails(int eventId) {
+    public EventDetailsDTO getDetails(int userId,int eventId) {
+        User currentUser = fetchUserDetails(userId);
+
+        // User-specific details
+        List<User> blockedUsers = currentUser != null ? currentUser.getBlockedUsers() : List.of();
+
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
+        if(blockedUsers.contains(event.getOrganizer()))
+            throw new BlockedMerchandiseException("Event with id " + eventId + " is blocked");
+        if(!isOrganizerNotBlockingUser(currentUser, event))
+            throw new BlockedMerchandiseException("Event with id " + eventId + " is blocked");
 
         EventDetailsDTO dto = new EventDetailsDTO();
         dto.setId(event.getId());

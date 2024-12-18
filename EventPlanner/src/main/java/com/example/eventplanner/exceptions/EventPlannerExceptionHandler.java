@@ -3,11 +3,12 @@ package com.example.eventplanner.exceptions;
 import com.example.eventplanner.dto.user.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class AuthenticationExceptionHandler {
+public class EventPlannerExceptionHandler {
 
     @ExceptionHandler(UserAuthenticationException.class)
     public ResponseEntity<ErrorResponseDto> handleUserAuthenticationException(UserAuthenticationException ex) {
@@ -20,5 +21,11 @@ public class AuthenticationExceptionHandler {
         }
 
         return new ResponseEntity<>(new ErrorResponseDto(ex.getMessage(), ex.getErrorType().name()), status);
+    }
+
+    @ExceptionHandler(BlockedMerchandiseException.class)
+    public ResponseEntity<ErrorResponseDto> handleBlockedMerchandise(BlockedMerchandiseException ex) {
+
+        return new ResponseEntity<>(new ErrorResponseDto(ex.getMessage(), "blocked user"), HttpStatus.FORBIDDEN);
     }
 }

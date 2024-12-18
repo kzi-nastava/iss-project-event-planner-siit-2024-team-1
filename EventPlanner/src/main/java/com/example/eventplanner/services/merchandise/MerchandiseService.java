@@ -8,6 +8,7 @@ import com.example.eventplanner.dto.merchandise.MerchandiseDetailDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
 import com.example.eventplanner.dto.merchandise.review.MerchandiseReviewOverviewDTO;
+import com.example.eventplanner.exceptions.BlockedMerchandiseException;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
@@ -54,12 +55,11 @@ public class MerchandiseService {
 
         // Step 1: Apply filters
         List<Merchandise> filteredMerchandise = allMerchandise.stream()
-                // Include only available merchandise
-                .filter(Merchandise::isAvailable)
                 // Exclude merchandise provided by blocked users
                 .filter(merchandise -> isNotBlocked(blockedUsers, serviceProviderRepository.findByMerchandiseId(merchandise.getId()).get()))
                 // Filter by city (if user has a city set)
                 .filter(merchandise -> isCityMatching(userCity, merchandise.getAddress().getCity()))
+                .filter(m->!m.isDeleted())
                 .toList();
 
         // Step 2: Sort and limit to top 5 by rating
@@ -117,10 +117,16 @@ public class MerchandiseService {
         return categoryDTO;
     }
 
-    public MerchandiseDetailDTO getMerchandiseById(int id) {
+    public MerchandiseDetailDTO getMerchandiseById(int userId,int id) {
+        User currentUser = fetchUserDetails(userId);
+
+        // User-specific details
+        List<User> blockedUsers = currentUser != null ? currentUser.getBlockedUsers() : List.of();
         Merchandise merchandise = merchandiseRepository.findById(id).orElseThrow(() ->
                 new RuntimeException("Merchandise with id " + id + " not found")
         );
+        if(blockedUsers.contains(serviceProviderRepository.findByMerchandiseId(merchandise.getId()).get()))
+            throw new BlockedMerchandiseException("Merchandise with id " + id + " is blocked");
         return mapToMerchandiseDetails(merchandise);
     }
 
@@ -178,7 +184,29 @@ public class MerchandiseService {
         return dto;
     }
 
+    public List<MerchandiseOverviewDTO> getFavoriteMerchandises(int userId) {
+        User currentUser = fetchUserDetails(userId);
 
+        // User-specific details
+        List<User> blockedUsers = currentUser != null ? currentUser.getBlockedUsers() : List.of();
+
+
+        // Fetch all merchandise
+        List<Merchandise> favoriteMerchandise = currentUser.getFavoriteMerchandises();
+
+        // Step 1: Apply filters
+        List<Merchandise> filteredMerchandise = favoriteMerchandise.stream()
+                // Include only available merchandise
+                .filter(m->!m.isDeleted())
+                // Exclude merchandise provided by blocked users
+                .filter(merchandise -> isNotBlocked(blockedUsers, serviceProviderRepository.findByMerchandiseId(merchandise.getId()).get()))
+                .toList();
+
+        // Step 2: Sort and limit to top 5 by rating
+        return filteredMerchandise.stream()
+                .map(this::convertToOverviewDTO)
+                .toList();
+    }
 
 
 }

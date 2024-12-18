@@ -110,6 +110,9 @@ public class ServiceService {
 
     private Specification<com.example.eventplanner.model.merchandise.Service> createSpecification(ServiceFiltersDTO ServiceFiltersDTO, String search) {
         Specification<com.example.eventplanner.model.merchandise.Service> spec = Specification.where(null);
+        spec = spec.and((root, query, criteriaBuilder) ->
+                criteriaBuilder.isFalse(root.get("deleted"))
+        );
         spec = addPriceRangeFilter(spec, ServiceFiltersDTO);
         spec = addCategoryFilter(spec, ServiceFiltersDTO);
         spec = addCityFilter(spec, ServiceFiltersDTO);
