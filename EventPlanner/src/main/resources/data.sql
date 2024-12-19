@@ -1970,3 +1970,6 @@ WHERE id between 1 and 6;
 -- from merchandise
 -- where id between 6 and 15;
 
+UPDATE public.id_generator
+SET next_val = 200
+WHERE sequence_name = 'merchandise';

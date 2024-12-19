@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 public class AddressDTO {
     private String street;
     private String city;
-    private int number;
+    private String number;
     private double longitude;
     private double latitude;
 }

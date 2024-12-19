@@ -9,7 +9,7 @@ public class Address {
 
     private String street;
     private String city;
-    private int number;
+    private String number;
     private double longitude;
     private double latitude;
 }
