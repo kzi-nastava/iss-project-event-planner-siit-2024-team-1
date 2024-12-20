@@ -134,15 +134,17 @@ public class PhotoService {
         BusinessPhoto businessPhoto = businessPhotoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Business photo not found with id: " + id));
 
-        if(spId == -1 && !businessPhotoRepository.existsByPhotoId(businessPhoto.getId())){
-            // Delete the photo file
-            Path photoPath = Paths.get(photoStoragePath).resolve(businessPhoto.getPhoto());
-            try {
-                Files.deleteIfExists(photoPath);
-                businessPhotoRepository.delete(businessPhoto);
-            } catch (IOException e) {
-                throw new RuntimeException("Could not delete file: " + photoPath, e);
-            }
+        if (spId != -1) {
+            ServiceProvider sp = serviceProviderRepository.findById(spId).orElseThrow(() -> new RuntimeException("Service provider not found with id: " + spId));
+            sp.getPhotos().remove(businessPhoto);
+        }
+
+        Path photoPath = Paths.get(photoStoragePath).resolve(businessPhoto.getPhoto());
+        try {
+            Files.deleteIfExists(photoPath);
+            businessPhotoRepository.delete(businessPhoto);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not delete file: " + photoPath, e);
         }
 
         // Delete from the database
