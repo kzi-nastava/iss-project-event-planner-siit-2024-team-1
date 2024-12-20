@@ -30,6 +30,7 @@ import com.example.eventplanner.repositories.eventType.EventTypeRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
 import com.example.eventplanner.repositories.user.EventOrganizerRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
+import com.example.eventplanner.services.notification.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
@@ -58,6 +59,7 @@ public class EventService {
     private final MerchandiseRepository merchandiseRepository;
     private final ActivityRepository activityRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public Page<EventOverviewDTO> getTop(int userId, Pageable pageable) {
         // Fetch user details
@@ -563,6 +565,7 @@ public class EventService {
         event.setMerchandise(merchandise);
 
         Event savedEvent = eventRepository.save(event);
+        notificationService.notifyUsersEventChanged(eventId);
 
         return mapToCreatedEventOverviewDTO(savedEvent, eventType, merchandise);
     }
