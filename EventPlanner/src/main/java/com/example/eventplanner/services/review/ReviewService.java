@@ -7,6 +7,8 @@ import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
 import com.example.eventplanner.repositories.review.ReviewRepository;
+import com.example.eventplanner.repositories.user.ServiceProviderRepository;
+import com.example.eventplanner.services.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,8 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final EventRepository eventRepository;
     private final MerchandiseRepository merchandiseRepository;
-
+    private final NotificationService notificationService;
+    private final ServiceProviderRepository serviceProviderRepository;
     public List<ReviewOverviewDTO> getAllPendingReviews() {
         // Fetch all pending reviews
         List<Review> pendingReviews = reviewRepository.findByStatusAndDeletedFalse(ReviewStatus.PENDING);
@@ -60,12 +63,15 @@ public class ReviewService {
 
         // Check if the review is associated with an Event
         Event event = eventRepository.findByReviewsContaining(review);
+        int reviewedUserId;
         if (event != null) {
             reviewedType = "Event";
             reviewedTitle = event.getTitle();
+            reviewedUserId=event.getOrganizer().getId();
         } else {
             // If not an Event, check for Merchandise (Product/Service)
             Merchandise merchandise = merchandiseRepository.findByReviewsContaining(review);
+            reviewedUserId=serviceProviderRepository.findByMerchandiseId(merchandise.getId()).get().getId();
             if (merchandise instanceof Product) {
                 reviewedType = "Product";
             } else if (merchandise instanceof com.example.eventplanner.model.merchandise.Service) {
@@ -75,9 +81,7 @@ public class ReviewService {
                 reviewedTitle = merchandise.getTitle();
             }
         }
-
-        // Map to ReviewOverviewDTO
-        return new ReviewOverviewDTO(
+        ReviewOverviewDTO reviewOverviewDTO=new ReviewOverviewDTO(
                 review.getId(),
                 review.getComment(),
                 review.getRating(),
@@ -87,5 +91,9 @@ public class ReviewService {
                 review.getReviewer() != null ? review.getReviewer().getUsername() : null,
                 review.getCreatedAt()
         );
+        // Map to ReviewOverviewDTO
+        if(reviewOverviewDTO.getStatus()==ReviewStatus.APPROVED)
+            notificationService.notifyOfNewReview(reviewedUserId, reviewOverviewDTO);
+        return reviewOverviewDTO;
     }
 }

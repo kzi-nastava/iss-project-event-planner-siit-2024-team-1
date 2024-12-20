@@ -1,7 +1,9 @@
 package com.example.eventplanner.services.notification;
 
+import com.example.eventplanner.dto.merchandise.review.ReviewOverviewDTO;
 import com.example.eventplanner.dto.notification.NotificationDTO;
 import com.example.eventplanner.model.event.Event;
+import com.example.eventplanner.model.merchandise.Review;
 import com.example.eventplanner.model.user.Notification;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.event.EventRepository;
@@ -11,6 +13,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +31,7 @@ public class NotificationService {
         Notification notification = new Notification();
         notification.setContent(content);
         notification.setRead(false);
+        notification.setDate(LocalDateTime.now());
 
         // Save notification first
         notification = notificationRepository.save(notification);
@@ -64,6 +68,7 @@ public class NotificationService {
         dto.setId(notification.getId());
         dto.setContent(notification.getContent());
         dto.setRead(notification.isRead());
+        dto.setDate(notification.getDate());
         return dto;
     }
 
@@ -78,12 +83,22 @@ public class NotificationService {
         }
     }
 
+    @Transactional
+    public void notifyOfNewReview(int userId, ReviewOverviewDTO review) {
+        Optional<User> user = userRepository.findById(userId);
+        if(user.isEmpty())throw new RuntimeException("User not found");
+        sendNotificationToUser(user.get(), "User: " + review.getReviewerUsername() + "\n has reviewed: "+
+                review.getReviewedTitle()+"\n"+
+                "Rating: "+review.getRating()+"/5\n"+
+                "Comment: "+review.getComment());
+    }
+
     public NotificationDTO MarkAsRead(int notificationId) {
         Optional<Notification> notification=notificationRepository.findById(notificationId);
         if(notification.isPresent()){
             notification.get().setRead(true);
             notificationRepository.save(notification.get());
-            return new NotificationDTO(notification.get().getId(), notification.get().getContent(), notification.get().isRead());
+            return mapToDTO(notification.get());
         }
         throw new RuntimeException("Notification not found");
     }
