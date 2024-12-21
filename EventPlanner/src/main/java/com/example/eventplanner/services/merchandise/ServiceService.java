@@ -73,6 +73,7 @@ public class ServiceService {
 
         // Create a specification for filtering
         Specification<com.example.eventplanner.model.merchandise.Service> spec = createSpecification(serviceFiltersDTO, search)
+                .and(excludeInvisible())
                 .and(excludeBlockedProviders(currentUser, blockedUsers)); // Exclude services by blocked providers
 
         // Fetch paginated services with the composed specification
@@ -80,6 +81,11 @@ public class ServiceService {
 
         // Convert the results to DTOs
         return pagedServices.map(this::convertToOverviewDTO);
+    }
+    private Specification<com.example.eventplanner.model.merchandise.Service> excludeInvisible(){
+        return (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.isTrue(root.get("visible"));
+        };
     }
 
     private Specification<com.example.eventplanner.model.merchandise.Service> excludeBlockedProviders(User currentUser, List<User> blockedUsers) {

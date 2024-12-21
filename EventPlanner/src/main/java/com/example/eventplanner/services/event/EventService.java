@@ -103,6 +103,7 @@ public class EventService {
         List<EventOverviewDTO> top5Events = eventsInUserCity.stream()
                 // Sort by the event date (descending)
                 .sorted((e1, e2) -> e2.getDate().compareTo(e1.getDate()))
+                .filter(Event::isPublic)
                 // Limit to the top 5 events
                 .limit(5)
                 // Convert to DTO
@@ -247,6 +248,7 @@ public class EventService {
 
         // Create a specification for filtering
         Specification<Event> spec = createSpecification(eventFiltersDTO, search)
+                .and(excludePrivateEvents())
                 .and(excludeBlockedOrganizers(currentUser,blockedUsers)) // Exclude events by blocked organizers
                 .and(excludeEventsFromBlockingOrganizers(currentUser, isAuthenticatedUser)); // Exclude events where the organizer blocks the user
 
@@ -255,6 +257,12 @@ public class EventService {
 
         // Convert to DTOs
         return pagedEvents.map(this::convertToOverviewDTO);
+    }
+
+    private Specification<Event> excludePrivateEvents(){
+        return (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.isTrue(root.get("isPublic"));
+        };
     }
 
     private Specification<Event> excludeBlockedOrganizers(User currentUser,List<User> blockedUsers) {

@@ -60,6 +60,7 @@ public class MerchandiseService {
                 // Filter by city (if user has a city set)
                 .filter(merchandise -> isCityMatching(userCity, merchandise.getAddress().getCity()))
                 .filter(m->!m.isDeleted())
+                .filter(Merchandise::isVisible)
                 .toList();
 
         // Step 2: Sort and limit to top 5 by rating
