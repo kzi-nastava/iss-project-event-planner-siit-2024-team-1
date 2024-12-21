@@ -80,7 +80,15 @@ public class UserService {
 
         responseDTO.setCompany(user.getCompany());
         responseDTO.setDescription(user.getDescription());
+        responseDTO.setPhotos(user.getPhotos().stream().map(this::mapToBusinnesPhotoDTO).toList());
         return responseDTO;
+    }
+
+    private BusinnesPhotoDTO mapToBusinnesPhotoDTO(BusinessPhoto photo){
+        BusinnesPhotoDTO businnesPhotoDTO = new BusinnesPhotoDTO();
+        businnesPhotoDTO.setId(photo.getId());
+        businnesPhotoDTO.setPhoto(photo.getPhoto());
+        return businnesPhotoDTO;
     }
 
     public EventOverviewDTO addEventToFavorites(int userId, int eventId) {
