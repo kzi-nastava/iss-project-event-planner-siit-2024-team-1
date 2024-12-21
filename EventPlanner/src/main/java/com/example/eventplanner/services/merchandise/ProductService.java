@@ -71,6 +71,7 @@ public class ProductService {
 
         // Create a specification for filtering
         Specification<Product> spec = createSpecification(productFiltersDTO, search)
+                .and(excludeInvisible())
                 .and(excludeBlockedProviders(currentUser, blockedUsers)); // Exclude products by blocked providers
 
         // Fetch paginated products with the composed specification
@@ -80,6 +81,11 @@ public class ProductService {
         return pagedProducts.map(this::convertToOverviewDTO);
     }
 
+    private Specification<Product> excludeInvisible(){
+        return (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.isTrue(root.get("visible"));
+        };
+    }
     private Specification<Product> excludeBlockedProviders(User currentUser, List<User> blockedUsers) {
         return (root, query, criteriaBuilder) -> {
             if (currentUser == null || blockedUsers == null || blockedUsers.isEmpty()||!(currentUser instanceof EventOrganizer)) {
