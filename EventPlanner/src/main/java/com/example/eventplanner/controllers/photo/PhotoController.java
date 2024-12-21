@@ -27,11 +27,11 @@ public class PhotoController {
                 .body(resource);
     }
 
-//    @PostMapping("/user")
-//    public ResponseEntity<Integer> uploadUserPhoto(@RequestParam("file") MultipartFile file) {
-//        int photoId = photoService.storeUserPhoto(file);
-//        return ResponseEntity.ok(photoId);
-//    }
+    @PostMapping("/user/{id}")
+    public ResponseEntity<String> uploadUserPhoto(@RequestParam("file") MultipartFile file, @PathVariable int id) {
+        String photoId = photoService.storeUserPhoto(file, id);
+        return ResponseEntity.ok("");
+    }
 
     @PostMapping("/business")
     public ResponseEntity<Integer> uploadBusinessPhoto(@RequestParam("file") MultipartFile file) {
@@ -55,6 +55,16 @@ public class PhotoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Integer> deleteMerchandisePhoto(@PathVariable int id) {
+        try {
+            photoService.deleteUserPhoto(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
     @RequestMapping(value = "/{spId}/business/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Integer> deleteBusinessPhoto(@PathVariable int id, @PathVariable int spId,

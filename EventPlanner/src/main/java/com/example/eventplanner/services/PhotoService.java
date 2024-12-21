@@ -9,6 +9,7 @@ import com.example.eventplanner.repositories.merchandise.MerchandisePhotoReposit
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
 import com.example.eventplanner.repositories.user.BusinessPhotoRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
+import com.example.eventplanner.repositories.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cglib.core.Local;
@@ -31,6 +32,7 @@ public class PhotoService {
     private final ServiceProviderRepository serviceProviderRepository;
     private final MerchandiseRepository merchandiseRepository;
     private final MerchandisePhotoRepository merchandisePhotoRepository;
+    private final UserRepository userRepository;
     @Value("${photo.storage.path}") // Path to the folder where photos are stored
     private String photoStoragePath;
 
@@ -38,7 +40,7 @@ public class PhotoService {
         return loadPhotoAsResource(filename);
     }
 
-    public String storeUserPhoto(MultipartFile file, User user) {
+    public String storeUserPhoto(MultipartFile file, int id) {
         try {
             String originalFilename = file.getOriginalFilename();
             String extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
@@ -54,7 +56,10 @@ public class PhotoService {
             }
 
             Files.copy(file.getInputStream(), path);
-            user.setPhoto(filename); // Assuming User entity has a photo attribute to store the filename
+            if(id != -1){
+                User user = userRepository.findById(id).orElseThrow();
+                user.setPhoto(filename);
+            }
             return filename;
         } catch (IOException e) {
             throw new RuntimeException("Could not store file " + file.getOriginalFilename(), e);
@@ -110,6 +115,23 @@ public class PhotoService {
         } catch (IOException e) {
             throw new RuntimeException("Could not store file " + file.getOriginalFilename(), e);
         }
+    }
+
+    public String deleteUserPhoto(int id) {
+        if(id != -1){
+            User user = userRepository.findById(id).orElseThrow();
+            // Delete from the database
+            String old = user.getPhoto();
+            user.setPhoto(null);
+            Path photoPath = Paths.get(photoStoragePath).resolve(user.getPhoto());
+            try {
+                Files.deleteIfExists(photoPath);
+            } catch (IOException e) {
+                throw new RuntimeException("Could not delete file: " + photoPath, e);
+            }
+            return old;
+        }
+        return "";
     }
 
     public int deleteMercById(int id, int mercId, boolean edit) {
