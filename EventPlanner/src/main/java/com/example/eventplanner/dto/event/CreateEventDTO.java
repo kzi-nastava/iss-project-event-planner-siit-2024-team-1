@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.example.eventplanner.dto.common.AddressDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +17,7 @@ public class CreateEventDTO {
     private String title;
     private String description;
     private int maxParticipants;
+    @JsonProperty("isPublic")
     private boolean isPublic;
     private LocalDateTime date;
     private AddressDTO address; // Embeddable Address representation

@@ -3,6 +3,7 @@ package com.example.eventplanner.dto.event;
 import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
 import com.example.eventplanner.model.common.Address;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +21,7 @@ public class  EventDetailsDTO {
     private String description;
     private int maxParticipants;
     private EventTypeOverviewDTO eventType;
+    @JsonProperty("isPublic")
     private boolean isPublic;
     private EventOrganizerDTO organizer;
 }
