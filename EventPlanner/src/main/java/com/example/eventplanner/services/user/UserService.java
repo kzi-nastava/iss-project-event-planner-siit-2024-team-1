@@ -335,5 +335,11 @@ public class UserService {
         return new BlockUserDTO(blockerId, blockedUserId);
     }
 
+    public UserOverviewDTO getMessagedSp(int id) {
+        ServiceProvider serviceProvider = serviceProviderRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Service Provider not found with id: " + id)
+        );
 
+        return convertToUserOverviewDTO(serviceProvider);
+    }
 }

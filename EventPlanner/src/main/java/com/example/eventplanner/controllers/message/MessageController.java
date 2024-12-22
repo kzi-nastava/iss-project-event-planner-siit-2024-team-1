@@ -1,10 +1,14 @@
 package com.example.eventplanner.controllers.message;
 
 import com.example.eventplanner.dto.user.MessageDTO;
+import com.example.eventplanner.dto.user.MessageRequestDTO;
 import com.example.eventplanner.model.user.Message;
 import com.example.eventplanner.services.message.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,21 +37,11 @@ public class MessageController {
         return ResponseEntity.ok(messages);
     }
 
-    /**
-     * Endpoint to send a message from a sender to a recipient.
-     *
-     * @param senderId   The ID of the sender.
-     * @param recipientId The ID of the recipient.
-     * @param content     The content of the message.
-     * @return The newly created and saved message.
-     */
-    @PostMapping
-    public ResponseEntity<MessageDTO> sendMessage(
-            @RequestParam int senderId,
-            @RequestParam int recipientId,
-            @RequestParam String content
-    ) {
-        MessageDTO message = messageService.sendMessageByIds(senderId, recipientId, content);
-        return ResponseEntity.ok(message);
+    @MessageMapping("/chat.sendMessage")
+    @SendTo("/user/message")
+    public MessageDTO sendMessage(@Payload MessageRequestDTO messageDTO) {
+        MessageDTO message = messageService
+                .sendMessageByIds(messageDTO.getSenderId(), messageDTO.getReceiverId(), messageDTO.getContent());
+        return message;
     }
 }

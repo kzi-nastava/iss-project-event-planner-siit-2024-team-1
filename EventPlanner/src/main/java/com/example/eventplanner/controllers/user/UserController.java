@@ -92,6 +92,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getEoWhoMessagedSp(id));
     }
 
+    @GetMapping("/sp/{id}/message")
+    public ResponseEntity<UserOverviewDTO> getMessagedSp(@PathVariable int id) {
+        return ResponseEntity.ok(userService.getMessagedSp(id));
+    }
+  
     @PostMapping("/{blockerId}/block/{blockedUserId}")
     public ResponseEntity<BlockUserDTO> blockUser(
             @PathVariable int blockerId,
