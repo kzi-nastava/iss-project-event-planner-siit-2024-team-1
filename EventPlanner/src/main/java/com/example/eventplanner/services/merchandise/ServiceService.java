@@ -287,6 +287,10 @@ public class ServiceService {
         return mapToReservationResponse(service,event,request);
     }
 
+    private void validateReservationDate(){
+
+    }
+
     private void validateReservationTiming(com.example.eventplanner.model.merchandise.Service service, Event event, ReservationRequestDTO request) throws Exception {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime reservationDeadline = event.getDate().minusMinutes(service.getReservationDeadline());

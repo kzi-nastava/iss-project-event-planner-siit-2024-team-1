@@ -5,6 +5,7 @@ import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
 import com.example.eventplanner.dto.merchandise.product.GetProductByIdResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.GetServiceByIdResponseDTO;
 import com.example.eventplanner.model.user.EventOrganizer;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +21,7 @@ public class CreatedEventOverviewDTO {
     private String title;
     private String description;
     private int maxParticipants;
+    @JsonProperty("isPublic")
     private boolean isPublic;
     private LocalDateTime date;
     private AddressDTO address; // Embeddable Address representation

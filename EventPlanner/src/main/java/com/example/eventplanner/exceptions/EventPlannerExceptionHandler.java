@@ -3,9 +3,15 @@ package com.example.eventplanner.exceptions;
 import com.example.eventplanner.dto.user.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class EventPlannerExceptionHandler {
@@ -36,5 +42,40 @@ public class EventPlannerExceptionHandler {
             default -> status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
         return new ResponseEntity<>(new ErrorResponseDto(ex.getMessage(), ex.getErrorType().name()), status);
+    }
+
+    @ExceptionHandler(ServiceReservationException.class)
+    public ResponseEntity<ErrorResponseDto> handleServiceReservationException(ServiceReservationException e) {
+        HttpStatus status;
+        switch (e.getErrorType()) {
+            case SERVICE_NOT_FOUND:
+            case EVENT_NOT_FOUND:
+                status = HttpStatus.NOT_FOUND;
+                break;
+            case TIMING_CONSTRAINT_VIOLATION:
+            case DURATION_CONSTRAINT_VIOLATION:
+            case TIME_SLOT_ALREADY_BOOKED:
+                status = HttpStatus.BAD_REQUEST;
+                break;
+            default:
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(
+                new ErrorResponseDto(e.getMessage(), e.getErrorType().name()),
+                status
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+
+        return new ResponseEntity<>(
+                new ErrorResponseDto(message, "VALIDATION_ERROR"),
+                HttpStatus.BAD_REQUEST
+        );
     }
 }

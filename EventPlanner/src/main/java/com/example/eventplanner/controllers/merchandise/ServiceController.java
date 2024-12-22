@@ -32,32 +32,11 @@ public class ServiceController {
 
 
     @PostMapping("/{serviceId}/reserve")
-    public ResponseEntity<?> reserveService(
+    public ResponseEntity<ReservationResponseDTO> reserveService(
             @PathVariable int serviceId,
             @Valid @RequestBody ReservationRequestDTO request) {
-        try {
-            ReservationResponseDTO response = serviceService.reserveService(serviceId, request);
-            return ResponseEntity.ok(response);
-        } catch (ServiceReservationException e) {
-            // Create a detailed error response
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("errorType", e.getErrorType());
-            errorResponse.put("message", e.getMessage());
-
-            // Return appropriate HTTP status based on error type
-            switch (e.getErrorType()) {
-                case SERVICE_NOT_FOUND:
-                case EVENT_NOT_FOUND:
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-                case TIMING_CONSTRAINT_VIOLATION:
-                case DURATION_CONSTRAINT_VIOLATION:
-                case TIME_SLOT_ALREADY_BOOKED:
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-                default:
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-            }
-        }
-
+        ReservationResponseDTO response = serviceService.reserveService(serviceId, request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{serviceId}/timeslots")

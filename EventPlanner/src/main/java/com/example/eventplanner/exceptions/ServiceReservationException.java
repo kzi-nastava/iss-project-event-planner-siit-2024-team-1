@@ -8,7 +8,8 @@ public class ServiceReservationException extends RuntimeException {
         EVENT_NOT_FOUND,
         TIMING_CONSTRAINT_VIOLATION,
         DURATION_CONSTRAINT_VIOLATION,
-        TIME_SLOT_ALREADY_BOOKED
+        TIME_SLOT_ALREADY_BOOKED,
+        PAST_DATE
     }
 
     public ServiceReservationException(String message, ErrorType errorType) {

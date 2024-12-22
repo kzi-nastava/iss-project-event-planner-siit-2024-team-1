@@ -538,6 +538,7 @@ public class EventService {
         dto.setDate(event.getDate());
         dto.setAddress(event.getAddress());
         dto.setType(event.getType() != null ? event.getType().getTitle() : null);
+        dto.setPublic(event.isPublic());
         return dto;
     }
 
