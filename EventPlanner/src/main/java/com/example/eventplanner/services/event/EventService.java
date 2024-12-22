@@ -45,6 +45,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -701,5 +702,65 @@ public class EventService {
         return event.getActivities().stream()
                 .map(this::mapToActivityOverviewDTO)
                 .toList();
+    }
+    public String buildEventEmailBody(Event event, String token, boolean isExistingUser,String frontLoginAddress,String frontFastRegisterAddress) {
+        String applicationLink = isExistingUser ? frontLoginAddress : frontFastRegisterAddress;
+
+        return String.format("""
+        <html>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px;">
+                <h1 style="color: #333;">You're Invited!</h1>
+                <h2 style="color: #666;">%s</h2>
+                
+                <div style="margin: 20px 0;">
+                    <p style="color: #444;">%s</p>
+                    
+                    <h3 style="color: #555;">Event Details:</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>📅 <strong>Date:</strong> %s</li>
+                        <li>📍 <strong>Location:</strong> %s</li>
+                        <li>👥 <strong>Maximum Participants:</strong> %d</li>
+                        <li>🎯 <strong>Type:</strong> %s</li>
+                    </ul>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="%s?inviteToken=%s" 
+                       style="background-color: #007bff; 
+                              color: white; 
+                              padding: 12px 24px; 
+                              text-decoration: none; 
+                              border-radius: 5px; 
+                              display: inline-block;">
+                        %s
+                    </a>
+                </div>
+                
+                <p style="color: #666; font-size: 0.9em;">
+                    This is an automated invitation. Please do not reply to this email.
+                </p>
+            </div>
+        </body>
+        </html>
+        """,
+                event.getTitle(),
+                event.getDescription(),
+                event.getDate().format(DateTimeFormatter.ofPattern("MMMM d, yyyy 'at' h:mm a")),
+                formatAddress(event.getAddress()),
+                event.getMaxParticipants(),
+                event.getType().getTitle(),
+                applicationLink,
+                token,
+                isExistingUser ? "Join Event" : "Register & Join Event"
+        );
+    }
+
+    private String formatAddress(Address address) {
+        return String.format("%s, %s, %s",
+                address.getStreet(),
+                address.getCity(),
+                address.getNumber()
+        );
     }
 }

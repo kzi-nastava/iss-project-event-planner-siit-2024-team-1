@@ -28,4 +28,13 @@ public class EventPlannerExceptionHandler {
 
         return new ResponseEntity<>(new ErrorResponseDto(ex.getMessage(), "blocked user"), HttpStatus.FORBIDDEN);
     }
+    @ExceptionHandler(RegisterUserException.class)
+    public ResponseEntity<ErrorResponseDto> handleRegisterUser(RegisterUserException ex) {
+        HttpStatus status;
+        switch (ex.getErrorType()) {
+            case USER_ALREADY_EXISTS -> status = HttpStatus.BAD_REQUEST;
+            default -> status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        return new ResponseEntity<>(new ErrorResponseDto(ex.getMessage(), ex.getErrorType().name()), status);
+    }
 }

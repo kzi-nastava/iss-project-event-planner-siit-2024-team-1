@@ -7,6 +7,7 @@ import com.example.eventplanner.repositories.auth.TokenRepository;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
 import com.example.eventplanner.services.email.EmailService;
+import com.example.eventplanner.services.event.EventService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -26,6 +27,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class JwtService {
 
+    private final EventService eventService;
     @Value("${application.security.jwt.secret-key}")
     private String secretKey;
 
@@ -122,19 +124,22 @@ public class JwtService {
 
     public InviteResponseDTO inviteToEvent(int eventId, String userEmail) {
         Optional<User> user = userRepository.findByUsername(userEmail);
-        String token=genereateEventToken(eventId, userEmail);
-        if (user.isPresent()) {
-            emailService.sendMail("system@eventplanner.com", userEmail, "Event invite link", "<a href=" + frontLoginAddress + "?inviteToken=" + token + ">Web application link</a>");
-        }
-        //send correct email
-        else {
-            emailService.sendMail("system@eventplanner.com", userEmail, "Event invite link", "<a href=" + frontFastRegisterAddress+ "?inviteToken=" + token + ">Web application link</a>");
+        String token = generateEventToken(eventId, userEmail);
+        Optional<Event> eventOptional = eventRepository.findById(eventId);
+
+        if (!eventOptional.isPresent()) {
+            throw new EntityNotFoundException("Event not found");
         }
 
+        Event event = eventOptional.get();
+        String emailBody = eventService.buildEventEmailBody(event, token, user.isPresent(),frontLoginAddress,frontFastRegisterAddress);
+        String subject = "Invitation to " + event.getTitle();
+
+        emailService.sendMail("system@eventplanner.com", userEmail, subject, emailBody);
         return new InviteResponseDTO(token);
     }
 
-    public String genereateEventToken(int eventId, String userEmail) {
+    public String generateEventToken(int eventId, String userEmail) {
         long expireTime = accessTokenExpire;
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));

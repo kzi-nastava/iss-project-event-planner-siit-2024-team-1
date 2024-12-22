@@ -7,7 +7,7 @@ INSERT INTO public."user" (active, id, latitude, longitude, number, role, token_
 
 
 UPDATE public.id_generator
-SET next_val = 200
+SET next_val = 300
 WHERE sequence_name = 'user';
 
 -- Insert Event Types
@@ -83,7 +83,7 @@ INSERT INTO event (
           'Deep dive into artificial intelligence advances',
           300,
           true,
-          '2024-12-10 10:00:00',
+          '2024-12-18 10:00:00',
           50000.00,
           1,
           'Technology Drive',

@@ -5,6 +5,7 @@ import com.example.eventplanner.dto.event.InviteResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
 import com.example.eventplanner.dto.user.UserSuspensionDTO;
 import com.example.eventplanner.dto.user.auth.*;
+import com.example.eventplanner.exceptions.RegisterUserException;
 import com.example.eventplanner.exceptions.UserAuthenticationException;
 import com.example.eventplanner.model.auth.AuthenticationResponse;
 import com.example.eventplanner.model.auth.Token;
@@ -192,6 +193,10 @@ public class AuthenticationService {
     }
 
     public LoginResponseDTO fastRegister(String email){
+        Optional<User> optionalUser=userRepository.findByUsername(email);
+        if(optionalUser.isPresent()) {
+            throw new RegisterUserException("User with that email already exists!",RegisterUserException.ErrorType.USER_ALREADY_EXISTS);
+        }
         AuthenticatedUser authenticatedUser = new AuthenticatedUser();
         authenticatedUser.setUsername(email);
         String userPassword=generateSecurePassword();
