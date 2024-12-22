@@ -5,6 +5,7 @@ import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
 import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.product.*;
+import com.example.eventplanner.dto.merchandise.service.ServiceOverviewDTO;
 import com.example.eventplanner.model.merchandise.*;
 import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.repositories.event.EventRepository;
@@ -116,6 +117,11 @@ public class ProductService {
     public List<MerchandiseOverviewDTO> getAll(){
         return productRepository.findAll().stream().map(this::convertToOverviewDTO).toList();
     }
+
+    public List<MerchandiseOverviewDTO> getAllByCategories(List<Integer> categories){
+        return productRepository.findAllByCategories(categories).stream().map(this::convertToOverviewDTO).toList();
+    }
+
     public ProductOverviewDTO getById(int id){
         return mapToProductOverviewDTO((Product)merchandiseRepository.findById(id).orElseThrow());
     }

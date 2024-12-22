@@ -4,6 +4,8 @@ INSERT INTO public."user" (active, id, latitude, longitude, number, role, token_
 INSERT INTO public."user" (active, id, latitude, longitude, number, role, token_expiration, user_type, activation_token, authorities, city, company, description, name, password, phone_number, photo, street, surname, username) VALUES (true, 53, 0, 0, 0, null, null, 'AuthenticatedUser', null, null, null, null, null, null, '$2a$10$whEsuP8YgniU5c13oQlK4OticBaEI59u0VF2wW.A4FXzN5HKZBkZm', null, null, null, null, 'o@o.o');
 INSERT INTO public."user" (active, id, latitude, longitude, number, role, token_expiration, user_type, activation_token, authorities, city, company, description, name, password, phone_number, photo, street, surname, username) VALUES (true, 54, 1, 1, 1, 1, null, 'EventOrganizer', null, 'ahahah', 'Portland', null, null, 'Petar', '$2a$10$yX8EqFhvXldOdVCh6xkCi.JPwAmo9f3AMNZaXzYHu7uO3WzUNpv9a', '123456', null, 'as', 'Petrovic', 'pera@p.p');
 INSERT INTO public."user" (active, id, latitude, longitude, number, role, token_expiration, user_type, activation_token, authorities, city, company, description, name, password, phone_number, photo, street, surname, username) VALUES (true, 152, 1, 1, 1, 2, null, 'ServiceProvider', null, 'ahahah', 'Denver', 'Goran akademija', 'aksdjasldkajsldkjasdlk', 'Goran', '$2a$10$F9z8liXTxHqldZxP/8VLw.bdefHSKsiK6zLPHbCtea8rNFVBoSZUm', '817281791879', null, 'asd', 'Goric', 'goran@g.g');
+INSERT INTO public."user" (active, id, latitude, longitude, number, role, token_expiration, user_type, activation_token, authorities, city, company, description, name, password, phone_number, photo, street, surname, username) VALUES (true, 11, 1, 1, 1, 1, null, 'EventOrganizer', null, 'ahahah', 'Denver', null, null, 'John', '$2b$12$AKNIH3jXWwaS/Cuxa9/PoO0FPnkK9tZhsdbxI.k0cqlAJr.x.b9kG', '817281791879', null, 'asd', 'Doe', 'johndoe@gmail.com');
+INSERT INTO public."user" (active, id, latitude, longitude, number, role, token_expiration, user_type, activation_token, authorities, city, company, description, name, password, phone_number, photo, street, surname, username) VALUES (true, 22, 1, 1, 1, 2, null, 'ServiceProvider', null, 'ahahah', 'Denver', 'Dzejn kompani', 'aksdjasldkajsldkjasdlk', 'Jane', '$2b$12$AKNIH3jXWwaS/Cuxa9/PoO0FPnkK9tZhsdbxI.k0cqlAJr.x.b9kG', '817281791879', null, 'asd', 'Doe', 'janedoe@gmail.com');
 
 
 UPDATE public.id_generator
@@ -920,7 +922,7 @@ INSERT INTO user_merchandise(merchandise_id, service_provider_id)
 SELECT id, 152
 FROM merchandise
 WHERE id BETWEEN 7 AND 25;
-
+update user_merchandise set service_provider_id = 22 where merchandise_id = 23 or merchandise_id = 24;
 insert into event_type (is_active, description, title)
 values (true,'all','all');
 
@@ -1973,3 +1975,24 @@ INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
 UPDATE public.id_generator
 SET next_val = 200
 WHERE sequence_name = 'merchandise';
+
+-- Insert time slots for one service
+INSERT INTO public.time_slots (end_time, id, start_time)
+VALUES
+    ('2024-12-21 10:00:00', 1, '2024-12-21 08:00:00'),
+    ('2024-12-25 12:30:00', 2, '2024-12-25 10:30:00'),
+    ('2024-12-25 15:00:00', 3, '2024-12-25 13:00:00'),
+    ('2024-12-25 15:00:00', 4, '2024-12-25 13:00:00'),
+    ('2024-12-29 15:00:00', 5, '2024-12-29 13:00:00'),
+    ('2025-01-29 15:00:00', 6, '2025-01-29 13:00:00'),
+    ('2025-01-29 15:00:00', 7, '2025-01-29 13:00:00');
+
+INSERT INTO public.merchandise_timeslots(
+    service_id, timeslot_id)
+VALUES (23, 1),
+       (23, 2),
+       (23, 3),
+       (23, 4),
+       (23, 5),
+       (24, 6),
+       (24, 7);

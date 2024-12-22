@@ -1,5 +1,6 @@
 package com.example.eventplanner.controllers.merchandise;
 
+import com.example.eventplanner.dto.category.GetAllByCategoriesDTO;
 import com.example.eventplanner.dto.filter.ServiceFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
@@ -39,6 +40,12 @@ public class ServiceController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/timeslots/{spId}")
+    public ResponseEntity<List<CalendarTimeSlotDTO>> getTimeslotsCalendar(@PathVariable int spId) {
+        List<CalendarTimeSlotDTO> timeslots = serviceService.getTimeslotsCalendar(spId);
+        return ResponseEntity.ok(timeslots);
+    }
+
     @GetMapping("/{serviceId}/timeslots")
     public ResponseEntity<List<TimeSlotDTO>> getServiceTimeslots(@PathVariable int serviceId) {
         List<TimeSlotDTO> timeslots = serviceService.getServiceTimeslots(serviceId);
@@ -48,6 +55,11 @@ public class ServiceController {
     @GetMapping()
     public ResponseEntity<List<ServiceOverviewDTO>> GetAll() {
         return ResponseEntity.ok(serviceService.getAll());
+    }
+
+    @PostMapping("/get-by-categories")
+    public ResponseEntity<List<ServiceOverviewDTO>> GetAllByCategories(@RequestBody GetAllByCategoriesDTO dto) {
+        return ResponseEntity.ok(serviceService.getAllByCategories(dto.getCategories()));
     }
 
     @GetMapping("sp/{id}")
