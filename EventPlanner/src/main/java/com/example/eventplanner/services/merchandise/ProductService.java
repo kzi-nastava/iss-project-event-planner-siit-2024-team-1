@@ -5,12 +5,17 @@ import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
 import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.product.*;
+import com.example.eventplanner.dto.merchandise.service.ServiceOverviewDTO;
 import com.example.eventplanner.model.merchandise.*;
+import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.merchandise.ProductRepository;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -60,21 +65,72 @@ public class ProductService {
     private final ServiceProviderRepository serviceProviderRepository;
     private final EventRepository eventRepository;
 
-    public Page<MerchandiseOverviewDTO> search(ProductFiltersDTO productFiltersDTO, String search, Pageable pageable) {
-        Specification<Product> spec = createSpecification(productFiltersDTO, search);
-        Page<Product> products = productRepository.findAll(spec, pageable);
-        return products.map(this::convertToOverviewDTO);
+    public Page<MerchandiseOverviewDTO> search(int userId, ProductFiltersDTO productFiltersDTO, String search, Pageable pageable) {
+        // Fetch user details
+        User currentUser = fetchUserDetails(userId);
+        List<User> blockedUsers = currentUser != null ? currentUser.getBlockedUsers().stream().filter(u->u instanceof ServiceProvider).toList() : List.of();
+
+        // Create a specification for filtering
+        Specification<Product> spec = createSpecification(productFiltersDTO, search)
+                .and(excludeInvisible())
+                .and(excludeBlockedProviders(currentUser, blockedUsers)); // Exclude products by blocked providers
+
+        // Fetch paginated products with the composed specification
+        Page<Product> pagedProducts = productRepository.findAll(spec, pageable);
+
+        // Convert the results to DTOs
+        return pagedProducts.map(this::convertToOverviewDTO);
+    }
+
+    private Specification<Product> excludeInvisible(){
+        return (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.isTrue(root.get("visible"));
+        };
+    }
+    private Specification<Product> excludeBlockedProviders(User currentUser, List<User> blockedUsers) {
+        return (root, query, criteriaBuilder) -> {
+            if (currentUser == null || blockedUsers == null || blockedUsers.isEmpty()||!(currentUser instanceof EventOrganizer)) {
+                return criteriaBuilder.conjunction(); // No filter if there are no blocked users or no current user
+            }
+
+            // Create a subquery to find services of blocked service providers
+            Subquery<Integer> subquery = query.subquery(Integer.class);
+            Root<ServiceProvider> serviceProviderRoot = subquery.from(ServiceProvider.class);
+
+            // Join service provider's merchandise (services)
+            Join<ServiceProvider, Merchandise> merchandiseJoin = serviceProviderRoot.join("merchandise");
+
+            // Select IDs of services belonging to blocked service providers
+            subquery.select(merchandiseJoin.get("id"))
+                    .where(serviceProviderRoot.in(blockedUsers));
+
+            // Exclude services that are in the subquery of blocked service providers
+            return criteriaBuilder.not(root.get("id").in(subquery));
+        };
+    }
+
+
+    private User fetchUserDetails(int userId) {
+        return userRepository.findById(userId).orElse(null);
     }
 
     public List<MerchandiseOverviewDTO> getAll(){
         return productRepository.findAll().stream().map(this::convertToOverviewDTO).toList();
     }
+
+    public List<MerchandiseOverviewDTO> getAllByCategories(List<Integer> categories){
+        return productRepository.findAllByCategories(categories).stream().map(this::convertToOverviewDTO).toList();
+    }
+
     public ProductOverviewDTO getById(int id){
         return mapToProductOverviewDTO((Product)merchandiseRepository.findById(id).orElseThrow());
     }
 
     private Specification<Product> createSpecification(ProductFiltersDTO productFiltersDTO, String search) {
         Specification<Product> spec = Specification.where(null);
+        spec = spec.and((root, query, criteriaBuilder) ->
+                criteriaBuilder.isFalse(root.get("deleted"))
+        );
         spec = addPriceRangeFilter(spec, productFiltersDTO);
         spec = addCategoryFilter(spec, productFiltersDTO);
         spec = addCityFilter(spec, productFiltersDTO);
@@ -234,19 +290,7 @@ public class ProductService {
         product.setReservationDeadline(createProductRequestDTO.getReservationDeadline());
         product.setCancellationDeadline(createProductRequestDTO.getCancellationDeadline());
         product.setAutomaticReservation(createProductRequestDTO.isAutomaticReservation());
-
-        // Step 3: Create and map Merchandise Photos
-        List<MerchandisePhoto> photos = createProductRequestDTO.getMerchandisePhotos().stream()
-                .map(photoDto -> {
-                    MerchandisePhoto newPhoto = new MerchandisePhoto();
-                    newPhoto.setPhoto(photoDto.getPhoto());// Assuming the photo ID is passed as part of DTO
-                    return newPhoto;
-                })
-                .collect(Collectors.toList());
-
-        // Save photos to the database first, before associating them with the product
-        List<MerchandisePhoto> savedPhotos = merchandisePhotoRepository.saveAll(photos);
-        product.setPhotos(savedPhotos);
+        product.setPhotos(merchandisePhotoRepository.findAllById(createProductRequestDTO.getMerchandisePhotos()));
 
         // Step 4: Map Event Types
         List<EventType> eventTypes = eventTypeRepository.findAllById(createProductRequestDTO.getEventTypesIds());
@@ -288,7 +332,7 @@ public class ProductService {
 
 
         // Step 8: Map to CreateProductResponseDTO and return
-        return mapToCreateProductResponseDTO(savedProduct, serviceProviderDTO, savedPhotos.stream().map(this::mapToMerchandisePhotoDTO).toList());
+        return mapToCreateProductResponseDTO(savedProduct, serviceProviderDTO, savedProduct.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
     }
 
     public CreateProductResponseDTO updateProduct(int productId, UpdateProductRequestDTO updateProductRequestDTO) {
@@ -319,19 +363,7 @@ public class ProductService {
         newProduct.setReservationDeadline(updateProductRequestDTO.getReservationDeadline());
         newProduct.setCancellationDeadline(updateProductRequestDTO.getCancellationDeadline());
         newProduct.setAutomaticReservation(updateProductRequestDTO.isAutomaticReservation());
-
-        // Step 3: Create and map Merchandise Photos
-        List<MerchandisePhoto> photos = updateProductRequestDTO.getMerchandisePhotos().stream()
-                .map(photoDto -> {
-                    MerchandisePhoto newPhoto = new MerchandisePhoto();
-                    newPhoto.setPhoto(photoDto.getPhoto() );// Assuming the photo ID is passed as part of DTO
-                    return newPhoto;
-                })
-                .collect(Collectors.toList());
-
-        // Save photos to the database first, before associating them with the product
-        List<MerchandisePhoto> savedPhotos = merchandisePhotoRepository.saveAll(photos);
-        newProduct.setPhotos(savedPhotos);
+        newProduct.setPhotos(merchandisePhotoRepository.findAllById(updateProductRequestDTO.getMerchandisePhotos()));
 
         // Step 4: Map Event Types
         List<EventType> eventTypes = eventTypeRepository.findAllById(updateProductRequestDTO.getEventTypesIds());
@@ -357,7 +389,7 @@ public class ProductService {
         ServiceProvider sp = serviceProviderRepository.save(serviceProvider);
 
         // Step 8: Map to CreateProductResponseDTO and return
-        return mapToCreateProductResponseDTO(savedProduct, serviceProviderDTO, savedPhotos.stream().map(this::mapToMerchandisePhotoDTO).toList());
+        return mapToCreateProductResponseDTO(savedProduct, serviceProviderDTO, savedProduct.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
     }
 
     public MerchandisePhotoDTO mapToMerchandisePhotoDTO(MerchandisePhoto merchandisePhoto) {

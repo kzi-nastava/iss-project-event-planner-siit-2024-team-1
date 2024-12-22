@@ -20,5 +20,5 @@ public class UpdateSpRequestDTO {
     private Role role;
 
     private String description;
-    private List<String> photos;
+    private List<Integer> photos;
 }

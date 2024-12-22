@@ -4,10 +4,7 @@ import com.example.eventplanner.dto.event.EventOverviewDTO;
 //import com.example.eventplanner.dto.event.FollowEventResponseDTO;
 import com.example.eventplanner.dto.event.FollowEventResponseDTO;
 import com.example.eventplanner.dto.merchandise.FavoriteResponseDTO;
-import com.example.eventplanner.dto.user.GetAuByIdResponseDTO;
-import com.example.eventplanner.dto.user.GetEoByIdResponseDTO;
-import com.example.eventplanner.dto.user.GetSpByIdResponseDTO;
-import com.example.eventplanner.dto.user.UserOverviewDTO;
+import com.example.eventplanner.dto.user.*;
 import com.example.eventplanner.dto.user.auth.*;
 import com.example.eventplanner.dto.user.update.*;
 import com.example.eventplanner.services.event.EventService;
@@ -85,9 +82,9 @@ public class UserController {
         return ResponseEntity.ok(userService.getChatUsersForEo(id));
     }
 
-    @GetMapping("/au/chat-users")
-    public ResponseEntity<List<UserOverviewDTO>> getChatUsersForAu() {
-        return ResponseEntity.ok(userService.getChatUsersForAu());
+    @GetMapping("/au/{id}/chat-users")
+    public ResponseEntity<List<UserOverviewDTO>> getChatUsersForAu(@PathVariable int id) {
+        return ResponseEntity.ok(userService.getChatUsersForAu(id));
     }
 
     @GetMapping("/sp/{id}/chat-users")
@@ -98,5 +95,14 @@ public class UserController {
     @GetMapping("/sp/{id}/message")
     public ResponseEntity<UserOverviewDTO> getMessagedSp(@PathVariable int id) {
         return ResponseEntity.ok(userService.getMessagedSp(id));
+    }
+  
+    @PostMapping("/{blockerId}/block/{blockedUserId}")
+    public ResponseEntity<BlockUserDTO> blockUser(
+            @PathVariable int blockerId,
+            @PathVariable int blockedUserId
+    ) {
+
+        return  ResponseEntity.ok(userService.blockUser(blockerId, blockedUserId));
     }
 }

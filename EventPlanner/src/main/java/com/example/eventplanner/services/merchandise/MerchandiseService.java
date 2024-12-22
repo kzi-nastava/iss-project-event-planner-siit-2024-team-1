@@ -8,7 +8,9 @@ import com.example.eventplanner.dto.merchandise.MerchandiseDetailDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
 import com.example.eventplanner.dto.merchandise.review.MerchandiseReviewOverviewDTO;
+import com.example.eventplanner.exceptions.BlockedMerchandiseException;
 import com.example.eventplanner.model.event.Category;
+import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.MerchandisePhoto;
@@ -17,9 +19,18 @@ import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.repositories.category.CategoryRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
+import com.example.eventplanner.model.user.User;
+import com.example.eventplanner.repositories.category.CategoryRepository;
+import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
+import com.example.eventplanner.repositories.user.ServiceProviderRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -33,19 +44,67 @@ public class MerchandiseService {
     private final MerchandiseRepository merchandiseRepository;
     private final ServiceProviderRepository serviceProviderRepository;
     private final CategoryRepository categoryRepository;
+    private final com.example.eventplanner.repositories.user.UserRepository userRepository;
+    private final ServiceProviderRepository serviceProviderRepository;
 
-    public List<MerchandiseOverviewDTO> getTop() {
-        return merchandiseRepository.findAll().stream()
-                .filter(Merchandise::isAvailable)
-                .map(this::convertToOverviewDTO)
-                .sorted(Comparator.comparing(MerchandiseOverviewDTO::getRating).reversed())
+    public List<MerchandiseOverviewDTO> getTop(int userId) {
+        User currentUser = fetchUserDetails(userId);
+
+        // User-specific details
+        List<User> blockedUsers = currentUser != null ? currentUser.getBlockedUsers() : List.of();
+        String userCity = currentUser != null && currentUser.getAddress() != null
+                ? currentUser.getAddress().getCity()
+                : null;
+
+        // Fetch all merchandise
+        List<Merchandise> allMerchandise = merchandiseRepository.findAll();
+
+        // Step 1: Apply filters
+        List<Merchandise> filteredMerchandise = allMerchandise.stream()
+                // Exclude merchandise provided by blocked users
+                .filter(merchandise -> isNotBlocked(blockedUsers, serviceProviderRepository.findByMerchandiseId(merchandise.getId()).get()))
+                // Filter by city (if user has a city set)
+                .filter(merchandise -> isCityMatching(userCity, merchandise.getAddress().getCity()))
+                .filter(m->!m.isDeleted())
+                .filter(Merchandise::isVisible)
+                .toList();
+
+        // Step 2: Sort and limit to top 5 by rating
+        return filteredMerchandise.stream()
+                .sorted(Comparator.comparing(Merchandise::getRating).reversed())
                 .limit(5)
-                .collect(Collectors.toList());
+                .map(this::convertToOverviewDTO)
+                .toList();
+    }
+    private User fetchUserDetails(int userId) {
+        return userRepository.findById(userId).orElse(null);
     }
 
-    public Page<MerchandiseOverviewDTO> getAll(Pageable pageable) {
-        return merchandiseRepository.findAll(pageable)
-                .map(this::convertToOverviewDTO);
+    private boolean isCityMatching(String userCity, String eventCity) {
+        return userCity == null || userCity.isEmpty() || userCity.equalsIgnoreCase(eventCity);
+    }
+
+    private boolean isNotBlocked(List<User> blockedUsers, User organizer) {
+        return blockedUsers == null || !blockedUsers.contains(organizer);
+    }
+
+    public Boolean favorizeMerchandise(int merchandiseId, int userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        Merchandise merchandise = merchandiseRepository.findById(merchandiseId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + merchandiseId));
+
+        if(user.getFavoriteMerchandises().contains(merchandise)) {
+            user.getFavoriteMerchandises().remove(merchandise);
+        }
+        else{
+            user.getFavoriteMerchandises().add(merchandise);
+        }
+
+
+        userRepository.save(user);
+
+        return true;
     }
 
     private MerchandiseOverviewDTO convertToOverviewDTO(Merchandise merchandise) {
@@ -84,10 +143,16 @@ public class MerchandiseService {
         return categoryDTO;
     }
 
-    public MerchandiseDetailDTO getMerchandiseById(int id) {
+    public MerchandiseDetailDTO getMerchandiseById(int userId,int id) {
+        User currentUser = fetchUserDetails(userId);
+
+        // User-specific details
+        List<User> blockedUsers = currentUser != null ? currentUser.getBlockedUsers() : List.of();
         Merchandise merchandise = merchandiseRepository.findById(id).orElseThrow(() ->
                 new RuntimeException("Merchandise with id " + id + " not found")
         );
+        if(blockedUsers.contains(serviceProviderRepository.findByMerchandiseId(merchandise.getId()).get()))
+            throw new BlockedMerchandiseException("Merchandise with id " + id + " is blocked");
         return mapToMerchandiseDetails(merchandise);
     }
 
@@ -107,6 +172,7 @@ public class MerchandiseService {
         merchandiseDetails.setCancellationDeadline(merchandise.getCancellationDeadline());
         merchandiseDetails.setMerchandisePhotos(merchandise.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
         merchandiseDetails.setReviews(merchandise.getReviews().stream().map(this::mapToMerchandiseReviewDTO).toList());
+        merchandiseDetails.setType(merchandise.getClass().getSimpleName());
 
         AddressDTO addressDTO = new AddressDTO();
         addressDTO.setCity(merchandise.getAddress().getCity());
@@ -154,4 +220,30 @@ public class MerchandiseService {
         dto.setRating(review.getRating());
         return dto;
     }
+
+    public List<MerchandiseOverviewDTO> getFavoriteMerchandises(int userId) {
+        User currentUser = fetchUserDetails(userId);
+
+        // User-specific details
+        List<User> blockedUsers = currentUser != null ? currentUser.getBlockedUsers() : List.of();
+
+
+        // Fetch all merchandise
+        List<Merchandise> favoriteMerchandise = currentUser.getFavoriteMerchandises();
+
+        // Step 1: Apply filters
+        List<Merchandise> filteredMerchandise = favoriteMerchandise.stream()
+                // Include only available merchandise
+                .filter(m->!m.isDeleted())
+                // Exclude merchandise provided by blocked users
+                .filter(merchandise -> isNotBlocked(blockedUsers, serviceProviderRepository.findByMerchandiseId(merchandise.getId()).get()))
+                .toList();
+
+        // Step 2: Sort and limit to top 5 by rating
+        return filteredMerchandise.stream()
+                .map(this::convertToOverviewDTO)
+                .toList();
+    }
+
+
 }

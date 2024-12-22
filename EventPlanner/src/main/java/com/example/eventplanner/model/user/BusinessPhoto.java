@@ -15,10 +15,5 @@ public class BusinessPhoto {
     private int id;
 
     private String photo;
-
-    @ManyToOne
-    @JoinColumn(name = "serviceProvider")
-    private ServiceProvider serviceProvider;
-
 }
 

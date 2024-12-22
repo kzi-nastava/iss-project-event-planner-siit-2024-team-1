@@ -1,5 +1,6 @@
 package com.example.eventplanner.controllers.merchandise;
 
+import com.example.eventplanner.dto.category.GetAllByCategoriesDTO;
 import com.example.eventplanner.dto.filter.ServiceFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
@@ -32,32 +33,17 @@ public class ServiceController {
 
 
     @PostMapping("/{serviceId}/reserve")
-    public ResponseEntity<?> reserveService(
+    public ResponseEntity<ReservationResponseDTO> reserveService(
             @PathVariable int serviceId,
             @Valid @RequestBody ReservationRequestDTO request) {
-        try {
-            ReservationResponseDTO response = serviceService.reserveService(serviceId, request);
-            return ResponseEntity.ok(response);
-        } catch (ServiceReservationException e) {
-            // Create a detailed error response
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("errorType", e.getErrorType());
-            errorResponse.put("message", e.getMessage());
+        ReservationResponseDTO response = serviceService.reserveService(serviceId, request);
+        return ResponseEntity.ok(response);
+    }
 
-            // Return appropriate HTTP status based on error type
-            switch (e.getErrorType()) {
-                case SERVICE_NOT_FOUND:
-                case EVENT_NOT_FOUND:
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-                case TIMING_CONSTRAINT_VIOLATION:
-                case DURATION_CONSTRAINT_VIOLATION:
-                case TIME_SLOT_ALREADY_BOOKED:
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-                default:
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-            }
-        }
-
+    @GetMapping("/timeslots/{spId}")
+    public ResponseEntity<List<CalendarTimeSlotDTO>> getTimeslotsCalendar(@PathVariable int spId) {
+        List<CalendarTimeSlotDTO> timeslots = serviceService.getTimeslotsCalendar(spId);
+        return ResponseEntity.ok(timeslots);
     }
 
     @GetMapping("/{serviceId}/timeslots")
@@ -69,6 +55,11 @@ public class ServiceController {
     @GetMapping()
     public ResponseEntity<List<ServiceOverviewDTO>> GetAll() {
         return ResponseEntity.ok(serviceService.getAll());
+    }
+
+    @PostMapping("/get-by-categories")
+    public ResponseEntity<List<ServiceOverviewDTO>> GetAllByCategories(@RequestBody GetAllByCategoriesDTO dto) {
+        return ResponseEntity.ok(serviceService.getAllByCategories(dto.getCategories()));
     }
 
     @GetMapping("sp/{id}")
@@ -121,6 +112,7 @@ public class ServiceController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<MerchandiseOverviewDTO>> filterServices(
+            @RequestParam int userId,
             @RequestParam(required = false) Double priceMin,
             @RequestParam(required = false) Double priceMax,
             @RequestParam(required = false) String category,
@@ -130,9 +122,9 @@ public class ServiceController {
             @RequestParam(required = false) String search,
             @PageableDefault(size = 10) Pageable pageable) {
 
-        ServiceFiltersDTO productFiltersDTO=new ServiceFiltersDTO(priceMin,priceMax,category,durationMin,durationMax,city);
+        ServiceFiltersDTO serviceFiltersDTO=new ServiceFiltersDTO(priceMin,priceMax,category,durationMin,durationMax,city);
 
-        return ResponseEntity.ok(serviceService.search(productFiltersDTO,search,pageable));
+        return ResponseEntity.ok(serviceService.search(userId,serviceFiltersDTO,search,pageable));
     }
 
 }

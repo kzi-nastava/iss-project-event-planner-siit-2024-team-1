@@ -1,18 +1,16 @@
 package com.example.eventplanner.controllers.merchandise;
 
 
+import com.example.eventplanner.dto.category.GetAllByCategoriesDTO;
 import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
-import com.example.eventplanner.dto.merchandise.product.BuyProductResponseDTO;
-import com.example.eventplanner.dto.merchandise.product.GetProductByIdResponseDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
 
-import com.example.eventplanner.services.event.EventService;
+import com.example.eventplanner.dto.merchandise.service.ServiceOverviewDTO;
 import com.example.eventplanner.services.merchandise.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 
@@ -20,13 +18,10 @@ import com.example.eventplanner.dto.merchandise.product.*;
 import com.example.eventplanner.dto.merchandise.product.create.CreateProductRequestDTO;
 import com.example.eventplanner.dto.merchandise.product.create.CreateProductResponseDTO;
 import com.example.eventplanner.dto.merchandise.product.update.UpdateProductRequestDTO;
-import com.example.eventplanner.dto.merchandise.product.update.UpdateProductResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.http.HttpResponse;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -57,9 +52,14 @@ public class ProductController {
         return new ResponseEntity<>(productService.createProduct(request), HttpStatus.CREATED);
     }
 
+    @PostMapping("/get-by-categories")
+    public ResponseEntity<List<MerchandiseOverviewDTO>> GetAllByCategories(@RequestBody GetAllByCategoriesDTO dto) {
+        return ResponseEntity.ok(productService.getAllByCategories(dto.getCategories()));
+    }
 
     @GetMapping("/search")
     public ResponseEntity<Page<MerchandiseOverviewDTO>> filterProducts(
+            @RequestParam int userId,
             @RequestParam(required = false) Double priceMin,
             @RequestParam(required = false) Double priceMax,
             @RequestParam(required = false) String category,
@@ -71,7 +71,7 @@ public class ProductController {
 
         ProductFiltersDTO productFiltersDTO=new ProductFiltersDTO(priceMin,priceMax,category,durationMin,durationMax,city);
 
-        return ResponseEntity.ok(productService.search(productFiltersDTO,search,pageable));
+        return ResponseEntity.ok(productService.search(userId,productFiltersDTO,search,pageable));
     }
 
     @PutMapping("/{id}")

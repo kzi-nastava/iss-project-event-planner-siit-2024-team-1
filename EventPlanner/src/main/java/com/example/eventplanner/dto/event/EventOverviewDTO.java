@@ -1,6 +1,7 @@
 package com.example.eventplanner.dto.event;
 
 import com.example.eventplanner.model.common.Address;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,4 +17,6 @@ public class EventOverviewDTO {
     private LocalDateTime date;
     private Address address;
     private String description;
+    @JsonProperty("isPublic")
+    private boolean isPublic;
 }

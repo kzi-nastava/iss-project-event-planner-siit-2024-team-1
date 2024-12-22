@@ -7,12 +7,21 @@ import com.example.eventplanner.dto.event.*;
 import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
 import com.example.eventplanner.dto.merchandise.product.GetProductByIdResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.GetServiceByIdResponseDTO;
+import com.example.eventplanner.dto.review.ReviewDTO;
+import com.example.eventplanner.dto.user.UserOverviewDTO;
+import com.example.eventplanner.exceptions.BlockedMerchandiseException;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.event.Activity;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.Product;
+
+import com.example.eventplanner.model.user.AuthenticatedUser;
+
+import com.example.eventplanner.model.merchandise.Review;
+import com.example.eventplanner.model.merchandise.ReviewStatus;
+
 import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.event.ActivityRepository;
@@ -21,8 +30,14 @@ import com.example.eventplanner.repositories.eventType.EventTypeRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
 import com.example.eventplanner.repositories.user.EventOrganizerRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
+import com.example.eventplanner.services.notification.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -30,8 +45,10 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,15 +60,119 @@ public class EventService {
     private final MerchandiseRepository merchandiseRepository;
     private final ActivityRepository activityRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
-    public Page<EventOverviewDTO> getTop(Pageable pageable) {
-        return eventRepository.findAll(pageable)
-                .map(this::convertToOverviewDTO);
+    public Page<EventOverviewDTO> getTop(int userId, Pageable pageable) {
+        // Fetch user details
+        User currentUser = fetchUserDetails(userId);
+        if (currentUser == null) {
+            // If user is null, no user-specific filters apply; fetch all events
+            return fetchAllEvents(pageable);
+        }
+
+        // User-specific details
+        boolean isAuthenticatedUser = currentUser instanceof AuthenticatedUser;
+        List<User> blockedUsers = currentUser.getBlockedUsers();
+        String userCity = currentUser.getAddress() != null
+                ? currentUser.getAddress().getCity()
+                : null;
+
+        // Fetch all events
+        List<Event> allEvents = eventRepository.findAll();
+
+        // Step 1: Apply filters
+        List<Event> filteredEvents = allEvents.stream()
+                // Exclude events by blocked organizers
+                .filter(event -> isNotBlocked(blockedUsers, event.getOrganizer()))
+                // Check if the organizer has not blocked the user
+                .filter(event -> {
+                    if (isAuthenticatedUser) {
+                        // Only check if the organizer has not blocked the user when authenticated
+                        return isOrganizerNotBlockingUser(currentUser, event);
+                    }
+                    // If the user is not authenticated, include the event
+                    return true;
+                })
+                .toList();
+
+        // Step 2: Filter to events in the user's city
+        List<Event> eventsInUserCity = filteredEvents.stream()
+                .filter(event -> isCityMatching(userCity, event.getAddress().getCity()))
+                .toList();
+
+        // Step 3: Sort and limit to top 5
+        List<EventOverviewDTO> top5Events = eventsInUserCity.stream()
+                // Sort by the event date (descending)
+                .sorted((e1, e2) -> e2.getDate().compareTo(e1.getDate()))
+                .filter(Event::isPublic)
+                // Limit to the top 5 events
+                .limit(5)
+                // Convert to DTO
+                .map(this::convertToOverviewDTO)
+                .toList();
+
+        // Return a paginated result
+        return new PageImpl<>(top5Events, pageable, top5Events.size());
     }
 
-    public Page<EventOverviewDTO> getAll(Pageable pageable) {
-        return eventRepository.findAll(pageable)
-                .map(this::convertToOverviewDTO);
+    private User fetchUserDetails(int userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
+
+    private Page<EventOverviewDTO> fetchAllEvents(Pageable pageable) {
+        Page<Event> eventPage = eventRepository.findAll(pageable);
+        List<EventOverviewDTO> events = eventPage.getContent().stream()
+                .map(this::convertToOverviewDTO)
+                .toList();
+        return new PageImpl<>(events, pageable, eventPage.getTotalElements());
+    }
+
+    private boolean isCityMatching(String userCity, String eventCity) {
+        return userCity == null || userCity.isEmpty() || userCity.equalsIgnoreCase(eventCity);
+    }
+
+    private boolean isNotBlocked(List<User> blockedUsers, User organizer) {
+        return blockedUsers == null || !blockedUsers.contains(organizer);
+    }
+
+    private boolean isOrganizerNotBlockingUser(User currentUser, Event event) {
+        return !event.getOrganizer().getBlockedUsers().contains(currentUser);
+    }
+
+
+    public List<EventOverviewDTO> getFavoriteEventsWp(int userId) {
+        // Fetch user details
+        User currentUser = fetchUserDetails(userId);
+
+        // Gracefully handle the case where the user does not exist
+        if (currentUser == null) {
+            return List.of(); // Return an empty list if the user is not found or null
+        }
+
+        // Determine if the user is an authenticated user
+        boolean isAuthenticatedUser = currentUser instanceof AuthenticatedUser;
+
+        // Get blocked users and favorite events
+        List<User> blockedUsers = currentUser.getBlockedUsers();
+        List<Event> favoriteEvents = currentUser.getFavoriteEvents();
+
+        // Filter favorite events using the same logic as in `getTop` and `search`
+        return favoriteEvents.stream()
+                // Exclude events blocked by the user
+                .filter(event -> isNotBlocked(blockedUsers, event.getOrganizer()))
+                // Ensure the organizer has not blocked the user (only for authenticated users)
+                .filter(event -> {
+                    if (isAuthenticatedUser) {
+                        // Only check if the organizer has not blocked the user when authenticated
+                        return isOrganizerNotBlockingUser(currentUser, event);
+                    }
+                    // If the user is not authenticated, include the event
+                    return true;
+                })
+                // Convert to DTO
+                .map(this::convertToOverviewDTO)
+                .toList();
     }
 
     public CreatedEventOverviewDTO getById(int id) {
@@ -62,18 +183,138 @@ public class EventService {
         return eventRepository.findByOrganizerId(id, pageable).map(this::convertToOverviewDTO);
     }
 
-    public List<EventOverviewDTO> getUserFollowedEvents(int userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-        return user.getFollowedEvents().stream()
-                .map(this::convertToOverviewDTO)
-                .collect(Collectors.toList());
+    public EventReportDTO getEventReport(int id){
+        EventReportDTO eventReportDTO = new EventReportDTO();
+        Event event = eventRepository.findById(id).orElseThrow();
+
+        eventReportDTO.setParticipants(event.getParticipants().stream().map(this::convertToUserDTO).toList());
+        eventReportDTO.setReviews(event.getReviews().stream().filter(review -> review.getStatus() == ReviewStatus.APPROVED).map(this::convertToReviewDTO).toList());
+
+        return eventReportDTO;
     }
 
-    public Page<EventOverviewDTO> search(EventFiltersDTO eventFiltersDTO, String search, Pageable pageable) {
-        Specification<Event> spec = createSpecification(eventFiltersDTO, search);
-        Page<Event> events = eventRepository.findAll(spec, pageable);
-        return events.map(this::convertToOverviewDTO);
+    private ReviewDTO convertToReviewDTO(Review review){
+        ReviewDTO reviewDTO = new ReviewDTO();
+        reviewDTO.setId(review.getId());
+        reviewDTO.setComment(review.getComment());
+        reviewDTO.setRating(review.getRating());
+        reviewDTO.setStatus(true);
+        return reviewDTO;
+    }
+
+    private UserOverviewDTO convertToUserDTO(User user){
+        UserOverviewDTO userOverviewDTO = new UserOverviewDTO(user.getId(), user.getUsername(), user.getName(), user.getSurname(), "");
+        return userOverviewDTO;
+    }
+
+    public List<EventOverviewDTO> getUserFollowedEvents(int userId) {
+        // Fetch user details
+        User currentUser = fetchUserDetails(userId);
+
+        // Gracefully handle the case where the user does not exist
+        if (currentUser == null) {
+            return List.of(); // Return an empty list if the user is not found or null
+        }
+
+        // Determine if the user is an authenticated user
+        boolean isAuthenticatedUser = currentUser instanceof AuthenticatedUser;
+
+        // Get blocked users and followed events
+        List<User> blockedUsers = currentUser.getBlockedUsers();
+        List<Event> followedEvents = currentUser.getFollowedEvents();
+
+        // Filter followed events using the same logic as in `getTop` and `search`
+        return followedEvents.stream()
+                // Exclude events blocked by the user
+                .filter(event -> isNotBlocked(blockedUsers, event.getOrganizer()))
+                // Ensure the organizer has not blocked the user (only for authenticated users)
+                .filter(event -> {
+                    if (isAuthenticatedUser) {
+                        // Only check if the organizer has not blocked the user when authenticated
+                        return isOrganizerNotBlockingUser(currentUser, event);
+                    }
+                    // If the user is not authenticated, include the event
+                    return true;
+                })
+                // Convert to DTO
+                .map(this::convertToOverviewDTO)
+                .toList();
+    }
+
+    public Page<EventOverviewDTO> search(int userId, EventFiltersDTO eventFiltersDTO, String search, Pageable pageable) {
+        // Fetch user details
+        User currentUser = fetchUserDetails(userId);
+        boolean isAuthenticatedUser = currentUser instanceof AuthenticatedUser;
+        List<User> blockedUsers = currentUser != null ? currentUser.getBlockedUsers() : List.of();
+
+        // Create a specification for filtering
+        Specification<Event> spec = createSpecification(eventFiltersDTO, search)
+                .and(excludePrivateEvents())
+                .and(excludeBlockedOrganizers(currentUser,blockedUsers)) // Exclude events by blocked organizers
+                .and(excludeEventsFromBlockingOrganizers(currentUser, isAuthenticatedUser)); // Exclude events where the organizer blocks the user
+
+        // Fetch paginated events with the composed specification
+        Page<Event> pagedEvents = eventRepository.findAll(spec, pageable);
+
+        // Convert to DTOs
+        return pagedEvents.map(this::convertToOverviewDTO);
+    }
+
+    private Specification<Event> excludePrivateEvents(){
+        return (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.isTrue(root.get("isPublic"));
+        };
+    }
+
+    private Specification<Event> excludeBlockedOrganizers(User currentUser,List<User> blockedUsers) {
+        return (root, query, criteriaBuilder) -> {
+            if (blockedUsers == null || blockedUsers.isEmpty()||currentUser instanceof EventOrganizer) {
+                return criteriaBuilder.conjunction(); // No filter if there are no blocked users
+            }
+            return criteriaBuilder.not(root.get("organizer").in(blockedUsers));
+        };
+    }
+
+    private Specification<Event> excludeEventsFromBlockingOrganizers(User currentUser, boolean isAuthenticatedUser) {
+        return (root, query, criteriaBuilder) -> {
+            if (currentUser == null || !isAuthenticatedUser||currentUser instanceof EventOrganizer) {
+                return criteriaBuilder.conjunction(); // No filter if the user is not logged in
+            }
+
+            // Create a subquery to find events by organizers who have blocked the current user
+            Subquery<Integer> subquery = query.subquery(Integer.class);
+            Root<Event> subQueryRoot = subquery.from(Event.class);
+
+            // Join organizer to check blocked users
+            Join<Event, User> organizerJoin = subQueryRoot.join("organizer");
+            Join<User, User> blockedUsersJoin = organizerJoin.join("blockedUsers");
+
+            // Select event IDs where the current user is in the organizer's blocked users
+            subquery.select(subQueryRoot.get("id"))
+                    .where(criteriaBuilder.equal(blockedUsersJoin, currentUser));
+
+            // Exclude events found in the subquery
+            return criteriaBuilder.not(root.get("id").in(subquery));
+        };
+    }
+
+    public Boolean favorizeEvent(int eventId, int userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+
+        if(user.getFavoriteEvents().contains(event)) {
+            user.getFavoriteEvents().remove(event);
+        }
+        else{
+            user.getFavoriteEvents().add(event);
+        }
+
+
+        userRepository.save(user);
+
+        return true;
     }
 
     private Specification<Event> createSpecification(EventFiltersDTO eventFiltersDTO, String search) {
@@ -135,13 +376,33 @@ public class EventService {
         }
         return spec;
     }
-    public EventDetailsDTO getDetails(int eventId) {
+    private EventTypeOverviewDTO convertToOverviewDTO(EventType eventType) {
+        EventTypeOverviewDTO dto = new EventTypeOverviewDTO();
+        dto.setId(eventType.getId());
+        dto.setTitle(eventType.getTitle());
+        dto.setDescription(eventType.getDescription());
+        dto.setActive(eventType.isActive());
+        dto.setRecommendedCategories(null);
+
+        return dto;
+    }
+    public EventDetailsDTO getDetails(int userId,int eventId) {
+        User currentUser = fetchUserDetails(userId);
+
+        // User-specific details
+        List<User> blockedUsers = currentUser != null ? currentUser.getBlockedUsers() : List.of();
+        boolean isAuthenticated=currentUser!=null?currentUser instanceof AuthenticatedUser:false;
+
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
+        if(blockedUsers.contains(event.getOrganizer()))
+            throw new BlockedMerchandiseException("Event with id " + eventId + " is blocked");
+        if(isAuthenticated && !isOrganizerNotBlockingUser(currentUser, event))
+            throw new BlockedMerchandiseException("Event with id " + eventId + " is blocked");
 
         EventDetailsDTO dto = new EventDetailsDTO();
         dto.setId(event.getId());
-        dto.setType(event.getType() != null ? event.getType().getTitle() : null);
+        dto.setEventType(convertToOverviewDTO(event.getType()));
         dto.setTitle(event.getTitle());
         dto.setDate(event.getDate());
 
@@ -198,6 +459,8 @@ public class EventService {
 
         Event savedEvent = eventRepository.save(event);
 
+        eventOrganizer.getOrganizingEvents().add(savedEvent);
+        eventOrganizerRepository.save(eventOrganizer);
         return mapToCreatedEventOverviewDTO(savedEvent, eventType, merchandise);
     }
 
@@ -277,6 +540,7 @@ public class EventService {
         dto.setDate(event.getDate());
         dto.setAddress(event.getAddress());
         dto.setType(event.getType() != null ? event.getType().getTitle() : null);
+        dto.setPublic(event.isPublic());
         return dto;
     }
 
@@ -313,6 +577,7 @@ public class EventService {
         event.setMerchandise(merchandise);
 
         Event savedEvent = eventRepository.save(event);
+        notificationService.notifyUsersEventChanged(eventId);
 
         return mapToCreatedEventOverviewDTO(savedEvent, eventType, merchandise);
     }
@@ -373,6 +638,10 @@ public class EventService {
         return event.getActivities().stream().map(this::mapToActivityOverviewDTO).toList();
     }
 
+    public ActivityOverviewDTO getActivity(int eventId) {
+        return mapToActivityOverviewDTO(activityRepository.findById(eventId).orElseThrow());
+    }
+
     public ActivityOverviewDTO updateActivity(int activityId, CreateActivityDTO dto) {
         Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new RuntimeException("Activity not found"));
 
@@ -380,9 +649,20 @@ public class EventService {
         activity.setDescription(dto.getDescription());
         activity.setStartTime(dto.getStartTime());
         activity.setEndTime(dto.getEndTime());
+        activity.setAddress(mapToAddress(dto.getAddress()));
         activity = activityRepository.save(activity);
 
         return mapToActivityOverviewDTO(activity);
+    }
+
+    private Address mapToAddress(AddressDTO dto) {
+        Address address = new Address();
+        address.setStreet(dto.getStreet());
+        address.setCity(dto.getCity());
+        address.setNumber(dto.getNumber());
+        address.setLatitude(dto.getLatitude());
+        address.setLongitude(dto.getLongitude());
+        return address;
     }
 
     private ActivityOverviewDTO mapToActivityOverviewDTO(Activity activity) {
@@ -425,5 +705,65 @@ public class EventService {
         return event.getActivities().stream()
                 .map(this::mapToActivityOverviewDTO)
                 .toList();
+    }
+    public String buildEventEmailBody(Event event, String token, boolean isExistingUser,String frontLoginAddress,String frontFastRegisterAddress) {
+        String applicationLink = isExistingUser ? frontLoginAddress : frontFastRegisterAddress;
+
+        return String.format("""
+        <html>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px;">
+                <h1 style="color: #333;">You're Invited!</h1>
+                <h2 style="color: #666;">%s</h2>
+                
+                <div style="margin: 20px 0;">
+                    <p style="color: #444;">%s</p>
+                    
+                    <h3 style="color: #555;">Event Details:</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>📅 <strong>Date:</strong> %s</li>
+                        <li>📍 <strong>Location:</strong> %s</li>
+                        <li>👥 <strong>Maximum Participants:</strong> %d</li>
+                        <li>🎯 <strong>Type:</strong> %s</li>
+                    </ul>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="%s?inviteToken=%s" 
+                       style="background-color: #007bff; 
+                              color: white; 
+                              padding: 12px 24px; 
+                              text-decoration: none; 
+                              border-radius: 5px; 
+                              display: inline-block;">
+                        %s
+                    </a>
+                </div>
+                
+                <p style="color: #666; font-size: 0.9em;">
+                    This is an automated invitation. Please do not reply to this email.
+                </p>
+            </div>
+        </body>
+        </html>
+        """,
+                event.getTitle(),
+                event.getDescription(),
+                event.getDate().format(DateTimeFormatter.ofPattern("MMMM d, yyyy 'at' h:mm a")),
+                formatAddress(event.getAddress()),
+                event.getMaxParticipants(),
+                event.getType().getTitle(),
+                applicationLink,
+                token,
+                isExistingUser ? "Join Event" : "Register & Join Event"
+        );
+    }
+
+    private String formatAddress(Address address) {
+        return String.format("%s, %s, %s",
+                address.getStreet(),
+                address.getCity(),
+                address.getNumber()
+        );
     }
 }

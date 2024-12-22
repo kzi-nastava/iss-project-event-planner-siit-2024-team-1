@@ -5,10 +5,7 @@ import com.example.eventplanner.dto.filter.ServiceFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 
 import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
-import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
-import com.example.eventplanner.dto.merchandise.service.ReservationResponseDTO;
-import com.example.eventplanner.dto.merchandise.service.ServiceOverviewDTO;
-import com.example.eventplanner.dto.merchandise.service.TimeSlotDTO;
+import com.example.eventplanner.dto.merchandise.service.*;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceRequestDTO;
@@ -18,6 +15,7 @@ import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.*;
+import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.category.CategoryRepository;
@@ -31,9 +29,14 @@ import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
 import com.example.eventplanner.services.email.EmailService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -60,14 +63,88 @@ public class ServiceService {
     private final CategoryRepository categoryRepository;
     private final MerchandiseRepository merchandiseRepository;
 
-    public Page<MerchandiseOverviewDTO> search(ServiceFiltersDTO ServiceFiltersDTO, String search, Pageable pageable) {
-        Specification<com.example.eventplanner.model.merchandise.Service> spec = createSpecification(ServiceFiltersDTO, search);
-        Page<com.example.eventplanner.model.merchandise.Service> products = serviceRepository.findAll(spec, pageable);
-        return products.map(this::convertToOverviewDTO);
+    public Page<MerchandiseOverviewDTO> search(int userId, ServiceFiltersDTO serviceFiltersDTO, String search, Pageable pageable) {
+        // Fetch user details
+        User currentUser = fetchUserDetails(userId);
+        List<User> blockedUsers = currentUser != null ? currentUser.getBlockedUsers().stream().filter(u->u instanceof ServiceProvider).toList() : List.of();
+
+        // Create a specification for filtering
+        Specification<com.example.eventplanner.model.merchandise.Service> spec = createSpecification(serviceFiltersDTO, search)
+                .and(excludeInvisible())
+                .and(excludeBlockedProviders(currentUser, blockedUsers)); // Exclude services by blocked providers
+
+        // Fetch paginated services with the composed specification
+        Page<com.example.eventplanner.model.merchandise.Service> pagedServices = serviceRepository.findAll(spec, pageable);
+
+        // Convert the results to DTOs
+        return pagedServices.map(this::convertToOverviewDTO);
+    }
+    private Specification<com.example.eventplanner.model.merchandise.Service> excludeInvisible(){
+        return (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.isTrue(root.get("visible"));
+        };
+    }
+
+    public List<CalendarTimeSlotDTO> getTimeslotsCalendar(int spId){
+        List<CalendarTimeSlotDTO> calendarTimeSlotDTOs = new ArrayList<>();
+
+        // Retrieve the service provider by ID
+        ServiceProvider serviceProvider = serviceProviderRepository.findById(spId)
+                .orElseThrow(() -> new RuntimeException("ServiceProvider not found"));
+
+        // For each service offered by the service provider, retrieve the associated timeslots
+        for (Merchandise merchandise : serviceProvider.getMerchandise()) {
+            if (merchandise instanceof com.example.eventplanner.model.merchandise.Service) {
+                com.example.eventplanner.model.merchandise.Service service = (com.example.eventplanner.model.merchandise.Service) merchandise;
+
+                // Retrieve all timeslots for the service
+                for (Timeslot timeslot : service.getTimeslots()) {
+                    CalendarTimeSlotDTO calendarTimeSlotDTO = new CalendarTimeSlotDTO();
+                    calendarTimeSlotDTO.setService(service.getTitle());
+                    calendarTimeSlotDTO.setId(timeslot.getId());
+                    calendarTimeSlotDTO.setStartTime(timeslot.getStartTime());
+                    calendarTimeSlotDTO.setEndTime(timeslot.getEndTime());
+
+                    // Add the DTO to the list
+                    calendarTimeSlotDTOs.add(calendarTimeSlotDTO);
+                }
+            }
+        }
+
+        return calendarTimeSlotDTOs;
+    }
+
+    private Specification<com.example.eventplanner.model.merchandise.Service> excludeBlockedProviders(User currentUser, List<User> blockedUsers) {
+        return (root, query, criteriaBuilder) -> {
+            if (currentUser == null || blockedUsers == null || blockedUsers.isEmpty()||!(currentUser instanceof EventOrganizer)) {
+                return criteriaBuilder.conjunction(); // No filter if there are no blocked users or no current user
+            }
+
+            // Create a subquery to find services of blocked service providers
+            Subquery<Integer> subquery = query.subquery(Integer.class);
+            Root<ServiceProvider> serviceProviderRoot = subquery.from(ServiceProvider.class);
+
+            // Join service provider's merchandise (services)
+            Join<ServiceProvider, Merchandise> merchandiseJoin = serviceProviderRoot.join("merchandise");
+
+            // Select IDs of services belonging to blocked service providers
+            subquery.select(merchandiseJoin.get("id"))
+                    .where(serviceProviderRoot.in(blockedUsers));
+
+            // Exclude services that are in the subquery of blocked service providers
+            return criteriaBuilder.not(root.get("id").in(subquery));
+        };
+    }
+
+    private User fetchUserDetails(int userId) {
+        return userRepository.findById(userId).orElse(null);
     }
 
     private Specification<com.example.eventplanner.model.merchandise.Service> createSpecification(ServiceFiltersDTO ServiceFiltersDTO, String search) {
         Specification<com.example.eventplanner.model.merchandise.Service> spec = Specification.where(null);
+        spec = spec.and((root, query, criteriaBuilder) ->
+                criteriaBuilder.isFalse(root.get("deleted"))
+        );
         spec = addPriceRangeFilter(spec, ServiceFiltersDTO);
         spec = addCategoryFilter(spec, ServiceFiltersDTO);
         spec = addCityFilter(spec, ServiceFiltersDTO);
@@ -89,6 +166,11 @@ public class ServiceService {
     public List<ServiceOverviewDTO> getAll(){
         return serviceRepository.findAll().stream().map(this::convertToServiceOverviewDTO).toList();
     }
+
+    public List<ServiceOverviewDTO> getAllByCategories(List<Integer> categories){
+        return serviceRepository.findAllByCategories(categories).stream().map(this::convertToServiceOverviewDTO).toList();
+    }
+
 
     private Specification<com.example.eventplanner.model.merchandise.Service> addCategoryFilter(Specification<com.example.eventplanner.model.merchandise.Service> spec, ServiceFiltersDTO ServiceFiltersDTO) {
         if (StringUtils.hasText(ServiceFiltersDTO.getCategory())) {
@@ -234,6 +316,10 @@ public class ServiceService {
         sendReservationEmail(request,serviceId);
 
         return mapToReservationResponse(service,event,request);
+    }
+
+    private void validateReservationDate(){
+
     }
 
     private void validateReservationTiming(com.example.eventplanner.model.merchandise.Service service, Event event, ReservationRequestDTO request) throws Exception {

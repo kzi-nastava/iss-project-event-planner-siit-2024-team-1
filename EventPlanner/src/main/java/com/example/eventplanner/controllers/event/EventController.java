@@ -27,16 +27,18 @@ public class EventController {
     private final JwtService jwtService;
     @GetMapping("/top")
     public ResponseEntity<Page<EventOverviewDTO>> getTopEvents(
+            @RequestParam int userId,
             @PageableDefault(size = 5, sort = "date", direction = Sort.Direction.DESC) Pageable eventPage
     ) {
-        return ResponseEntity.ok(eventService.getTop(eventPage));
+        return ResponseEntity.ok(eventService.getTop(userId,eventPage));
     }
-    @GetMapping("/all")
-    public ResponseEntity<Page<EventOverviewDTO>> getAllEvents(
-            @PageableDefault(size = 10, sort = "date", direction = Sort.Direction.DESC) Pageable eventPage
-    ) {
-        return ResponseEntity.ok(eventService.getAll(eventPage));
+
+
+    @GetMapping("/{userId}/favorite")
+    public ResponseEntity<List<EventOverviewDTO>> getFavoriteEventsWp(@PathVariable int userId) {
+        return ResponseEntity.ok(eventService.getFavoriteEventsWp(userId));
     }
+
 
     @GetMapping("/eo/{id}")
     public ResponseEntity<Page<EventOverviewDTO>> getEventsByEo(@PathVariable int id,
@@ -52,8 +54,16 @@ public class EventController {
         return ResponseEntity.ok(eventService.getUserFollowedEvents(userId));
     }
 
+    @GetMapping("/report/{id}")
+    public ResponseEntity<EventReportDTO> getEventReport(
+            @PathVariable int id
+    ) {
+        return ResponseEntity.ok(eventService.getEventReport(id));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<Page<EventOverviewDTO>> filterEvents(
+            @RequestParam int userId,
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate,
             @RequestParam(required = false) String type,
@@ -61,12 +71,17 @@ public class EventController {
             @RequestParam(required = false) String search,
             @PageableDefault(size = 10) Pageable pageable) {
         EventFiltersDTO eventFiltersDTO=new EventFiltersDTO(startDate,endDate,type,city);
-        return ResponseEntity.ok(eventService.search(eventFiltersDTO,search,pageable));
+        return ResponseEntity.ok(eventService.search(userId,eventFiltersDTO,search,pageable));
     }
 
     @GetMapping("/{id}/agenda")
     public ResponseEntity<List<ActivityOverviewDTO>> getAgenda(@PathVariable int id) {
         return ResponseEntity.ok(eventService.getAgenda(id));
+    }
+
+    @GetMapping("/activities/{id}")
+    public ResponseEntity<ActivityOverviewDTO> getActivity(@PathVariable int id) {
+        return ResponseEntity.ok(eventService.getActivity(id));
     }
 
     @GetMapping("/{id}")
@@ -75,8 +90,8 @@ public class EventController {
     }
 
     @GetMapping("/{id}/details")
-    public ResponseEntity<EventDetailsDTO> getDetails(@PathVariable int id) {
-        return ResponseEntity.ok(eventService.getDetails(id));
+    public ResponseEntity<EventDetailsDTO> getDetails(@PathVariable int id,@RequestParam int userId) {
+        return ResponseEntity.ok(eventService.getDetails(userId,id));
     }
 
     @PostMapping
@@ -130,5 +145,13 @@ public class EventController {
             @RequestParam int eventId
     ) {
         return ResponseEntity.ok(jwtService.inviteToEvent(eventId,email));
+    }
+
+    @PostMapping("/{eventId}/add-to-favorites/{userId}")
+    public ResponseEntity<Boolean> favorizeEvent(
+            @PathVariable int eventId,
+            @PathVariable int userId
+            ) {
+        return ResponseEntity.ok(eventService.favorizeEvent(eventId, userId));
     }
 }

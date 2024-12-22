@@ -2,10 +2,7 @@ package com.example.eventplanner.services.user;
 
 import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.event.EventOverviewDTO;
-import com.example.eventplanner.dto.user.GetAuByIdResponseDTO;
-import com.example.eventplanner.dto.user.GetEoByIdResponseDTO;
-import com.example.eventplanner.dto.user.GetSpByIdResponseDTO;
-import com.example.eventplanner.dto.user.UserOverviewDTO;
+import com.example.eventplanner.dto.user.*;
 import com.example.eventplanner.dto.user.auth.RegisterEoRequestDTO;
 import com.example.eventplanner.dto.user.auth.RegisterEoRequestResponseDTO;
 import com.example.eventplanner.dto.user.auth.RegisterSpRequestDTO;
@@ -17,6 +14,7 @@ import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.user.*;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.message.MessageRepository;
+import com.example.eventplanner.repositories.user.BusinessPhotoRepository;
 import com.example.eventplanner.repositories.user.EventOrganizerRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
@@ -38,6 +36,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final EventOrganizerRepository eventOrganizerRepository;
     private final MessageRepository messageRepository;
+    private final BusinessPhotoRepository businessPhotoRepository;
 
     public GetAuByIdResponseDTO getAuById(int id){
         User user = userRepository.findById(id)
@@ -81,7 +80,15 @@ public class UserService {
 
         responseDTO.setCompany(user.getCompany());
         responseDTO.setDescription(user.getDescription());
+        responseDTO.setPhotos(user.getPhotos().stream().map(this::mapToBusinnesPhotoDTO).toList());
         return responseDTO;
+    }
+
+    private BusinnesPhotoDTO mapToBusinnesPhotoDTO(BusinessPhoto photo){
+        BusinnesPhotoDTO businnesPhotoDTO = new BusinnesPhotoDTO();
+        businnesPhotoDTO.setId(photo.getId());
+        businnesPhotoDTO.setPhoto(photo.getPhoto());
+        return businnesPhotoDTO;
     }
 
     public EventOverviewDTO addEventToFavorites(int userId, int eventId) {
@@ -162,7 +169,7 @@ public class UserService {
         user.setPhoto(request.getPhoto());
 
         user.setDescription(request.getDescription());
-        //Auser.setPhotos(request.getPhotos());
+        user.setPhotos(businessPhotoRepository.findAllById(request.getPhotos()));
 
 
         user = userRepository.save(user);
@@ -220,7 +227,7 @@ public class UserService {
     public List<UserOverviewDTO> getServiceProvidersForOrganizerEvents(int organizerId) {
         // Fetch the Event Organizer by ID
         EventOrganizer organizer = eventOrganizerRepository.findById(organizerId)
-                .orElseThrow(() -> new EntityNotFoundException("Event Organizer not found with id: " + organizerId));
+                .orElseThrow(() -> new EntityNotFoundException("Event Organizer not found with ID: " + organizerId));
 
         // Fetch all events organized by the Event Organizer
         List<Event> organizedEvents = organizer.getOrganizingEvents();
@@ -230,8 +237,9 @@ public class UserService {
                 .flatMap(event -> event.getMerchandise().stream()) // Get merchandise from each event
                 .distinct() // Avoid duplicate merchandise
                 .map(merchandise -> serviceProviderRepository.findByMerchandiseId(merchandise.getId())
-                        .orElseThrow(() -> new EntityNotFoundException("Service Provider not found for merchandise id: " + merchandise.getId())))
+                        .orElseThrow(() -> new EntityNotFoundException("Service Provider not found for merchandise ID: " + merchandise.getId())))
                 .distinct() // Avoid duplicate service providers
+                .filter(serviceProvider -> !organizer.getBlockedUsers().contains(serviceProvider)) // Remove blocked users
                 .map(this::convertToUserOverviewDTO) // Convert to DTO
                 .toList();
 
@@ -239,12 +247,16 @@ public class UserService {
     }
 
     public List<UserOverviewDTO> getAuWhoMessagedEo(int organizerId) {
+        EventOrganizer organizer = eventOrganizerRepository.findById(organizerId)
+                .orElseThrow(() -> new RuntimeException("Organizer not found with ID: " + organizerId));
+
         List<Message> messages = messageRepository.findByRecipientId(organizerId);
 
-        // Extract senders who are AuthenticatedUsers
+        // Extract senders who are AuthenticatedUsers and not blocked by the Organizer
         return messages.stream()
                 .map(Message::getSender) // Get the sender of the message
                 .filter(user -> user instanceof AuthenticatedUser) // Keep only AuthenticatedUsers
+                .filter(user -> !organizer.getBlockedUsers().contains(user)) // Remove users blocked by Organizer
                 .distinct() // Remove duplicates
                 .map(this::convertToUserOverviewDTO) // Convert to UserOverviewDTO
                 .toList(); // Collect the result as a list
@@ -260,22 +272,34 @@ public class UserService {
         return users;
     }
 
-    public List<UserOverviewDTO> getChatUsersForAu(){
-        return eventOrganizerRepository.findAll().stream().map(this::convertToUserOverviewDTO).toList();
+    public List<UserOverviewDTO> getChatUsersForAu(int userId) {
+        // Fetch the current user
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Get the blocked users list
+        List<User> blockedUsers = user.getBlockedUsers();
+
+        // Return all event organizers excluding blocked ones
+        return eventOrganizerRepository.findAll().stream()
+                .filter(organizer -> !blockedUsers.contains(organizer)) // Exclude blocked organizers
+                .map(this::convertToUserOverviewDTO)
+                .toList();
     }
 
     public List<UserOverviewDTO> getEoWhoMessagedSp(int serviceProviderId) {
         // Fetch the Service Provider by ID
         ServiceProvider serviceProvider = serviceProviderRepository.findById(serviceProviderId)
-                .orElseThrow(() -> new RuntimeException("Service Provider not found with id: " + serviceProviderId));
+                .orElseThrow(() -> new RuntimeException("Service Provider not found with ID: " + serviceProviderId));
 
         // Fetch all messages where the recipient is the service provider
         List<Message> messages = messageRepository.findByRecipientId(serviceProviderId);
 
-        // Extract senders who are EventOrganizers
+        // Extract senders who are EventOrganizers and are not blocked by the Service Provider
         return messages.stream()
                 .map(Message::getSender) // Get the sender of the message
                 .filter(user -> user instanceof EventOrganizer) // Keep only EventOrganizers
+                .filter(user -> !serviceProvider.getBlockedUsers().contains(user)) // Remove EventOrganizers blocked by the Service Provider
                 .distinct() // Remove duplicates
                 .map(this::convertToUserOverviewDTO) // Convert to UserOverviewDTO
                 .toList(); // Collect the result as a list
@@ -289,6 +313,27 @@ public class UserService {
         return new UserOverviewDTO(sp.getId(),sp.getUsername(),sp.getName(),sp.getSurname(),sp.getPhoto());
     }
 
+    public BlockUserDTO blockUser(int blockerId, int blockedUserId) {
+        // Validate the blocker and the blocked user
+        if (blockerId == blockedUserId) {
+            throw new RuntimeException("Users cannot block themselves.");
+        }
+
+        User blocker = userRepository.findById(blockerId)
+                .orElseThrow(() -> new RuntimeException("Blocker user not found with ID: " + blockerId));
+        User blockedUser = userRepository.findById(blockedUserId)
+                .orElseThrow(() -> new RuntimeException("Blocked user not found with ID: " + blockedUserId));
+
+        // Prevent re-blocking if already blocked
+        if (blocker.getBlockedUsers().contains(blockedUser)) {
+            throw new RuntimeException("User is already blocked.");
+        }
+
+        // Add the blocked user to the blocker's list of blocked users
+        blocker.getBlockedUsers().add(blockedUser);
+        userRepository.save(blocker); // Persist changes
+        return new BlockUserDTO(blockerId, blockedUserId);
+    }
 
     public UserOverviewDTO getMessagedSp(int id) {
         ServiceProvider serviceProvider = serviceProviderRepository.findById(id).orElseThrow(

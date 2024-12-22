@@ -26,15 +26,10 @@ public class MerchandiseController {
     private final MerchandiseService merchandiseService;
 
     @GetMapping("/top")
-    public ResponseEntity<List<MerchandiseOverviewDTO>> getTopMerchandise() {
-        return ResponseEntity.ok(merchandiseService.getTop());
+    public ResponseEntity<List<MerchandiseOverviewDTO>> getTopMerchandise(@RequestParam int userId) {
+        return ResponseEntity.ok(merchandiseService.getTop(userId));
     }
-    @GetMapping("/all")
-    public ResponseEntity<Page<MerchandiseOverviewDTO>> getAllMerchandise(
-            @PageableDefault(size = 10, sort = "price", direction = Sort.Direction.DESC) Pageable merchandisePage
-    ) {
-        return ResponseEntity.ok(merchandiseService.getAll(merchandisePage));
-    }
+
 
     @GetMapping("/categories")
     public ResponseEntity<GetAllCategoriesDTO> getAllMerchandise() {
@@ -42,8 +37,21 @@ public class MerchandiseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MerchandiseDetailDTO> getMerchandiseById(@PathVariable int id) {
-        MerchandiseDetailDTO merchandiseDetail = this.merchandiseService.getMerchandiseById(id);
+    public ResponseEntity<MerchandiseDetailDTO> getMerchandiseById(@PathVariable int id,@RequestParam int userId) {
+        MerchandiseDetailDTO merchandiseDetail = this.merchandiseService.getMerchandiseById(userId,id);
         return ResponseEntity.ok(merchandiseDetail);
+    }
+
+    @GetMapping("/{userId}/favorite")
+    public ResponseEntity<List<MerchandiseOverviewDTO>>  getFavoriteMerchandise(@PathVariable int userId) {
+        return ResponseEntity.ok(merchandiseService.getFavoriteMerchandises(userId));
+    }
+
+    @PostMapping("/{merchandiseId}/add-to-favorites/{userId}")
+    public ResponseEntity<Boolean> favorizeMerchandise(
+            @PathVariable int merchandiseId,
+            @PathVariable int userId
+    ) {
+        return ResponseEntity.ok(merchandiseService.favorizeMerchandise(merchandiseId, userId));
     }
 }
