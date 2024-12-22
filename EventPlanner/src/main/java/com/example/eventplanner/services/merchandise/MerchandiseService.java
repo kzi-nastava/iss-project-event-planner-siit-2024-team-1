@@ -45,7 +45,6 @@ public class MerchandiseService {
     private final ServiceProviderRepository serviceProviderRepository;
     private final CategoryRepository categoryRepository;
     private final com.example.eventplanner.repositories.user.UserRepository userRepository;
-    private final ServiceProviderRepository serviceProviderRepository;
 
     public List<MerchandiseOverviewDTO> getTop(int userId) {
         User currentUser = fetchUserDetails(userId);
