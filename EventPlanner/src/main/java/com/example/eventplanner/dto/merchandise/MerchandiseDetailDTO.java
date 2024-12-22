@@ -34,5 +34,6 @@ public class MerchandiseDetailDTO {
     private CategoryOverviewDTO category;
     private List<EventTypeOverviewDTO> eventTypes;
     private double rating;
+    private int serviceProviderId;
     private String type;
 }
