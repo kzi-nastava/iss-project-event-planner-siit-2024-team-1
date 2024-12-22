@@ -46,4 +46,12 @@ public class MerchandiseController {
     public ResponseEntity<List<MerchandiseOverviewDTO>>  getFavoriteMerchandise(@PathVariable int userId) {
         return ResponseEntity.ok(merchandiseService.getFavoriteMerchandises(userId));
     }
+
+    @PostMapping("/{merchandiseId}/add-to-favorites/{userId}")
+    public ResponseEntity<Boolean> favorizeMerchandise(
+            @PathVariable int merchandiseId,
+            @PathVariable int userId
+    ) {
+        return ResponseEntity.ok(merchandiseService.favorizeMerchandise(merchandiseId, userId));
+    }
 }

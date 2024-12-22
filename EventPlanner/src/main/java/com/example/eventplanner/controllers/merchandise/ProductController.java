@@ -1,11 +1,13 @@
 package com.example.eventplanner.controllers.merchandise;
 
 
+import com.example.eventplanner.dto.category.GetAllByCategoriesDTO;
 import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
 
+import com.example.eventplanner.dto.merchandise.service.ServiceOverviewDTO;
 import com.example.eventplanner.services.merchandise.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -50,6 +52,10 @@ public class ProductController {
         return new ResponseEntity<>(productService.createProduct(request), HttpStatus.CREATED);
     }
 
+    @PostMapping("/get-by-categories")
+    public ResponseEntity<List<MerchandiseOverviewDTO>> GetAllByCategories(@RequestBody GetAllByCategoriesDTO dto) {
+        return ResponseEntity.ok(productService.getAllByCategories(dto.getCategories()));
+    }
 
     @GetMapping("/search")
     public ResponseEntity<Page<MerchandiseOverviewDTO>> filterProducts(

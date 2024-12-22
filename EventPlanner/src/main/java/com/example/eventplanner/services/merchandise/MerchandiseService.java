@@ -10,6 +10,7 @@ import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
 import com.example.eventplanner.dto.merchandise.review.MerchandiseReviewOverviewDTO;
 import com.example.eventplanner.exceptions.BlockedMerchandiseException;
 import com.example.eventplanner.model.event.Category;
+import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.MerchandisePhoto;
@@ -19,6 +20,7 @@ import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.category.CategoryRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
@@ -80,6 +82,25 @@ public class MerchandiseService {
 
     private boolean isNotBlocked(List<User> blockedUsers, User organizer) {
         return blockedUsers == null || !blockedUsers.contains(organizer);
+    }
+
+    public Boolean favorizeMerchandise(int merchandiseId, int userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        Merchandise merchandise = merchandiseRepository.findById(merchandiseId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + merchandiseId));
+
+        if(user.getFavoriteMerchandises().contains(merchandise)) {
+            user.getFavoriteMerchandises().remove(merchandise);
+        }
+        else{
+            user.getFavoriteMerchandises().add(merchandise);
+        }
+
+
+        userRepository.save(user);
+
+        return true;
     }
 
     private MerchandiseOverviewDTO convertToOverviewDTO(Merchandise merchandise) {
