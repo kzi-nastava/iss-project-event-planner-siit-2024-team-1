@@ -459,6 +459,8 @@ public class EventService {
 
         Event savedEvent = eventRepository.save(event);
 
+        eventOrganizer.getOrganizingEvents().add(savedEvent);
+        eventOrganizerRepository.save(eventOrganizer);
         return mapToCreatedEventOverviewDTO(savedEvent, eventType, merchandise);
     }
 
