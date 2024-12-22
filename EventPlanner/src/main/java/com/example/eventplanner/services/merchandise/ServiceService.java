@@ -5,10 +5,7 @@ import com.example.eventplanner.dto.filter.ServiceFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 
 import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
-import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
-import com.example.eventplanner.dto.merchandise.service.ReservationResponseDTO;
-import com.example.eventplanner.dto.merchandise.service.ServiceOverviewDTO;
-import com.example.eventplanner.dto.merchandise.service.TimeSlotDTO;
+import com.example.eventplanner.dto.merchandise.service.*;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceRequestDTO;
@@ -86,6 +83,35 @@ public class ServiceService {
         return (root, query, criteriaBuilder) -> {
             return criteriaBuilder.isTrue(root.get("visible"));
         };
+    }
+
+    public List<CalendarTimeSlotDTO> getTimeslotsCalendar(int spId){
+        List<CalendarTimeSlotDTO> calendarTimeSlotDTOs = new ArrayList<>();
+
+        // Retrieve the service provider by ID
+        ServiceProvider serviceProvider = serviceProviderRepository.findById(spId)
+                .orElseThrow(() -> new RuntimeException("ServiceProvider not found"));
+
+        // For each service offered by the service provider, retrieve the associated timeslots
+        for (Merchandise merchandise : serviceProvider.getMerchandise()) {
+            if (merchandise instanceof com.example.eventplanner.model.merchandise.Service) {
+                com.example.eventplanner.model.merchandise.Service service = (com.example.eventplanner.model.merchandise.Service) merchandise;
+
+                // Retrieve all timeslots for the service
+                for (Timeslot timeslot : service.getTimeslots()) {
+                    CalendarTimeSlotDTO calendarTimeSlotDTO = new CalendarTimeSlotDTO();
+                    calendarTimeSlotDTO.setService(service.getTitle());
+                    calendarTimeSlotDTO.setId(timeslot.getId());
+                    calendarTimeSlotDTO.setStartTime(timeslot.getStartTime());
+                    calendarTimeSlotDTO.setEndTime(timeslot.getEndTime());
+
+                    // Add the DTO to the list
+                    calendarTimeSlotDTOs.add(calendarTimeSlotDTO);
+                }
+            }
+        }
+
+        return calendarTimeSlotDTOs;
     }
 
     private Specification<com.example.eventplanner.model.merchandise.Service> excludeBlockedProviders(User currentUser, List<User> blockedUsers) {

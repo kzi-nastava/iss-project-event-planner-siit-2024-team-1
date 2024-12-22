@@ -61,6 +61,12 @@ public class ServiceController {
 
     }
 
+    @GetMapping("/timeslots/{spId}")
+    public ResponseEntity<List<CalendarTimeSlotDTO>> getTimeslotsCalendar(@PathVariable int spId) {
+        List<CalendarTimeSlotDTO> timeslots = serviceService.getTimeslotsCalendar(spId);
+        return ResponseEntity.ok(timeslots);
+    }
+
     @GetMapping("/{serviceId}/timeslots")
     public ResponseEntity<List<TimeSlotDTO>> getServiceTimeslots(@PathVariable int serviceId) {
         List<TimeSlotDTO> timeslots = serviceService.getServiceTimeslots(serviceId);

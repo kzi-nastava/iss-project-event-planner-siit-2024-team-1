@@ -922,7 +922,7 @@ INSERT INTO user_merchandise(merchandise_id, service_provider_id)
 SELECT id, 152
 FROM merchandise
 WHERE id BETWEEN 7 AND 25;
-
+update user_merchandise set service_provider_id = 22 where merchandise_id = 23 or merchandise_id = 24;
 insert into event_type (is_active, description, title)
 values (true,'all','all');
 
@@ -1975,3 +1975,24 @@ INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
 UPDATE public.id_generator
 SET next_val = 200
 WHERE sequence_name = 'merchandise';
+
+-- Insert time slots for one service
+INSERT INTO public.time_slots (end_time, id, start_time)
+VALUES
+    ('2024-12-21 10:00:00', 1, '2024-12-21 08:00:00'),
+    ('2024-12-25 12:30:00', 2, '2024-12-25 10:30:00'),
+    ('2024-12-25 15:00:00', 3, '2024-12-25 13:00:00'),
+    ('2024-12-25 15:00:00', 4, '2024-12-25 13:00:00'),
+    ('2024-12-29 15:00:00', 5, '2024-12-29 13:00:00'),
+    ('2025-01-29 15:00:00', 6, '2025-01-29 13:00:00'),
+    ('2025-01-29 15:00:00', 7, '2025-01-29 13:00:00');
+
+INSERT INTO public.merchandise_timeslots(
+    service_id, timeslot_id)
+VALUES (23, 1),
+       (23, 2),
+       (23, 3),
+       (23, 4),
+       (23, 5),
+       (24, 6),
+       (24, 7);
