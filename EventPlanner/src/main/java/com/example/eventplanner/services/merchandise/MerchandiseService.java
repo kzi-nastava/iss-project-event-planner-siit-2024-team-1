@@ -13,8 +13,10 @@ import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.MerchandisePhoto;
 import com.example.eventplanner.model.merchandise.Review;
+import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.repositories.category.CategoryRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
+import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MerchandiseService {
     private final MerchandiseRepository merchandiseRepository;
+    private final ServiceProviderRepository serviceProviderRepository;
     private final CategoryRepository categoryRepository;
 
     public List<MerchandiseOverviewDTO> getTop() {
@@ -122,6 +125,16 @@ public class MerchandiseService {
 
         merchandiseDetails.setEventTypes(merchandise.getEventTypes().stream().map(this::mapToEventTypeOverviewDTO).toList());
         merchandiseDetails.setRating(merchandise.getRating());
+
+        ServiceProvider sp = serviceProviderRepository.findByMerchandiseId(merchandise.getId()).orElse(
+                sp = null
+        );
+        if(sp != null) {
+            merchandiseDetails.setServiceProviderId(sp.getId());
+        } else {
+            merchandiseDetails.setServiceProviderId(-1);
+        }
+
         return merchandiseDetails;
     }
 

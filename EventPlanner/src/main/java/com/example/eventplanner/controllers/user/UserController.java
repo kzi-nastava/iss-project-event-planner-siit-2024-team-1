@@ -94,4 +94,9 @@ public class UserController {
     public ResponseEntity<List<UserOverviewDTO>> getChatUsersForSp(@PathVariable int id) {
         return ResponseEntity.ok(userService.getEoWhoMessagedSp(id));
     }
+
+    @GetMapping("/sp/{id}/message")
+    public ResponseEntity<UserOverviewDTO> getMessagedSp(@PathVariable int id) {
+        return ResponseEntity.ok(userService.getMessagedSp(id));
+    }
 }
