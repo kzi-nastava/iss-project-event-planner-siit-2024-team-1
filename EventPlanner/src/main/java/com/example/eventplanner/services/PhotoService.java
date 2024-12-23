@@ -123,7 +123,7 @@ public class PhotoService {
             // Delete from the database
             String old = user.getPhoto();
             user.setPhoto(null);
-            Path photoPath = Paths.get(photoStoragePath).resolve(user.getPhoto());
+            Path photoPath = Paths.get(photoStoragePath).resolve(old);
             try {
                 Files.deleteIfExists(photoPath);
             } catch (IOException e) {

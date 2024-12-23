@@ -4,5 +4,5 @@ public enum Role {
     AU,
     EO,
     SP,
-    ADMIN
+    A
 }

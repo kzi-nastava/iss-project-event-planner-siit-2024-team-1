@@ -325,9 +325,7 @@ public class ProductService {
         // Step 7: Save the new product (Merchandise)
         Product savedProduct = productRepository.save(product);
 
-        List<Merchandise> merchandise = serviceProvider.getMerchandise();
-        merchandise.add(savedProduct);
-        serviceProvider.setMerchandise(merchandise);
+        serviceProvider.getMerchandise().add(savedProduct);
         ServiceProvider sp = serviceProviderRepository.save(serviceProvider);
 
 
