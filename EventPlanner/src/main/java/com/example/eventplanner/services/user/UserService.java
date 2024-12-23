@@ -14,12 +14,10 @@ import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.user.*;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.message.MessageRepository;
-import com.example.eventplanner.repositories.user.BusinessPhotoRepository;
-import com.example.eventplanner.repositories.user.EventOrganizerRepository;
-import com.example.eventplanner.repositories.user.ServiceProviderRepository;
-import com.example.eventplanner.repositories.user.UserRepository;
+import com.example.eventplanner.repositories.user.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,12 +35,27 @@ public class UserService {
     private final EventOrganizerRepository eventOrganizerRepository;
     private final MessageRepository messageRepository;
     private final BusinessPhotoRepository businessPhotoRepository;
+    private final AdministratorRepository administratorRepository;
 
     public GetAuByIdResponseDTO getAuById(int id){
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         GetAuByIdResponseDTO responseDTO = new GetAuByIdResponseDTO();
+        responseDTO.setEmail(user.getUsername());
+        responseDTO.setName(user.getName());
+        responseDTO.setSurname(user.getSurname());
+        responseDTO.setPhoneNumber(user.getPhoneNumber());
+        responseDTO.setAddress(user.getAddress());
+        responseDTO.setPhoto(user.getPhoto());
+        return responseDTO;
+    }
+
+    public GetEoByIdResponseDTO getAdminById(int id){
+        Administrator user = administratorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        GetEoByIdResponseDTO responseDTO = new GetEoByIdResponseDTO();
         responseDTO.setEmail(user.getUsername());
         responseDTO.setName(user.getName());
         responseDTO.setSurname(user.getSurname());

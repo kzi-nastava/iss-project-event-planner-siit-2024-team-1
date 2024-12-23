@@ -28,6 +28,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getAuById(id));
     }
 
+    @GetMapping("/admin/{id}")
+    public ResponseEntity<GetEoByIdResponseDTO> getAdminById(@PathVariable(value = "id") int id) {
+        return ResponseEntity.ok(userService.getAdminById(id));
+    }
+
     @GetMapping("/sp/{id}")
     public ResponseEntity<GetSpByIdResponseDTO> getSpById(@PathVariable(value = "id") int id) {
         return ResponseEntity.ok(userService.getSpById(id));
