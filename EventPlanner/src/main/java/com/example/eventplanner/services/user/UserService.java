@@ -43,11 +43,6 @@ public class UserService {
 
         GetAuByIdResponseDTO responseDTO = new GetAuByIdResponseDTO();
         responseDTO.setEmail(user.getUsername());
-        responseDTO.setName(user.getName());
-        responseDTO.setSurname(user.getSurname());
-        responseDTO.setPhoneNumber(user.getPhoneNumber());
-        responseDTO.setAddress(user.getAddress());
-        responseDTO.setPhoto(user.getPhoto());
         return responseDTO;
     }
 

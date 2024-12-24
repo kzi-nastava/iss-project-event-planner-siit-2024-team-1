@@ -12,10 +12,7 @@ import com.example.eventplanner.model.auth.Token;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.user.*;
 import com.example.eventplanner.repositories.auth.TokenRepository;
-import com.example.eventplanner.repositories.user.BusinessPhotoRepository;
-import com.example.eventplanner.repositories.user.EventOrganizerRepository;
-import com.example.eventplanner.repositories.user.ServiceProviderRepository;
-import com.example.eventplanner.repositories.user.UserRepository;
+import com.example.eventplanner.repositories.user.*;
 import com.example.eventplanner.services.email.EmailService;
 import com.example.eventplanner.services.user.UserService;
 import com.example.eventplanner.services.userreport.UserReportService;
@@ -51,6 +48,7 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final UserReportService userReportService;
     private final BusinessPhotoRepository businessPhotoRepository;
+    private final AuthenticatedUserRepository authenticatedUserRepository;
 
 //    public RegisterAuUserResponseRequestDTO registerAu(RegisterAuUserRequestDTO request) {
 //
@@ -79,11 +77,24 @@ public class AuthenticationService {
 //
 //    }
 
-    public RegisterEoRequestResponseDTO registerEo(RegisterEoRequestDTO request) {
+    public RegisterEoRequestResponseDTO registerEo(RegisterEoRequestDTO request, boolean promotion) {
+        String email = "";
+        if(!promotion){
+            // check if user already exist. if exist than authenticate the user
+            if(repository.findByUsername(request.getEmail()).isPresent()) {
+                return new RegisterEoRequestResponseDTO(-1, "User Already Exists", null,null, null,null, null,null, null, null);
+            }
+        }
+        else{
+            User user = userRepository.findByUsername(request.getEmail()).get();
+            List<Token> tokens = tokenRepository.findAllAccessTokensByUser(user.getId());
+            tokenRepository.deleteAll(tokens);
+            userRepository.delete(user);
+            email = request.getEmail();
+        }
 
-        // check if user already exist. if exist than authenticate the user
-        if(repository.findByUsername(request.getEmail()).isPresent()) {
-            return new RegisterEoRequestResponseDTO(-1, "User Already Exists", null,null, null,null, null,null, null, null);
+        if(!email.equals("")){
+            request.setEmail(email);
         }
 
         EventOrganizer user = new EventOrganizer();
@@ -95,7 +106,7 @@ public class AuthenticationService {
         user.setAddress(mapToAddress(request.getAddress()));
         user.setPhoto(request.getPhoto());
         user.setRole(request.getRole());
-        user.setAuthorities("ahahah");
+        user.setAuthorities("");
 
         long activationTokenExpire = 24 * 60 * 60 * 1000;
         String activationToken = jwtService.generateActivationToken(user, activationTokenExpire);
@@ -151,12 +162,25 @@ public class AuthenticationService {
         return address;
     }
 
-    public RegisterSpRequestResponseDTO registerSp(RegisterSpRequestDTO request) {
-
-        // check if user already exist. if exist than authenticate the user
-        if(repository.findByUsername(request.getEmail()).isPresent()) {
-            return new RegisterSpRequestResponseDTO(-1, "User Already Exists", null,null, null,null, null, null,null, null, null, null, null);
+    public RegisterSpRequestResponseDTO registerSp(RegisterSpRequestDTO request, boolean promotion) {
+        String email = "";
+        if(!promotion){
+            if(repository.findByUsername(request.getEmail()).isPresent()) {
+                return new RegisterSpRequestResponseDTO(-1, "User Already Exists", null,null, null,null, null, null,null, null, null, null, null);
+            }
         }
+        else{
+            User user = userRepository.findByUsername(request.getEmail()).get();
+            List<Token> tokens = tokenRepository.findAllAccessTokensByUser(user.getId());
+            tokenRepository.deleteAll(tokens);
+            userRepository.delete(user);
+            email = request.getEmail();
+        }
+
+        if(!email.equals("")){
+            request.setEmail(email);
+        }
+
 
         ServiceProvider user = new ServiceProvider();
         user.setName(request.getName());
@@ -167,7 +191,7 @@ public class AuthenticationService {
         user.setAddress(mapToAddress(request.getAddress()));
         user.setPhoto(request.getPhoto());
         user.setRole(request.getRole());
-        user.setAuthorities("ahahah");
+        user.setAuthorities("");
 
         user.setCompany(request.getCompany());
         user.setDescription(request.getDescription());
