@@ -42,16 +42,16 @@ public class    AuthenticationController {
 
     @PostMapping("/register-eo")
     public ResponseEntity<RegisterEoRequestResponseDTO> registerEo(
-            @RequestBody RegisterEoRequestDTO request
+            @RequestBody RegisterEoRequestDTO request, @RequestParam(defaultValue = "false") boolean promotion
     ) {
-        return ResponseEntity.ok(authService.registerEo(request));
+        return ResponseEntity.ok(authService.registerEo(request, promotion));
     }
 
     @PostMapping("/register-sp")
     public ResponseEntity<RegisterSpRequestResponseDTO> registerSp(
-            @RequestBody RegisterSpRequestDTO request
+            @RequestBody RegisterSpRequestDTO request, @RequestParam(defaultValue = "false") boolean promotion
     ) {
-        return ResponseEntity.ok(authService.registerSp(request));
+        return ResponseEntity.ok(authService.registerSp(request, promotion));
     }
 
     @PostMapping("/fast-register")
