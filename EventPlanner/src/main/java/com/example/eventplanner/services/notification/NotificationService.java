@@ -11,6 +11,7 @@ import com.example.eventplanner.repositories.notification.NotificationRepository
 import com.example.eventplanner.repositories.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class NotificationService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final NotificationRepository notificationRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public void sendNotificationToUser(User user, String content) {
@@ -38,6 +40,11 @@ public class NotificationService {
 
         // Add to user's notifications and save user
         user.getNotifications().add(notification);
+        messagingTemplate.convertAndSendToUser(
+                String.valueOf(user.getId()),
+                "/notifications",  // Will become /user/notifications
+                mapToDTO(notification)
+        );
         userRepository.save(user);
     }
 
