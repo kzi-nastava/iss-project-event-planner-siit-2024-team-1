@@ -52,6 +52,7 @@ public class MessageController {
         return message;
     }
 
+
     private String generateConversationId(int senderId, int recipientId) {
         //function sorts ids, so that conversation is unique no matter which user sends the message
         return senderId < recipientId ? senderId + "-" + recipientId : recipientId + "-" + senderId;
