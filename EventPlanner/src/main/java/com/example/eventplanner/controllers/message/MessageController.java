@@ -4,6 +4,7 @@ import com.example.eventplanner.dto.user.MessageDTO;
 import com.example.eventplanner.dto.user.MessageRequestDTO;
 import com.example.eventplanner.model.user.Message;
 import com.example.eventplanner.services.message.MessageService;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -18,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin
 public class MessageController {
-
+    private final SimpMessagingTemplate messagingTemplate;
     private final MessageService messageService;
 
     /**
@@ -38,10 +39,21 @@ public class MessageController {
     }
 
     @MessageMapping("/chat.sendMessage")
-    @SendTo("/user/message")
     public MessageDTO sendMessage(@Payload MessageRequestDTO messageDTO) {
         MessageDTO message = messageService
                 .sendMessageByIds(messageDTO.getSenderId(), messageDTO.getReceiverId(), messageDTO.getContent());
+
+        String conversationId = generateConversationId(message.getSenderId(), message.getRecipientId());
+        System.out.println(conversationId);
+        messagingTemplate.convertAndSendToUser(String.valueOf(message.getSenderId()),
+                                                    "/private/messages/" + conversationId, message);
+        messagingTemplate.convertAndSendToUser(String.valueOf(message.getRecipientId()),
+                                                    "/private/messages/" + conversationId, message);
         return message;
+    }
+
+    private String generateConversationId(int senderId, int recipientId) {
+        //function sorts ids, so that conversation is unique no matter which user sends the message
+        return senderId < recipientId ? senderId + "-" + recipientId : recipientId + "-" + senderId;
     }
 }
