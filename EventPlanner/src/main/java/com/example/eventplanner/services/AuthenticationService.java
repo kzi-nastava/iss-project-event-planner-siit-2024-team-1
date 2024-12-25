@@ -8,6 +8,7 @@ import com.example.eventplanner.dto.user.auth.*;
 import com.example.eventplanner.exceptions.RegisterUserException;
 import com.example.eventplanner.exceptions.UserAuthenticationException;
 import com.example.eventplanner.model.auth.AuthenticationResponse;
+import com.example.eventplanner.model.auth.Role;
 import com.example.eventplanner.model.auth.Token;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.user.*;
@@ -227,6 +228,7 @@ public class AuthenticationService {
         authenticatedUser.setPassword(passwordEncoder.encode(userPassword));
         authenticatedUser.setActive(true);
         authenticatedUser.setAddress(new Address());
+        authenticatedUser.setRole(Role.AU);
         emailService.sendMail("system@eventplanner.com",email,"Generated Password","Dear user, your password has been automatically generated, please" +
                 " change it as soon as possible! <br><br>Password:<br>"+userPassword);
         userRepository.save(authenticatedUser);

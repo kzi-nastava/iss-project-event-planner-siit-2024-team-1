@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) // All subclasses stored in one table
@@ -79,4 +80,5 @@ public class User {
             joinColumns =  @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "merchandise_id"))
     private List<Merchandise> favoriteMerchandises;
+
 }
