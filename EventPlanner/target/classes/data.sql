@@ -20,11 +20,48 @@ INSERT INTO event_type (title, description, is_active) VALUES
                                                            ('Networking Event', 'Professional networking opportunities', true),
                                                            ('Educational Seminar', 'Knowledge sharing and learning', true),
                                                            ( 'Social Gathering', 'Community and social events', true);
+-- First, ensure we have a category
+INSERT INTO category (title,description,pending) VALUES ('Entertainment','Entertainment description',false),
+                                                        ('Funerality','Entertainment description',false),
+                                                        ('Suicidabiliyu','Entertainment description',false),
+                                                        ('Protest','Entertainment description',false);
+
+INSERT INTO eventtype_category(category_id,eventtype_id) VALUES
+                                                             (1,1),
+                                                             (2,2),
+                                                             (3,2),
+                                                             (1,2),
+                                                             (4,2);
+
+INSERT INTO budget_item(id,amount_spent, category_id, max_amount) VALUES
+                                                                   (100,0,1,5000),
+                                                                   (200,0,2,1200),
+                                                                   (300,0,3,650);
+
+INSERT INTO budget(budget_id) VALUES
+                                  (100),
+                                  (200),
+                                  (300),
+                                  (400),
+                                  (500),
+                                  (600),
+                                  (700),
+                                  (800),
+                                  (900),
+                                  (1000),
+                                  (1100),
+                                  (1200);
+
+INSERT INTO budget_budget_items(budget_budget_id, budget_item_id) VALUES
+                                                                      (400,100),
+                                                                      (400,200),
+                                                                      (200,300);
 --
 -- -- No separate address table needed since it's an @Embeddable
 --
 -- Insert Events with embedded addresses
 INSERT INTO event (
+    budget_id,
     title,
     description,
     max_participants,
@@ -40,6 +77,7 @@ INSERT INTO event (
     organizer_id
 ) VALUES
       (
+       100,
           'Tech Innovation Summit 2024',
           'Annual conference exploring cutting-edge technologies',
           500,
@@ -54,6 +92,7 @@ INSERT INTO event (
           37.7749, 1
       ),
       (
+       200,
           'Digital Marketing Workshop',
           'Hands-on training for modern marketing strategies',
           100,
@@ -68,6 +107,7 @@ INSERT INTO event (
           40.7128, 1
       ),
       (
+        300,
           'Startup Networking Night',
           'Connect with entrepreneurs and investors',
           200,
@@ -81,12 +121,12 @@ INSERT INTO event (
           -87.6298,
           41.8781, 1
       ),
-      (
+      (400,
           'AI & Machine Learning Forum',
           'Deep dive into artificial intelligence advances',
           300,
           true,
-          '2024-12-18 10:00:00',
+          '2025-12-18 10:00:00',
           50000.00,
           1,
           'Technology Drive',
@@ -95,7 +135,7 @@ INSERT INTO event (
           -97.7431,
           30.2672, 1
       ),
-      (
+      (500,
           'Leadership Development Seminar',
           'Building effective leadership skills',
           150,
@@ -109,7 +149,7 @@ INSERT INTO event (
           -71.0589,
           42.3601, 1
       ),
-      (
+      (600,
           'Cloud Computing Workshop',
           'Hands-on cloud infrastructure training',
           80,
@@ -123,7 +163,7 @@ INSERT INTO event (
           -122.3321,
           47.6062, 1
       ),
-      (
+      (700,
           'Entrepreneur Meetup',
           'Casual networking for business owners',
           120,
@@ -137,7 +177,7 @@ INSERT INTO event (
           -80.1918,
           25.7617, 1
       ),
-      (
+      (800,
           'Community Tech Fair',
           'Local technology showcase and demos',
           400,
@@ -151,7 +191,7 @@ INSERT INTO event (
           -104.9903,
           39.7392, 1
       ),
-      (
+      (900,
           'Agile Project Management',
           'Modern project management methodologies',
           100,
@@ -165,7 +205,7 @@ INSERT INTO event (
           -122.6784,
           45.5155, 54
       ),
-      (
+      (1000,
           'Tech Startup Pitch Night',
           'Pitch competition for new startups',
           150,
@@ -179,7 +219,7 @@ INSERT INTO event (
           -118.2437,
           34.0522, 54
       ),
-      (
+      (1100,
           'Cybersecurity Conference',
           'Latest in digital security and protection',
           200,
@@ -193,7 +233,7 @@ INSERT INTO event (
           -77.0369,
           38.9072, 54
       ),
-      (
+      (1200,
           'Digital Transformation Forum',
           'Business modernization strategies',
           180,
@@ -221,13 +261,6 @@ insert into user_organizing_events(event_organizer_id,organizing_events_id) valu
                                                                                 (54,10),
                                                                                 (54,11),
                                                                                 (54,12);
-
-
--- First, ensure we have a category
-INSERT INTO category (title,description,pending) VALUES ('Entertainment','Entertainment description',false),
-                                                        ('Funerality','Entertainment description',false),
-                                                        ('Suicidabiliyu','Entertainment description',false),
-                                                        ('Protest','Entertainment description',false);
 
 
 INSERT INTO merchandise (
@@ -1977,23 +2010,23 @@ UPDATE public.id_generator
 SET next_val = 200
 WHERE sequence_name = 'merchandise';
 
--- Insert time slots for one service
-INSERT INTO public.time_slots (end_time, id, start_time)
-VALUES
-    ('2024-12-21 10:00:00', 1, '2024-12-21 08:00:00'),
-    ('2024-12-25 12:30:00', 2, '2024-12-25 10:30:00'),
-    ('2024-12-25 15:00:00', 3, '2024-12-25 13:00:00'),
-    ('2024-12-25 15:00:00', 4, '2024-12-25 13:00:00'),
-    ('2024-12-29 15:00:00', 5, '2024-12-29 13:00:00'),
-    ('2025-01-29 15:00:00', 6, '2025-01-29 13:00:00'),
-    ('2025-01-29 15:00:00', 7, '2025-01-29 13:00:00');
-
-INSERT INTO public.merchandise_timeslots(
-    service_id, timeslot_id)
-VALUES (23, 1),
-       (23, 2),
-       (23, 3),
-       (23, 4),
-       (23, 5),
-       (24, 6),
-       (24, 7);
+-- -- Insert time slots for one service
+-- INSERT INTO public.time_slots (end_time, id, start_time)
+-- VALUES
+--     ('2024-12-21 10:00:00', 1, '2024-12-21 08:00:00'),
+--     ('2024-12-25 12:30:00', 2, '2024-12-25 10:30:00'),
+--     ('2024-12-25 15:00:00', 3, '2024-12-25 13:00:00'),
+--     ('2024-12-25 15:00:00', 4, '2024-12-25 13:00:00'),
+--     ('2024-12-29 15:00:00', 5, '2024-12-29 13:00:00'),
+--     ('2025-01-29 15:00:00', 6, '2025-01-29 13:00:00'),
+--     ('2025-01-29 15:00:00', 7, '2025-01-29 13:00:00');
+--
+-- INSERT INTO public.merchandise_timeslots(
+--     service_id, timeslot_id)
+-- VALUES (23, 1),
+--        (23, 2),
+--        (23, 3),
+--        (23, 4),
+--        (23, 5),
+--        (24, 6),
+--        (24, 7);
