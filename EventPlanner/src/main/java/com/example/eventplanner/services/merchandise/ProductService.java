@@ -6,8 +6,11 @@ import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.product.*;
 import com.example.eventplanner.dto.merchandise.service.ServiceOverviewDTO;
+import com.example.eventplanner.model.event.*;
 import com.example.eventplanner.model.merchandise.*;
 import com.example.eventplanner.model.user.EventOrganizer;
+import com.example.eventplanner.repositories.budget.BudgetItemRepository;
+import com.example.eventplanner.repositories.budget.BudgetRepository;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.merchandise.ProductRepository;
 import jakarta.persistence.criteria.Join;
@@ -28,10 +31,6 @@ import com.example.eventplanner.dto.merchandise.product.create.CreateProductRequ
 import com.example.eventplanner.dto.merchandise.product.create.CreateProductResponseDTO;
 import com.example.eventplanner.dto.merchandise.product.update.UpdateProductRequestDTO;
 import com.example.eventplanner.model.common.Address;
-import com.example.eventplanner.model.event.Activity;
-import com.example.eventplanner.model.event.Category;
-import com.example.eventplanner.model.event.Event;
-import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Product;
 import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.model.user.User;
@@ -64,6 +63,8 @@ public class ProductService {
     private final ServiceRepository serviceRepository;
     private final ServiceProviderRepository serviceProviderRepository;
     private final EventRepository eventRepository;
+    private final BudgetItemRepository budgetItemRepository;
+    private final BudgetRepository budgetRepository;
 
     public Page<MerchandiseOverviewDTO> search(int userId, ProductFiltersDTO productFiltersDTO, String search, Pageable pageable) {
         // Fetch user details
@@ -455,16 +456,27 @@ public class ProductService {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
         Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
 
-        boolean exists = event.getMerchandise().stream().anyMatch(
-                p -> p.getCategory().getId() == product.getCategory().getId());
-        if(exists) {
-            throw new Exception("Already have product or service for this category");
+        BudgetItem existingBudgetItem = event.getBudget()
+                                            .getBudgetItems()
+                                            .stream()
+                                            .filter(item ->
+                                                    item.getCategory().getId() == product.getCategory().getId() &&
+                                                    item.getMerchandise() == null)
+                                            .findFirst()
+                                            .orElse(null);
+        if(existingBudgetItem != null) {
+            existingBudgetItem.setMerchandise(product);
         }
         else {
-            event.getMerchandise().add(product);
-            Event event1 = eventRepository.save(event);
+            BudgetItem budgetItem = new BudgetItem();
+            budgetItem.setMerchandise(product);
+            budgetItem.setCategory(product.getCategory());
+            budgetItem.setMaxAmount(0);
+            BudgetItem savedBudgetItem = budgetItemRepository.save(budgetItem);
+            event.getBudget().getBudgetItems().add(savedBudgetItem);
         }
 
+        budgetRepository.save(event.getBudget());
         return new BuyProductResponseDTO();
     }
 }

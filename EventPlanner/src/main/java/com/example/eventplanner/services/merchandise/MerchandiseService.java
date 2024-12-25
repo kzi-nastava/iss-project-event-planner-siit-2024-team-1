@@ -245,4 +245,8 @@ public class MerchandiseService {
     }
 
 
+    public List<MerchandiseOverviewDTO> getMerchandiseByCategory(int categoryId) {
+        List<Merchandise> filteredMerchandise = merchandiseRepository.findMerchandiseByCategory(categoryId);
+        return filteredMerchandise.stream().map(this::convertToOverviewDTO).toList();
+    }
 }

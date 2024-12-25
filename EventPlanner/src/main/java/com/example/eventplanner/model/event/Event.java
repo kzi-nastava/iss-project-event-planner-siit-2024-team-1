@@ -56,11 +56,15 @@ public class Event {
 
     @ManyToMany
     @JoinTable(
-            name = "budget",
+            name = "events_merchandise",
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "merchandise_id")
     )
     private List<Merchandise> merchandise;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "budget_id", referencedColumnName = "budgetId")
+    private Budget budget;
 
     @ManyToMany
     private List<User> participants;

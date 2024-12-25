@@ -11,6 +11,7 @@ import com.example.eventplanner.dto.merchandise.service.create.CreateServiceResp
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceRequestDTO;
 import com.example.eventplanner.exceptions.ServiceReservationException;
 import com.example.eventplanner.model.common.Address;
+import com.example.eventplanner.model.event.BudgetItem;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
@@ -18,6 +19,8 @@ import com.example.eventplanner.model.merchandise.*;
 import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.model.user.User;
+import com.example.eventplanner.repositories.budget.BudgetItemRepository;
+import com.example.eventplanner.repositories.budget.BudgetRepository;
 import com.example.eventplanner.repositories.category.CategoryRepository;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.eventType.EventTypeRepository;
@@ -62,6 +65,8 @@ public class ServiceService {
     private final EventTypeRepository eventTypeRepository;
     private final CategoryRepository categoryRepository;
     private final MerchandiseRepository merchandiseRepository;
+    private final BudgetItemRepository budgetItemRepository;
+    private final BudgetRepository budgetRepository;
 
     public Page<MerchandiseOverviewDTO> search(int userId, ServiceFiltersDTO serviceFiltersDTO, String search, Pageable pageable) {
         // Fetch user details
@@ -304,7 +309,27 @@ public class ServiceService {
 
         service.getTimeslots().add(timeslot);
 
-        event.getMerchandise().add(service);
+        BudgetItem existingBudgetItem = event.getBudget()
+                .getBudgetItems()
+                .stream()
+                .filter(item ->
+                        item.getCategory().getId() == service.getCategory().getId() &&
+                                item.getMerchandise() == null)
+                .findFirst()
+                .orElse(null);
+        if(existingBudgetItem != null) {
+            existingBudgetItem.setMerchandise(service);
+        }
+        else {
+            BudgetItem budgetItem = new BudgetItem();
+            budgetItem.setMerchandise(service);
+            budgetItem.setCategory(service.getCategory());
+            budgetItem.setMaxAmount(0);
+            BudgetItem savedBudgetItem = budgetItemRepository.save(budgetItem);
+            event.getBudget().getBudgetItems().add(savedBudgetItem);
+        }
+
+        budgetRepository.save(event.getBudget());
 
         // Save changes
         timeslotRepository.save(timeslot);
