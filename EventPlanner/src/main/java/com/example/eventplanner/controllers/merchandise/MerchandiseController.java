@@ -30,6 +30,10 @@ public class MerchandiseController {
         return ResponseEntity.ok(merchandiseService.getTop(userId));
     }
 
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<List<MerchandiseOverviewDTO>> getMerchandiseByCategory(@PathVariable (name = "categoryId") int categoryId) {
+        return ResponseEntity.ok(merchandiseService.getMerchandiseByCategory(categoryId));
+    }
 
     @GetMapping("/categories")
     public ResponseEntity<GetAllCategoriesDTO> getAllMerchandise() {

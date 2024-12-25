@@ -11,9 +11,7 @@ import com.example.eventplanner.dto.review.ReviewDTO;
 import com.example.eventplanner.dto.user.UserOverviewDTO;
 import com.example.eventplanner.exceptions.BlockedMerchandiseException;
 import com.example.eventplanner.model.common.Address;
-import com.example.eventplanner.model.event.Activity;
-import com.example.eventplanner.model.event.Event;
-import com.example.eventplanner.model.event.EventType;
+import com.example.eventplanner.model.event.*;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.Product;
 
@@ -24,6 +22,8 @@ import com.example.eventplanner.model.merchandise.ReviewStatus;
 
 import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.User;
+import com.example.eventplanner.repositories.budget.BudgetItemRepository;
+import com.example.eventplanner.repositories.budget.BudgetRepository;
 import com.example.eventplanner.repositories.event.ActivityRepository;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.eventType.EventTypeRepository;
@@ -61,6 +61,8 @@ public class EventService {
     private final ActivityRepository activityRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final BudgetRepository budgetRepository;
+    private final BudgetItemRepository budgetItemRepository;
 
     public Page<EventOverviewDTO> getTop(int userId, Pageable pageable) {
         // Fetch user details
@@ -442,17 +444,33 @@ public class EventService {
 
         EventType eventType = eventTypeRepository.findById(dto.getEventTypeId()).orElseThrow();
         event.setType(eventType);
-        List<Merchandise> products = merchandiseRepository.findAllById(dto.getProductIds());
-        List<Merchandise> services = merchandiseRepository.findAllById(dto.getServiceIds());
-        List<Merchandise> merchandise = new ArrayList<>();
 
-        if(!products.isEmpty()){
-            merchandise.addAll(products);
-        }
-        if(!services.isEmpty()){
-            merchandise.addAll(services);
-        }
-        event.setMerchandise(merchandise);
+        Budget budget = new Budget();
+        List<BudgetItem> budgetItems = eventType.getCategories().stream().map(category -> {
+            BudgetItem item = new BudgetItem();
+            item.setMaxAmount(0.0);
+            item.setCategory(category);
+            item.setAmountSpent(0.0);
+            return item;
+        }).toList();
+
+        List<BudgetItem> savedBudgetItems = budgetItemRepository.saveAll(budgetItems);
+        budget.setBudgetItems(savedBudgetItems);
+        Budget savedBudget = budgetRepository.save(budget);
+        event.setBudget(savedBudget);
+
+//        List<Merchandise> products = merchandiseRepository.findAllById(dto.getProductIds());
+//        List<Merchandise> services = merchandiseRepository.findAllById(dto.getServiceIds());
+        List<Merchandise> merchandise = new ArrayList<>();
+//
+//        if(!products.isEmpty()){
+//            merchandise.addAll(products);
+//        }
+//        if(!services.isEmpty()){
+//            merchandise.addAll(services);
+//        }
+//
+//        event.setMerchandise(merchandise);
 
         EventOrganizer eventOrganizer = eventOrganizerRepository.findById(dto.getOrganizerId()).orElseThrow();
         event.setOrganizer(eventOrganizer);
