@@ -12,6 +12,7 @@ import com.example.eventplanner.repositories.userreport.UserReportRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
 import com.example.eventplanner.repositories.userreport.UserSuspensionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,8 +26,9 @@ import java.util.stream.Collectors;
 public class UserReportService {
 
     private final UserReportRepository userReportRepository;
-    private final UserRepository userRepository; // Assuming this exists
+    private final UserRepository userRepository;
     private final UserSuspensionRepository userSuspensionRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public UserReportResponseDTO createReport(UserReportDTO userReportDTO) {
         // Fetch the reporter and reported user from UserRepository
@@ -117,6 +119,18 @@ public class UserReportService {
             suspension.setReason(userReport.getReason()); // Reason from the report
             userSuspensionRepository.save(suspension);
         }
+
+        messagingTemplate.convertAndSendToUser(
+                String.valueOf(suspension.getUser().getId()),
+                "/suspensions",
+                new UserSuspensionDTO(
+                        suspension.getId(),
+                        suspension.getUser().getId(),
+                        suspension.getStartTime(),
+                        suspension.getEndTime(),
+                        suspension.getReason()
+                )
+        );
 
         // Map the UserSuspension entity to UserSuspensionDTO
         return new UserSuspensionDTO(

@@ -203,7 +203,7 @@ public class EventService {
     }
 
     private UserOverviewDTO convertToUserDTO(User user){
-        UserOverviewDTO userOverviewDTO = new UserOverviewDTO(user.getId(), user.getUsername(), user.getName(), user.getSurname(), "");
+        UserOverviewDTO userOverviewDTO = new UserOverviewDTO(user.getId(), user.getUsername(), user.getName(), user.getSurname(), "",user.getRole());
         return userOverviewDTO;
     }
 
