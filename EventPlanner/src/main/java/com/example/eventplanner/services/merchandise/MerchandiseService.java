@@ -245,8 +245,13 @@ public class MerchandiseService {
     }
 
 
-    public List<MerchandiseOverviewDTO> getMerchandiseByCategory(int categoryId) {
-        List<Merchandise> filteredMerchandise = merchandiseRepository.findMerchandiseByCategory(categoryId);
+    public List<MerchandiseOverviewDTO> getMerchandiseByCategory(int categoryId, double maxPrice) {
+        List<Merchandise> merchandises = merchandiseRepository.findMerchandiseByCategory(categoryId);
+        List<Merchandise> filteredMerchandise = merchandises.stream()
+                .filter(merchandise ->
+                        (merchandise.getPrice() - (merchandise.getPrice()*merchandise.getDiscount())/100) < maxPrice &&
+                         merchandise.isAvailable() && !merchandise.isDeleted() && merchandise.isVisible())
+                .toList();
         return filteredMerchandise.stream().map(this::convertToOverviewDTO).toList();
     }
 }
