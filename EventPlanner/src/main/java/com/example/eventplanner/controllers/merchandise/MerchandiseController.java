@@ -31,8 +31,9 @@ public class MerchandiseController {
     }
 
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<MerchandiseOverviewDTO>> getMerchandiseByCategory(@PathVariable (name = "categoryId") int categoryId) {
-        return ResponseEntity.ok(merchandiseService.getMerchandiseByCategory(categoryId));
+    public ResponseEntity<List<MerchandiseOverviewDTO>> getMerchandiseByCategory(@PathVariable (name = "categoryId") int categoryId,
+                                                                                 @RequestParam double maxPrice) {
+        return ResponseEntity.ok(merchandiseService.getMerchandiseByCategory(categoryId, maxPrice));
     }
 
     @GetMapping("/categories")
