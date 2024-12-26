@@ -334,6 +334,32 @@ public class ProductService {
         return mapToCreateProductResponseDTO(savedProduct, serviceProviderDTO, savedProduct.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
     }
 
+    public Boolean availProduct(int id){
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        if(product.isAvailable()){
+            product.setAvailable(false);
+        }
+        else{
+            product.setAvailable(true);
+        }
+        return productRepository.save(product) != null;
+    }
+
+    public Boolean showProduct(int id){
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        if(product.isVisible()){
+            product.setVisible(false);
+        }
+        else{
+            product.setVisible(true);
+        }
+        return productRepository.save(product) != null;
+    }
+
     public CreateProductResponseDTO updateProduct(int productId, UpdateProductRequestDTO updateProductRequestDTO) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));

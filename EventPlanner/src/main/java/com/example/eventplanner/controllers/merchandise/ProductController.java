@@ -79,6 +79,16 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProduct(id, request));
     }
 
+    @PutMapping("/avail/{id}")
+    public ResponseEntity<Boolean> avail(@PathVariable int id) {
+        return ResponseEntity.ok(productService.availProduct(id));
+    }
+
+    @PutMapping("/show/{id}")
+    public ResponseEntity<Boolean> show(@PathVariable int id) {
+        return ResponseEntity.ok(productService.showProduct(id));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable int id) {
         return ResponseEntity.ok(productService.deleteProduct(id));
