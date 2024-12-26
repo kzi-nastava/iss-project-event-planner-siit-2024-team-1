@@ -20,11 +20,48 @@ INSERT INTO event_type (title, description, is_active) VALUES
                                                            ('Networking Event', 'Professional networking opportunities', true),
                                                            ('Educational Seminar', 'Knowledge sharing and learning', true),
                                                            ( 'Social Gathering', 'Community and social events', true);
+-- First, ensure we have a category
+INSERT INTO category (title,description,pending) VALUES ('Entertainment','Entertainment description',false),
+                                                        ('Funerality','Entertainment description',false),
+                                                        ('Suicidabiliyu','Entertainment description',false),
+                                                        ('Protest','Entertainment description',false);
+
+INSERT INTO eventtype_category(category_id,eventtype_id) VALUES
+                                                             (1,1),
+                                                             (2,2),
+                                                             (3,2),
+                                                             (1,2),
+                                                             (4,2);
+
+INSERT INTO budget_item(id,amount_spent, category_id, max_amount) VALUES
+                                                                      (100,0,1,5000),
+                                                                      (200,0,2,1200),
+                                                                      (300,0,3,650);
+
+INSERT INTO budget(budget_id) VALUES
+                                  (100),
+                                  (200),
+                                  (300),
+                                  (400),
+                                  (500),
+                                  (600),
+                                  (700),
+                                  (800),
+                                  (900),
+                                  (1000),
+                                  (1100),
+                                  (1200);
+
+INSERT INTO budget_budget_items(budget_budget_id, budget_item_id) VALUES
+                                                                      (400,100),
+                                                                      (400,200),
+                                                                      (200,300);
 --
 -- -- No separate address table needed since it's an @Embeddable
 --
 -- Insert Events with embedded addresses
 INSERT INTO event (
+    budget_id,
     title,
     description,
     max_participants,
@@ -40,6 +77,7 @@ INSERT INTO event (
     organizer_id
 ) VALUES
       (
+          100,
           'Tech Innovation Summit 2024',
           'Annual conference exploring cutting-edge technologies',
           500,
@@ -54,6 +92,7 @@ INSERT INTO event (
           37.7749, 1
       ),
       (
+          200,
           'Digital Marketing Workshop',
           'Hands-on training for modern marketing strategies',
           100,
@@ -68,6 +107,7 @@ INSERT INTO event (
           40.7128, 1
       ),
       (
+          300,
           'Startup Networking Night',
           'Connect with entrepreneurs and investors',
           200,
@@ -81,131 +121,131 @@ INSERT INTO event (
           -87.6298,
           41.8781, 1
       ),
-      (
-          'AI & Machine Learning Forum',
-          'Deep dive into artificial intelligence advances',
-          300,
-          true,
-          '2024-12-18 10:00:00',
-          50000.00,
-          1,
-          'Technology Drive',
-          'Chicago',
-          555,
-          -97.7431,
-          30.2672, 1
+      (400,
+       'AI & Machine Learning Forum',
+       'Deep dive into artificial intelligence advances',
+       300,
+       true,
+       '2025-12-18 10:00:00',
+       50000.00,
+       1,
+       'Technology Drive',
+       'Chicago',
+       555,
+       -97.7431,
+       30.2672, 1
       ),
-      (
-          'Leadership Development Seminar',
-          'Building effective leadership skills',
-          150,
-          true,
-          '2024-08-20 09:30:00',
-          30000.00,
-          4,
-          'Corporate Boulevard',
-          'Chicago',
-          777,
-          -71.0589,
-          42.3601, 1
+      (500,
+       'Leadership Development Seminar',
+       'Building effective leadership skills',
+       150,
+       true,
+       '2024-08-20 09:30:00',
+       30000.00,
+       4,
+       'Corporate Boulevard',
+       'Chicago',
+       777,
+       -71.0589,
+       42.3601, 1
       ),
-      (
-          'Cloud Computing Workshop',
-          'Hands-on cloud infrastructure training',
-          80,
-          true,
-          '2024-10-05 14:00:00',
-          20000.00,
-          2,
-          'Innovation Way',
-          'Chicago',
-          234,
-          -122.3321,
-          47.6062, 1
+      (600,
+       'Cloud Computing Workshop',
+       'Hands-on cloud infrastructure training',
+       80,
+       true,
+       '2024-10-05 14:00:00',
+       20000.00,
+       2,
+       'Innovation Way',
+       'Chicago',
+       234,
+       -122.3321,
+       47.6062, 1
       ),
-      (
-          'Entrepreneur Meetup',
-          'Casual networking for business owners',
-          120,
-          true,
-          '2024-09-28 17:30:00',
-          10000.00,
-          3,
-          'Startup Street',
-          'Chicago',
-          445,
-          -80.1918,
-          25.7617, 1
+      (700,
+       'Entrepreneur Meetup',
+       'Casual networking for business owners',
+       120,
+       true,
+       '2024-09-28 17:30:00',
+       10000.00,
+       3,
+       'Startup Street',
+       'Chicago',
+       445,
+       -80.1918,
+       25.7617, 1
       ),
-      (
-          'Community Tech Fair',
-          'Local technology showcase and demos',
-          400,
-          true,
-          '2024-08-30 11:00:00',
-          35000.00,
-          5,
-          'Exhibition Drive',
-          'Denver',
-          567,
-          -104.9903,
-          39.7392, 1
+      (800,
+       'Community Tech Fair',
+       'Local technology showcase and demos',
+       400,
+       true,
+       '2024-08-30 11:00:00',
+       35000.00,
+       5,
+       'Exhibition Drive',
+       'Denver',
+       567,
+       -104.9903,
+       39.7392, 1
       ),
-      (
-          'Agile Project Management',
-          'Modern project management methodologies',
-          100,
-          true,
-          '2024-12-05 10:00:00',
-          25000.00,
-          2,
-          'Management Road',
-          'Portland',
-          333,
-          -122.6784,
-          45.5155, 54
+      (900,
+       'Agile Project Management',
+       'Modern project management methodologies',
+       100,
+       true,
+       '2024-12-05 10:00:00',
+       25000.00,
+       2,
+       'Management Road',
+       'Portland',
+       333,
+       -122.6784,
+       45.5155, 54
       ),
-      (
-          'Tech Startup Pitch Night',
-          'Pitch competition for new startups',
-          150,
-          true,
-          '2024-12-18 18:00:00',
-          20000.00,
-          3,
-          'Venture Avenue',
-          'Los Angeles',
-          678,
-          -118.2437,
-          34.0522, 54
+      (1000,
+       'Tech Startup Pitch Night',
+       'Pitch competition for new startups',
+       150,
+       true,
+       '2024-12-18 18:00:00',
+       20000.00,
+       3,
+       'Venture Avenue',
+       'Los Angeles',
+       678,
+       -118.2437,
+       34.0522, 54
       ),
-      (
-          'Cybersecurity Conference',
-          'Latest in digital security and protection',
-          200,
-          true,
-          '2024-11-25 09:00:00',
-          40000.00,
-          1,
-          'Security Street',
-          'Washington DC',
-          901,
-          -77.0369,
-          38.9072, 54
+      (1100,
+       'Cybersecurity Conference',
+       'Latest in digital security and protection',
+       200,
+       true,
+       '2024-11-25 09:00:00',
+       40000.00,
+       1,
+       'Security Street',
+       'Washington DC',
+       901,
+       -77.0369,
+       38.9072, 54
       ),
-      (
-          'Digital Transformation Forum',
-          'Business modernization strategies',
-          180,
-          true,
-          '2024-09-08 13:00:00',
-          35000.00,
-          4,
-          'Enterprise Road',
-          'Houston',
-          432,
-          -95.3698,
-          29.7604, 54
+      (1200,
+       'Digital Transformation Forum',
+       'Business modernization strategies',
+       180,
+       true,
+       '2024-09-08 13:00:00',
+       35000.00,
+       4,
+       'Enterprise Road',
+       'Houston',
+       432,
+       -95.3698,
+       29.7604, 54
       );
 
 insert into user_organizing_events(event_organizer_id,organizing_events_id) values
@@ -221,13 +261,6 @@ insert into user_organizing_events(event_organizer_id,organizing_events_id) valu
                                                                                 (54,10),
                                                                                 (54,11),
                                                                                 (54,12);
-
-
--- First, ensure we have a category
-INSERT INTO category (title,description,pending) VALUES ('Entertainment','Entertainment description',false),
-                                                        ('Funerality','Entertainment description',false),
-                                                        ('Suicidabiliyu','Entertainment description',false),
-                                                        ('Protest','Entertainment description',false);
 
 
 INSERT INTO merchandise (
@@ -1997,3 +2030,4 @@ VALUES (23, 1),
        (23, 5),
        (24, 6),
        (24, 7);
+ALTER SEQUENCE time_slots_id_seq RESTART WITH 8;
