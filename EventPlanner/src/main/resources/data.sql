@@ -1227,9 +1227,9 @@ INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_i
 
 -- Reviews for "Event Photography"
 INSERT INTO review (id, comment, rating, status, deleted, created_at, reviewer_id) VALUES
-                                                                                       (57, 'The photos came out beautifully, capturing every special moment.', 5, 'PENDING', false, '2023-05-01 10:30:00', 1),
-                                                                                       (58, 'Professional service, but delivery was delayed.', 4, 'PENDING', false, '2023-05-02 11:30:00', 2),
-                                                                                       (59, 'Attention to detail was stunning. Would hire again.', 5, 'PENDING', false, '2023-05-03 12:30:00', 1),
+                                                                                       (57, 'The photos came out beautifully, capturing every special moment.', 5, 'APPROVED', false, '2023-05-01 10:30:00', 1),
+                                                                                       (58, 'Professional service, but delivery was delayed.', 4, 'APPROVED', false, '2023-05-02 11:30:00', 2),
+                                                                                       (59, 'Attention to detail was stunning. Would hire again.', 5, 'APPROVED', false, '2023-05-03 12:30:00', 1),
                                                                                        (60, 'Good quality but a bit pricey.', 4, 'PENDING', false, '2023-05-04 13:30:00', 2);
 
 -- Link Reviews to Merchandise

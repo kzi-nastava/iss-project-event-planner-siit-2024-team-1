@@ -1,17 +1,23 @@
 package com.example.eventplanner.services.review;
 
+import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
+import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewOverviewDTO;
 import com.example.eventplanner.model.merchandise.*;
 import com.example.eventplanner.model.event.Event;
 
+import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
 import com.example.eventplanner.repositories.review.ReviewRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
+import com.example.eventplanner.repositories.user.UserRepository;
 import com.example.eventplanner.services.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +29,8 @@ public class ReviewService {
     private final MerchandiseRepository merchandiseRepository;
     private final NotificationService notificationService;
     private final ServiceProviderRepository serviceProviderRepository;
+    private final UserRepository userRepository;
+
     public List<ReviewOverviewDTO> getAllPendingReviews() {
         // Fetch all pending reviews
         List<Review> pendingReviews = reviewRepository.findByStatusAndDeletedFalse(ReviewStatus.PENDING);
@@ -95,5 +103,43 @@ public class ReviewService {
         if(reviewOverviewDTO.getStatus()==ReviewStatus.APPROVED)
             notificationService.notifyOfNewReview(reviewedUserId, reviewOverviewDTO);
         return reviewOverviewDTO;
+    }
+
+    public ReviewMerchandiseResponseDTO leaveMerchandiseReview(int id, ReviewMerchandiseRequestDTO request) {
+        User reviewer = userRepository.findById(request.getReviewerId()).orElseThrow(() -> new RuntimeException("User not found"));
+        Review review = new Review();
+
+        review.setRating(request.getRating());
+        review.setComment(request.getComment());
+        review.setReviewer(reviewer);
+        review.setStatus(ReviewStatus.PENDING);
+        review.setDeleted(false);
+        review.setCreatedAt(LocalDateTime.now());
+        Review savedReview = reviewRepository.save(review);
+
+        if(request.getType().equals("merchandise")) {
+            Merchandise reviewedMerchandise = merchandiseRepository.findById(id).orElseThrow(() -> new RuntimeException("Merchandise not found"));
+            reviewedMerchandise.getReviews().add(review);
+            merchandiseRepository.save(reviewedMerchandise);
+        }else if(request.getType().equals("event")) {
+            Event reviewedEvent = eventRepository.findById(id).orElseThrow(() -> new RuntimeException("Event not found"));
+            reviewedEvent.getReviews().add(review);
+            eventRepository.save(reviewedEvent);
+        }else {
+            throw new RuntimeException("Unsupported type");
+        }
+
+        return mapToReviewResponseDTO(savedReview);
+    }
+
+    public ReviewMerchandiseResponseDTO mapToReviewResponseDTO(Review review) {
+        ReviewMerchandiseResponseDTO responseDTO = new ReviewMerchandiseResponseDTO();
+        responseDTO.setId(review.getId());
+        responseDTO.setComment(review.getComment());
+        responseDTO.setRating(review.getRating());
+        responseDTO.setReviewerId(review.getReviewer().getId());
+        responseDTO.setStatus(review.getStatus());
+
+        return responseDTO;
     }
 }

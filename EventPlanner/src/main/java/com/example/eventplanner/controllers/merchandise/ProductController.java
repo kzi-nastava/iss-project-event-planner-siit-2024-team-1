@@ -104,8 +104,4 @@ public class ProductController {
         return ResponseEntity.ok(Map.of("message", "Product bought"));
     }
 
-    @PostMapping("/{id}/review")
-    public ResponseEntity<ReviewMerchandiseResponseDTO> addReview(@RequestBody ReviewMerchandiseRequestDTO request, @PathVariable int id) {
-        return ResponseEntity.ok(new ReviewMerchandiseResponseDTO());
-    }
 }

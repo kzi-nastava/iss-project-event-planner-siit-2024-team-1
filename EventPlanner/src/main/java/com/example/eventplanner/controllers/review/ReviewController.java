@@ -1,5 +1,7 @@
 package com.example.eventplanner.controllers.review;
 
+import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
+import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewOverviewDTO;
 import com.example.eventplanner.dto.review.ReviewDTO;
 import com.example.eventplanner.dto.review.ReviewUpdateResponseDTO;
@@ -34,4 +36,10 @@ public class ReviewController {
         return ResponseEntity.ok(pendingReviews);
     }
 
+    @PostMapping("/{id}/add")
+    public ResponseEntity<ReviewMerchandiseResponseDTO> leaveMerchandiseReview(@PathVariable int id,
+                                                                               @RequestBody ReviewMerchandiseRequestDTO request) {
+        ReviewMerchandiseResponseDTO responseDTO = reviewService.leaveMerchandiseReview(id, request);
+        return ResponseEntity.ok(new ReviewMerchandiseResponseDTO());
+    }
 }
