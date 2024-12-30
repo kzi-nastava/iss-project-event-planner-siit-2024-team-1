@@ -105,11 +105,6 @@ public class ServiceController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/review")
-    public ResponseEntity<ReviewMerchandiseResponseDTO> addReview(@RequestBody ReviewMerchandiseRequestDTO request, @PathVariable int id) {
-        return ResponseEntity.ok(new ReviewMerchandiseResponseDTO());
-    }
-
     @GetMapping("/search")
     public ResponseEntity<Page<MerchandiseOverviewDTO>> filterServices(
             @RequestParam int userId,

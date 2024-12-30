@@ -15,6 +15,7 @@ import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.MerchandisePhoto;
 import com.example.eventplanner.model.merchandise.Review;
+import com.example.eventplanner.model.merchandise.ReviewStatus;
 import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.repositories.category.CategoryRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
@@ -170,7 +171,10 @@ public class MerchandiseService {
         merchandiseDetails.setReservationDeadline(merchandise.getReservationDeadline());
         merchandiseDetails.setCancellationDeadline(merchandise.getCancellationDeadline());
         merchandiseDetails.setMerchandisePhotos(merchandise.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
-        merchandiseDetails.setReviews(merchandise.getReviews().stream().map(this::mapToMerchandiseReviewDTO).toList());
+
+        List<Review> approvedReviews = merchandise.getReviews().stream().filter(review -> review.getStatus() == ReviewStatus.APPROVED).toList();
+        merchandiseDetails.setReviews(approvedReviews.stream().map(this::mapToMerchandiseReviewDTO).toList());
+
         merchandiseDetails.setType(merchandise.getClass().getSimpleName());
 
         AddressDTO addressDTO = new AddressDTO();
