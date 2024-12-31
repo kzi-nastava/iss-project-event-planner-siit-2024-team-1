@@ -7,6 +7,6 @@ public class PriceListItemResponseDTO {
     private int merchandiseId;
     private String title;
     private double price;
-    private double discount;
+    private int discount;
     private double discountedPrice;
 }
