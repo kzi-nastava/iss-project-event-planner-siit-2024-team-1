@@ -29,6 +29,14 @@ public class EventPlannerExceptionHandler {
         return new ResponseEntity<>(new ErrorResponseDto(ex.getMessage(), ex.getErrorType().name()), status);
     }
 
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<ErrorResponseDto> handleTokenExpiredException(TokenExpiredException ex) {
+        return new ResponseEntity<>(
+                new ErrorResponseDto(ex.getMessage(), "TOKEN_EXPIRED"),
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+
     @ExceptionHandler(BlockedMerchandiseException.class)
     public ResponseEntity<ErrorResponseDto> handleBlockedMerchandise(BlockedMerchandiseException ex) {
 

@@ -2,9 +2,11 @@ package com.example.eventplanner.controllers.auth;
 
 import com.example.eventplanner.dto.event.InviteResponseDTO;
 import com.example.eventplanner.dto.user.auth.*;
+import com.example.eventplanner.exceptions.TokenExpiredException;
 import com.example.eventplanner.model.auth.AuthenticationResponse;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.services.AuthenticationService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -76,7 +80,7 @@ public class    AuthenticationController {
     }
 
     @PostMapping("/refresh_token")
-    public ResponseEntity refreshToken(
+    public ResponseEntity<AuthenticationResponse> refreshToken(
             HttpServletRequest request,
             HttpServletResponse response
     ) {

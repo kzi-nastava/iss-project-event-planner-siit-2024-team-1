@@ -1,6 +1,7 @@
 package com.example.eventplanner.services;
 
 import com.example.eventplanner.dto.event.InviteResponseDTO;
+import com.example.eventplanner.exceptions.TokenExpiredException;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.auth.TokenRepository;
@@ -9,6 +10,7 @@ import com.example.eventplanner.repositories.user.UserRepository;
 import com.example.eventplanner.services.email.EmailService;
 import com.example.eventplanner.services.event.EventService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -69,12 +71,16 @@ public class JwtService {
     public boolean isValidRefreshToken(String token, User user) {
         String username = extractUsername(token);
 
-        boolean validRefreshToken = tokenRepository
-                .findByRefreshToken(token)
-                .map(t -> !t.isLoggedOut())
-                .orElse(false);
+        try{
+            boolean validRefreshToken = tokenRepository
+                    .findByRefreshToken(token)
+                    .map(t -> !t.isLoggedOut())
+                    .orElse(false);
 
-        return (username.equals(user.getUsername())) && !isTokenExpired(token) && validRefreshToken;
+            return (username.equals(user.getUsername())) && !isTokenExpired(token) && validRefreshToken;
+        }catch (ExpiredJwtException e){
+            throw new TokenExpiredException("Token expired");
+        }
     }
 
     private boolean isTokenExpired(String token) {
