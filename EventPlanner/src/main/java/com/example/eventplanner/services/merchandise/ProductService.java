@@ -211,7 +211,7 @@ public class ProductService {
 
         // Map the merchandise of the service provider to ProductOverviewDTO
         return serviceProvider.getMerchandise().stream()
-                .filter(merchandise -> merchandise instanceof Product && !merchandise.isDeleted()) 
+                .filter(merchandise -> merchandise instanceof Product && !merchandise.isDeleted() && merchandise.getState() == MerchandiseState.APPROVED)
                 .map(this::mapToProductOverviewDTO)
                 .toList();
     }

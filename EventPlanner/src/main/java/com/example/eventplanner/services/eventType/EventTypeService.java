@@ -29,6 +29,11 @@ public class EventTypeService {
                 .map(this::convertToOverviewDTO).toList();
     }
 
+    public List<EventTypeOverviewDTO> getAllActive() {
+        return eventTypeRepository.findAll().stream().filter(eventType -> eventType.isActive())
+                .map(this::convertToOverviewDTO).toList();
+    }
+
     public Page<EventTypeOverviewDTO> getAll(Pageable pageable) {
         return eventTypeRepository.findAll(pageable)
                 .map(this::convertToOverviewDTO);

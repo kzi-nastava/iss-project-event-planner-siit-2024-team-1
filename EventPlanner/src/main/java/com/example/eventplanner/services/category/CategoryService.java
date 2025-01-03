@@ -4,8 +4,11 @@ import com.example.eventplanner.dto.category.CategoryOverviewDTO;
 import com.example.eventplanner.dto.category.CategoryRequestDTO;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.merchandise.Merchandise;
+import com.example.eventplanner.model.merchandise.MerchandiseState;
+import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.repositories.category.CategoryRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
+import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.services.merchandise.MerchandiseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final MerchandiseService merchandiseService;
     private final MerchandiseRepository merchandiseRepository;
+    private final ServiceProviderRepository serviceProviderRepository;
 
     public List<CategoryOverviewDTO> getAllApprovedCategories() {
         List<Category> allCategories = categoryRepository.findAllApprovedCategories();
@@ -44,13 +48,24 @@ public class CategoryService {
         category.setDescription(request.getDescription());
         category.setPending(request.isPending());
         categoryRepository.save(category);
-        return getAllApprovedCategories();
+        return categoryRepository.findAll().stream().map(this::mapToCategoryOverviewDTO).toList();
     }
 
     public List<CategoryOverviewDTO> approveCategory(int categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new IllegalArgumentException("Category with id: " + categoryId + " not found"));
         category.setPending(false);
+
+        List<Merchandise> merchandise = merchandiseRepository.findMerchandiseByCategory(categoryId);
+        if(!merchandise.isEmpty()) {
+            for(Merchandise merc : merchandise){
+                if(merc.getState() == MerchandiseState.PENDING) {
+                    merc.setState(MerchandiseState.APPROVED);
+                    merchandiseRepository.save(merc);
+                }
+            }
+        }
+
         categoryRepository.save(category);
         return getAllApprovedCategories();
     }
@@ -61,6 +76,17 @@ public class CategoryService {
         category.setTitle(request.getTitle());
         category.setDescription(request.getDescription());
         category.setPending(false);
+
+        List<Merchandise> merchandise = merchandiseRepository.findMerchandiseByCategory(categoryId);
+        if(!merchandise.isEmpty()) {
+            for(Merchandise merc : merchandise){
+                if(merc.getState() == MerchandiseState.PENDING) {
+                    merc.setState(MerchandiseState.APPROVED);
+                    merchandiseRepository.save(merc);
+                }
+            }
+        }
+
         categoryRepository.save(category);
         return getAllApprovedCategories();
     }
@@ -75,7 +101,14 @@ public class CategoryService {
             if(merchandise.isEmpty()) {
                 categoryRepository.deleteById(categoryId);
             }else {
-                throw new Exception("Cannot delete category, it is connected with merchandise");
+                for(Merchandise merc : merchandise){
+                    if(merc.getState() == MerchandiseState.PENDING) {
+                        ServiceProvider sp = serviceProviderRepository.findByMerchandiseId(merc.getId()).get();
+                        sp.getMerchandise().remove(merc);
+                        serviceProviderRepository.save(sp);
+                        merchandiseRepository.deleteById(merc.getId());
+                    }
+                }
             }
 
         return getAllApprovedCategories();
