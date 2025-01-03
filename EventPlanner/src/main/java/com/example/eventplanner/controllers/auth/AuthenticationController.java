@@ -61,6 +61,13 @@ public class    AuthenticationController {
         return ResponseEntity.ok(authService.fastRegister(email));
     }
 
+    @PutMapping("/deactivate/{id}")
+    public ResponseEntity<Boolean> deactivate(
+            @PathVariable int id
+    ) {
+        return ResponseEntity.ok(authService.deactivate(id));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(
             @RequestBody LoginRequestDTO request
