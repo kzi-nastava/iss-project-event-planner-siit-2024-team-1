@@ -15,6 +15,7 @@ import com.example.eventplanner.model.user.*;
 import com.example.eventplanner.repositories.auth.TokenRepository;
 import com.example.eventplanner.repositories.user.*;
 import com.example.eventplanner.services.email.EmailService;
+import com.example.eventplanner.services.merchandise.ServiceService;
 import com.example.eventplanner.services.user.UserService;
 import com.example.eventplanner.services.userreport.UserReportService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,6 +51,9 @@ public class AuthenticationService {
     private final UserReportService userReportService;
     private final BusinessPhotoRepository businessPhotoRepository;
     private final AuthenticatedUserRepository authenticatedUserRepository;
+    private final EventOrganizerRepository eventOrganizerRepository;
+    private final ServiceProviderRepository serviceProviderRepository;
+    private final ServiceService serviceService;
 
 //    public RegisterAuUserResponseRequestDTO registerAu(RegisterAuUserRequestDTO request) {
 //
@@ -149,6 +153,30 @@ public class AuthenticationService {
         repository.save(user);
 
         return "Account verified successfully!";
+    }
+
+    public Boolean deactivate(int id){
+        User user = repository.findById(id).orElseThrow();
+
+        if(user.getRole() == Role.EO){
+            EventOrganizer eventOrganizer = eventOrganizerRepository.findById(id).orElseThrow();
+
+            if(eventOrganizer.getOrganizingEvents().isEmpty()){
+                user.setActive(false);
+                userRepository.save(user);
+                return true;
+            }
+            return false;
+        }else if(user.getRole() == Role.SP){
+            ServiceProvider serviceProvider = serviceProviderRepository.findById(id).orElseThrow();
+            if(serviceService.getTimeslotsCalendar(serviceProvider.getId()).isEmpty()){
+                user.setActive(false);
+                userRepository.save(user);
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
 
     public Address mapToAddress(AddressDTO dto){
@@ -270,6 +298,14 @@ public class AuthenticationService {
 
                     "User is suspended until\n" + formattedDate + "\nReason: " + suspensionDTO.getReason(),
                     UserAuthenticationException.ErrorType.USER_SUSPENDED
+            );
+        }
+
+        if(!user.isActive()){
+            throw new UserAuthenticationException(
+
+                    "Your account is not active\n",
+                    UserAuthenticationException.ErrorType.USER_NOT_FOUND
             );
         }
 
