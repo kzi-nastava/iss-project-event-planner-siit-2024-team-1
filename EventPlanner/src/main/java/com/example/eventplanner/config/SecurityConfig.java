@@ -35,18 +35,16 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.logoutHandler = logoutHandler;
     }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        req->req//.requestMatchers("/login/**","/register-eo/**", "/refresh_token/**")
-                                //.permitAll()
-                                //.requestMatchers("/admin_only/**").hasAuthority("ADMIN")
-                                .anyRequest().permitAll()
-                                //.authenticated()
+                        req->req.requestMatchers("/api/v1/auth/login")
+                                .permitAll()
+                                .anyRequest()
+                                .authenticated()
                 ).userDetailsService(userDetailsServiceImp)
                 .sessionManagement(session->session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -64,6 +62,34 @@ public class SecurityConfig {
                 .build();
 
     }
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//
+//        return http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .authorizeHttpRequests(
+//                        req->req//.requestMatchers("/login/**","/register-eo/**", "/refresh_token/**")
+//                                //.permitAll()
+//                                //.requestMatchers("/admin_only/**").hasAuthority("ADMIN")
+//                                .anyRequest().permitAll()
+//                                //.authenticated()
+//                ).userDetailsService(userDetailsServiceImp)
+//                .sessionManagement(session->session
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+//                .exceptionHandling(
+//                        e->e.accessDeniedHandler(
+//                                        (request, response, accessDeniedException)->response.setStatus(403)
+//                                )
+//                                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+//                .logout(l->l
+//                        .logoutUrl("/logout")
+//                        .addLogoutHandler(logoutHandler)
+//                        .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()
+//                        ))
+//                .build();
+//
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
