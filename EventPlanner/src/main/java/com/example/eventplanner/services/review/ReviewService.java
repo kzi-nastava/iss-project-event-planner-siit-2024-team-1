@@ -3,6 +3,7 @@ package com.example.eventplanner.services.review;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewOverviewDTO;
+import com.example.eventplanner.model.common.Review;
 import com.example.eventplanner.model.merchandise.*;
 import com.example.eventplanner.model.event.Event;
 
@@ -17,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,26 +68,29 @@ public class ReviewService {
     private ReviewOverviewDTO mapToReviewOverviewDTO(Review review) {
         String reviewedType = null; // Determine if review is for Event, Product, or Service
         String reviewedTitle = null;
+        int reviewedEntityId;
 
         // Check if the review is associated with an Event
         Event event = eventRepository.findByReviewsContaining(review);
         int reviewedUserId;
         if (event != null) {
-            reviewedType = "Event";
+            reviewedType = "EVENT";
             reviewedTitle = event.getTitle();
             reviewedUserId=event.getOrganizer().getId();
+            reviewedEntityId=event.getId();
         } else {
             // If not an Event, check for Merchandise (Product/Service)
             Merchandise merchandise = merchandiseRepository.findByReviewsContaining(review);
             reviewedUserId=serviceProviderRepository.findByMerchandiseId(merchandise.getId()).get().getId();
             if (merchandise instanceof Product) {
-                reviewedType = "Product";
+                reviewedType = "PRODUCT";
             } else if (merchandise instanceof com.example.eventplanner.model.merchandise.Service) {
-                reviewedType = "Service";
+                reviewedType = "SERVICE";
             }
             if (merchandise != null) {
                 reviewedTitle = merchandise.getTitle();
             }
+            reviewedEntityId=merchandise.getId();
         }
         ReviewOverviewDTO reviewOverviewDTO=new ReviewOverviewDTO(
                 review.getId(),
@@ -101,7 +104,7 @@ public class ReviewService {
         );
         // Map to ReviewOverviewDTO
         if(reviewOverviewDTO.getStatus()==ReviewStatus.APPROVED)
-            notificationService.notifyOfNewReview(reviewedUserId, reviewOverviewDTO);
+            notificationService.notifyOfNewReview(reviewedUserId, reviewOverviewDTO,reviewedEntityId);
         return reviewOverviewDTO;
     }
 

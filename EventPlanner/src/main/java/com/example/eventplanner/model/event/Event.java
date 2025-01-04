@@ -1,18 +1,16 @@
 package com.example.eventplanner.model.event;
 import com.example.eventplanner.model.merchandise.Merchandise;
-import com.example.eventplanner.model.merchandise.Review;
+import com.example.eventplanner.model.common.Review;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.user.EventOrganizer;
-import com.example.eventplanner.model.user.Notification;
+import com.example.eventplanner.model.common.Notification;
 import com.example.eventplanner.model.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 @Entity
 @Data
@@ -30,11 +28,6 @@ public class Event {
     private LocalDateTime date;
     private double maxBudget;
 
-    @OneToMany
-    @JoinTable(
-            inverseJoinColumns = @JoinColumn(name = "notification_id")
-    )
-    private List<Notification> notifications;
 
     @Embedded
     private Address address;

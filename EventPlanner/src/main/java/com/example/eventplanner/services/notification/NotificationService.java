@@ -2,9 +2,9 @@ package com.example.eventplanner.services.notification;
 
 import com.example.eventplanner.dto.merchandise.review.ReviewOverviewDTO;
 import com.example.eventplanner.dto.notification.NotificationDTO;
+import com.example.eventplanner.model.common.NotificationType;
 import com.example.eventplanner.model.event.Event;
-import com.example.eventplanner.model.merchandise.Review;
-import com.example.eventplanner.model.user.Notification;
+import com.example.eventplanner.model.common.Notification;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.notification.NotificationRepository;
@@ -29,11 +29,13 @@ public class NotificationService {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
-    public void sendNotificationToUser(User user, String content) {
+    public void sendNotificationToUser(User user, String content, NotificationType type,int entityId) {
         Notification notification = new Notification();
         notification.setContent(content);
         notification.setRead(false);
         notification.setDate(LocalDateTime.now());
+        notification.setType(type);
+        notification.setEntityId(entityId);
 
         // Save notification first
         notification = notificationRepository.save(notification);
@@ -76,6 +78,8 @@ public class NotificationService {
         dto.setContent(notification.getContent());
         dto.setRead(notification.isRead());
         dto.setDate(notification.getDate());
+        dto.setType(notification.getType());
+        dto.setEntityId(notification.getEntityId());
         return dto;
     }
 
@@ -86,18 +90,20 @@ public class NotificationService {
 
         List<User> affectedUsers = userRepository.findByFollowedEvents_Id(eventId);
         for (User user : affectedUsers) {
-            sendNotificationToUser(user, "Event: " + event.getTitle() + " has been updated");
+            sendNotificationToUser(user, "Event: " + event.getTitle() + " has been updated", NotificationType.EVENT,eventId);
         }
     }
 
     @Transactional
-    public void notifyOfNewReview(int userId, ReviewOverviewDTO review) {
+    public void notifyOfNewReview(int userId, ReviewOverviewDTO review,int reviewedEntityId) {
         Optional<User> user = userRepository.findById(userId);
         if(user.isEmpty())throw new RuntimeException("User not found");
+        String type=review.getReviewedType();
+        NotificationType notificationType=NotificationType.valueOf(type);
         sendNotificationToUser(user.get(), "User: " + review.getReviewerUsername() + "\n has reviewed: "+
                 review.getReviewedTitle()+"\n"+
                 "Rating: "+review.getRating()+"/5\n"+
-                "Comment: "+review.getComment());
+                "Comment: "+review.getComment(),notificationType,reviewedEntityId);
     }
 
     public NotificationDTO MarkAsRead(int notificationId) {

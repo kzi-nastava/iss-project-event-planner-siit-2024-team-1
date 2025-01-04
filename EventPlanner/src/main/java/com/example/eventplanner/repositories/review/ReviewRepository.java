@@ -1,6 +1,6 @@
 package com.example.eventplanner.repositories.review;
 
-import com.example.eventplanner.model.merchandise.Review;
+import com.example.eventplanner.model.common.Review;
 import com.example.eventplanner.model.merchandise.ReviewStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 

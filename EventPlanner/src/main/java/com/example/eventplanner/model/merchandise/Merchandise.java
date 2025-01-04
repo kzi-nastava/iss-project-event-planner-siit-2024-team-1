@@ -1,5 +1,6 @@
 package com.example.eventplanner.model.merchandise;
 
+import com.example.eventplanner.model.common.Review;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
@@ -8,7 +9,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Formula;
 
 import java.util.List;
 

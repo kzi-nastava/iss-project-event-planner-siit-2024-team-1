@@ -1244,7 +1244,7 @@ INSERT INTO merchandise_reviews (merchandise_id, review_id) VALUES
 (2, 57),
 (2, 58),
 (2, 59),
-(2, 60);
+(6, 60);
 
 -- -- INSERT INTO merchandise (
 -- --     merchandise_type,

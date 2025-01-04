@@ -1,6 +1,5 @@
-package com.example.eventplanner.model.user;
+package com.example.eventplanner.model.common;
 
-import com.example.eventplanner.model.event.Event;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,4 +19,6 @@ public class Notification {
     private String content;
     private boolean read;
     private LocalDateTime date;
+    private NotificationType type;
+    private int entityId;//id of entity which notification notifies about
 }

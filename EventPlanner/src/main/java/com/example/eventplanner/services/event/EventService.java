@@ -17,7 +17,7 @@ import com.example.eventplanner.model.merchandise.Product;
 
 import com.example.eventplanner.model.user.AuthenticatedUser;
 
-import com.example.eventplanner.model.merchandise.Review;
+import com.example.eventplanner.model.common.Review;
 import com.example.eventplanner.model.merchandise.ReviewStatus;
 
 import com.example.eventplanner.model.user.EventOrganizer;
@@ -33,7 +33,6 @@ import com.example.eventplanner.repositories.user.UserRepository;
 import com.example.eventplanner.services.notification.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.domain.Page;
@@ -48,8 +47,6 @@ import org.springframework.util.StringUtils;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

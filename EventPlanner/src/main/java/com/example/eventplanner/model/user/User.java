@@ -1,6 +1,7 @@
 package com.example.eventplanner.model.user;
 import com.example.eventplanner.model.auth.Role;
 import com.example.eventplanner.model.common.Address;
+import com.example.eventplanner.model.common.Notification;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import jakarta.persistence.*;
@@ -10,7 +11,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) // All subclasses stored in one table
