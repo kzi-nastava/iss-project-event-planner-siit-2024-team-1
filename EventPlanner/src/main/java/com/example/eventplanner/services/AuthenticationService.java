@@ -18,6 +18,7 @@ import com.example.eventplanner.services.email.EmailService;
 import com.example.eventplanner.services.merchandise.ServiceService;
 import com.example.eventplanner.services.user.UserService;
 import com.example.eventplanner.services.userreport.UserReportService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -364,38 +365,41 @@ public class AuthenticationService {
         tokenRepository.save(token);
     }
 
-    public ResponseEntity refreshToken(
+    public ResponseEntity<AuthenticationResponse> refreshToken(
             HttpServletRequest request,
             HttpServletResponse response) {
-        // extract the token from authorization header
+
+        // Extract the token from the Authorization header
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         String token = authHeader.substring(7);
 
-        // extract username from token
+        // Extract username from the token
         String username = jwtService.extractUsername(token);
 
-        // check if the user exist in database
+        // Check if the user exists in the database
         User user = repository.findByUsername(username)
-                .orElseThrow(()->new RuntimeException("No user found"));
+                .orElseThrow(() -> new RuntimeException("No user found"));
 
-        // check if the token is valid
-        if(jwtService.isValidRefreshToken(token, user)) {
-            // generate access token
+        // Check if the token is valid
+        if (jwtService.isValidRefreshToken(token, user)) {
+            // Generate new access and refresh tokens
             String accessToken = jwtService.generateAccessToken(user);
             String refreshToken = jwtService.generateRefreshToken(user);
 
+            // Revoke all previous tokens and save the new ones
             revokeAllTokenByUser(user);
             saveUserToken(accessToken, refreshToken, user);
 
-            return new ResponseEntity(new AuthenticationResponse(accessToken, refreshToken, "New token generated"), HttpStatus.OK);
+            // Return both tokens in the response
+            return ResponseEntity.ok(new AuthenticationResponse(accessToken, refreshToken, "New token generated"));
         }
 
-        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-
+        // If token is invalid or expired, return 401 Unauthorized
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }
