@@ -383,6 +383,7 @@ public class ProductService {
         newProduct.setDiscount(updateProductRequestDTO.getDiscount());
         newProduct.setVisible(updateProductRequestDTO.isVisible());
         newProduct.setAvailable(true);
+        newProduct.setState(MerchandiseState.APPROVED);
         newProduct.setMinDuration(updateProductRequestDTO.getMinDuration());
         newProduct.setMaxDuration(updateProductRequestDTO.getMaxDuration());
         newProduct.setReservationDeadline(updateProductRequestDTO.getReservationDeadline());
