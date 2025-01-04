@@ -1,7 +1,7 @@
 package com.example.eventplanner.repositories.merchandise;
 
 import com.example.eventplanner.model.merchandise.Merchandise;
-import com.example.eventplanner.model.merchandise.Review;
+import com.example.eventplanner.model.common.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -1,5 +1,6 @@
 package com.example.eventplanner.dto.notification;
 
+import com.example.eventplanner.model.common.NotificationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,4 +16,6 @@ public class NotificationDTO {
     private String content;
     private boolean read;
     private LocalDateTime date;
+    private NotificationType type;
+    private int entityId;
 }

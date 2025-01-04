@@ -4,7 +4,6 @@ import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.EventType;
-import com.example.eventplanner.model.merchandise.Review;
 import lombok.Data;
 
 import java.util.List;

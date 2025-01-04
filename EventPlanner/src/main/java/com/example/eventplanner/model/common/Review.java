@@ -1,5 +1,6 @@
-package com.example.eventplanner.model.merchandise;
+package com.example.eventplanner.model.common;
 
+import com.example.eventplanner.model.merchandise.ReviewStatus;
 import com.example.eventplanner.model.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

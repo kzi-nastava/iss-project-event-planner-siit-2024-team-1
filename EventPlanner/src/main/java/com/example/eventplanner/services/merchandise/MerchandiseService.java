@@ -10,34 +10,22 @@ import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
 import com.example.eventplanner.dto.merchandise.review.MerchandiseReviewOverviewDTO;
 import com.example.eventplanner.exceptions.BlockedMerchandiseException;
 import com.example.eventplanner.model.event.Category;
-import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.MerchandisePhoto;
-import com.example.eventplanner.model.merchandise.Review;
+import com.example.eventplanner.model.common.Review;
 import com.example.eventplanner.model.merchandise.ReviewStatus;
 import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.repositories.category.CategoryRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.model.user.User;
-import com.example.eventplanner.repositories.category.CategoryRepository;
-import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
-import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
