@@ -210,7 +210,7 @@ INSERT INTO event (
        'Pitch competition for new startups',
        150,
        true,
-       '2024-12-18 18:00:00',
+       '2025-1-10 18:00:00',
        20000.00,
        3,
        'Venture Avenue',

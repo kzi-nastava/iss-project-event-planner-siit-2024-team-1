@@ -449,6 +449,10 @@ public class ServiceService {
         response.setProviderId(request.getOrganizerId());
         response.setStartTime(request.getStartTime());
         response.setEndTime(request.getEndTime());
+        Optional<ServiceProvider> serviceProvider=serviceProviderRepository.findByMerchandiseId(service.getId());
+        if(serviceProvider.isPresent()) {
+            response.setProviderEmail(serviceProvider.get().getUsername());
+        }
         return response;
     }
 
