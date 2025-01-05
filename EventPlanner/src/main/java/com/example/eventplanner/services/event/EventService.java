@@ -340,8 +340,8 @@ public class EventService {
         if (StringUtils.hasText(eventFiltersDTO.getType())) {
             return spec.and((root, query, criteriaBuilder) ->
                     criteriaBuilder.equal(
-                            root.get("type").get("title"),
-                            eventFiltersDTO.getType()
+                            criteriaBuilder.lower(root.get("type").get("title")),
+                            eventFiltersDTO.getType().toLowerCase()
                     )
             );
         }
@@ -352,8 +352,8 @@ public class EventService {
         if (StringUtils.hasText(eventFiltersDTO.getCity())) {
             return spec.and((root, query, criteriaBuilder) ->
                     criteriaBuilder.equal(
-                            root.get("address").get("city"),
-                            eventFiltersDTO.getCity()
+                            criteriaBuilder.lower(root.get("address").get("city")),
+                            eventFiltersDTO.getCity().toLowerCase()
                     )
             );
         }
