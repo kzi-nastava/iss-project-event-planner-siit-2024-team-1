@@ -1,6 +1,7 @@
 package com.example.eventplanner.services.merchandise;
 
 import com.example.eventplanner.dto.common.AddressDTO;
+import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.filter.ServiceFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 
@@ -156,15 +157,27 @@ public class ServiceService {
         return spec;
     }
 
-    private Specification<com.example.eventplanner.model.merchandise.Service> addPriceRangeFilter(Specification<com.example.eventplanner.model.merchandise.Service> spec, ServiceFiltersDTO ServiceFiltersDTO) {
-        if (ServiceFiltersDTO.getPriceMin() != null && ServiceFiltersDTO.getPriceMax() != null) {
-            return spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.between(root.get("price"),
-                            ServiceFiltersDTO.getPriceMin(),
-                            ServiceFiltersDTO.getPriceMax())
-            );
-        }
-        return spec;
+    private Specification<com.example.eventplanner.model.merchandise.Service> addPriceRangeFilter(Specification<com.example.eventplanner.model.merchandise.Service> spec, ServiceFiltersDTO serviceFiltersDTO) {
+        return spec.and((root, query, criteriaBuilder) -> {
+            if (serviceFiltersDTO.getPriceMin() == null && serviceFiltersDTO.getPriceMax() == null) {
+                return null; // No price filter if both are null
+            }
+
+            if (serviceFiltersDTO.getPriceMin() != null && serviceFiltersDTO.getPriceMax() != null) {
+                return criteriaBuilder.between(root.get("price"),
+                        serviceFiltersDTO.getPriceMin(),
+                        serviceFiltersDTO.getPriceMax());
+            }
+
+            if (serviceFiltersDTO.getPriceMin() != null) {
+                return criteriaBuilder.greaterThanOrEqualTo(root.get("price"),
+                        serviceFiltersDTO.getPriceMin());
+            }
+
+            // At this point, only priceMax is not null
+            return criteriaBuilder.lessThanOrEqualTo(root.get("price"),
+                    serviceFiltersDTO.getPriceMax());
+        });
     }
 
     public List<ServiceOverviewDTO> getAll(){
@@ -176,12 +189,14 @@ public class ServiceService {
     }
 
 
-    private Specification<com.example.eventplanner.model.merchandise.Service> addCategoryFilter(Specification<com.example.eventplanner.model.merchandise.Service> spec, ServiceFiltersDTO ServiceFiltersDTO) {
+    private Specification<com.example.eventplanner.model.merchandise.Service> addCategoryFilter(
+            Specification<com.example.eventplanner.model.merchandise.Service> spec,
+            ServiceFiltersDTO ServiceFiltersDTO) {
         if (StringUtils.hasText(ServiceFiltersDTO.getCategory())) {
             return spec.and((root, query, criteriaBuilder) ->
                     criteriaBuilder.equal(
-                            root.get("category"),
-                            ServiceFiltersDTO.getCategory()
+                            criteriaBuilder.lower(root.get("category")),
+                            ServiceFiltersDTO.getCategory().toLowerCase()
                     )
             );
         }
@@ -192,8 +207,8 @@ public class ServiceService {
         if (StringUtils.hasText(ServiceFiltersDTO.getCity())) {
             return spec.and((root, query, criteriaBuilder) ->
                     criteriaBuilder.equal(
-                            root.get("address").get("city"),
-                            ServiceFiltersDTO.getCity()
+                            criteriaBuilder.lower(root.get("address").get("city")),
+                            ServiceFiltersDTO.getCity().toLowerCase()
                     )
             );
         }

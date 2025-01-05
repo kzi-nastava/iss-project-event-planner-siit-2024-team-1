@@ -140,22 +140,34 @@ public class ProductService {
     }
 
     private Specification<Product> addPriceRangeFilter(Specification<Product> spec, ProductFiltersDTO productFiltersDTO) {
-        if (productFiltersDTO.getPriceMin() != null && productFiltersDTO.getPriceMax() != null) {
-            return spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.between(root.get("price"),
-                            productFiltersDTO.getPriceMin(),
-                            productFiltersDTO.getPriceMax())
-            );
-        }
-        return spec;
+        return spec.and((root, query, criteriaBuilder) -> {
+            if (productFiltersDTO.getPriceMin() == null && productFiltersDTO.getPriceMax() == null) {
+                return null; // No price filter if both are null
+            }
+
+            if (productFiltersDTO.getPriceMin() != null && productFiltersDTO.getPriceMax() != null) {
+                return criteriaBuilder.between(root.get("price"),
+                        productFiltersDTO.getPriceMin(),
+                        productFiltersDTO.getPriceMax());
+            }
+
+            if (productFiltersDTO.getPriceMin() != null) {
+                return criteriaBuilder.greaterThanOrEqualTo(root.get("price"),
+                        productFiltersDTO.getPriceMin());
+            }
+
+            // At this point, only priceMax is not null
+            return criteriaBuilder.lessThanOrEqualTo(root.get("price"),
+                    productFiltersDTO.getPriceMax());
+        });
     }
 
     private Specification<Product> addCategoryFilter(Specification<Product> spec, ProductFiltersDTO productFiltersDTO) {
         if (StringUtils.hasText(productFiltersDTO.getCategory())) {
             return spec.and((root, query, criteriaBuilder) ->
                     criteriaBuilder.equal(
-                            root.get("category"),
-                            productFiltersDTO.getCategory()
+                            criteriaBuilder.lower(root.get("category")),
+                            productFiltersDTO.getCategory().toLowerCase()
                     )
             );
         }
@@ -166,8 +178,8 @@ public class ProductService {
         if (StringUtils.hasText(productFiltersDTO.getCity())) {
             return spec.and((root, query, criteriaBuilder) ->
                     criteriaBuilder.equal(
-                            root.get("address").get("city"),
-                            productFiltersDTO.getCity()
+                            criteriaBuilder.lower(root.get("address").get("city")),
+                            productFiltersDTO.getCity().toLowerCase()
                     )
             );
         }
