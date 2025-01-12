@@ -1,5 +1,7 @@
 package com.example.eventplanner.model.merchandise;
 
+import com.example.eventplanner.model.event.Category;
+import com.example.eventplanner.model.event.Event;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,9 +23,12 @@ public class Timeslot {
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
+    @ManyToOne
+    private Event event;
 
-    public Timeslot(LocalDateTime startTime, LocalDateTime endTime) {
+    public Timeslot(LocalDateTime startTime, LocalDateTime endTime,Event event) {
         this.startTime = startTime;
         this.endTime = endTime;
+        this.event = event;
     }
 }

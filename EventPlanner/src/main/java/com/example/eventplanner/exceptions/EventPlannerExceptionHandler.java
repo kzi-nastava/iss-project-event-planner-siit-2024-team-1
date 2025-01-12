@@ -1,6 +1,7 @@
 package com.example.eventplanner.exceptions;
 
 import com.example.eventplanner.dto.user.ErrorResponseDto;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -20,9 +21,9 @@ public class EventPlannerExceptionHandler {
     public ResponseEntity<ErrorResponseDto> handleUserAuthenticationException(UserAuthenticationException ex) {
         HttpStatus status;
         switch (ex.getErrorType()) {
-            case USER_NOT_FOUND, INVALID_CREDENTIALS -> status = HttpStatus.UNAUTHORIZED;
+            case  INVALID_CREDENTIALS -> status = HttpStatus.FORBIDDEN;
             case USER_SUSPENDED -> status = HttpStatus.FORBIDDEN;
-            case ACCOUNT_NOT_VERIFIED -> status = HttpStatus.BAD_REQUEST;
+            case ACCOUNT_NOT_VERIFIED,USER_NOT_FOUND -> status = HttpStatus.BAD_REQUEST;
             default -> status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
 
@@ -42,6 +43,13 @@ public class EventPlannerExceptionHandler {
 
         return new ResponseEntity<>(new ErrorResponseDto(ex.getMessage(), "blocked user"), HttpStatus.FORBIDDEN);
     }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleBlockedMerchandise(EntityNotFoundException ex) {
+
+        return new ResponseEntity<>(new ErrorResponseDto(ex.getMessage(), "SERVICE_NOT_FOUND"), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(RegisterUserException.class)
     public ResponseEntity<ErrorResponseDto> handleRegisterUser(RegisterUserException ex) {
         HttpStatus status;

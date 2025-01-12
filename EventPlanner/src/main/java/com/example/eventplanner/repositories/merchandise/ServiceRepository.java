@@ -2,6 +2,7 @@ package com.example.eventplanner.repositories.merchandise;
 
 
 import com.example.eventplanner.model.merchandise.Service;
+import com.example.eventplanner.model.merchandise.Timeslot;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -16,5 +17,8 @@ public interface ServiceRepository extends JpaRepository<Service, Integer>, JpaS
 
     @Query("SELECT s FROM Service s WHERE s.category.id IN :categoryIds AND s.available = true AND s.deleted = false")
     List<Service> findAllByCategories(@Param("categoryIds") List<Integer> categoryIds);
+
+    @Query("SELECT s FROM Service s JOIN s.timeslots t WHERE t = :timeslot")
+    List<Service> findByTimeslotsContaining(@Param("timeslot") Timeslot timeslot);
 }
 
