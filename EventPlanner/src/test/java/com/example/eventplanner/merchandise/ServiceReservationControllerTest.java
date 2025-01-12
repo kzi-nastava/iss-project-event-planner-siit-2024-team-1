@@ -79,6 +79,7 @@ class ServiceReservationControllerTest {
 
         // Create and save organizer
         organizer = new EventOrganizer();
+        organizer.setName("Organizer");
         organizer.setUsername("organizer@test.com");
         organizer.setAddress(new Address());
         organizer.setNotifications(new ArrayList<>());
@@ -89,7 +90,12 @@ class ServiceReservationControllerTest {
         // Create and save event with budget
         event = new Event();
         event.setDate(eventDate);
-        event.setAddress(new Address());
+        event.setTitle("Test Event");
+        Address address = new Address();
+        address.setCity("City");
+        address.setStreet("Street");
+        address.setNumber("1");
+        event.setAddress(address);
         event.setBudget(new Budget());
         event.getBudget().setBudgetItems(new ArrayList<>());
         event.setOrganizer(organizer);
@@ -116,6 +122,7 @@ class ServiceReservationControllerTest {
         service = serviceRepository.save(service);
 
         provider = new ServiceProvider();
+        provider.setName("Provider");
         provider.setUsername("provider@test.com");
         provider.setMerchandise(Arrays.asList(service));
         provider.setAddress(new Address());

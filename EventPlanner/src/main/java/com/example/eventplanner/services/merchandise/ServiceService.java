@@ -357,7 +357,7 @@ public class ServiceService {
         // Send notifications
 
         ReservationResponseDTO reservationResponseDTO = mapToReservationResponse(service,event,request);
-        sendReservationEmail(request,serviceId);
+        sendReservationEmail(request,event,serviceId);
         reservationNotificationScheduler.scheduleReservationNotification(service,timeslot);
 
 
@@ -451,30 +451,86 @@ public class ServiceService {
 
 
 
-    private void sendReservationEmail(ReservationRequestDTO request,int serviceId) {
-        Optional<User> eventOrganizer=userRepository.findById(request.getOrganizerId());
+    private void sendReservationEmail(ReservationRequestDTO request, Event event, int serviceId) {
+        // Fetch the event organizer
+        Optional<User> eventOrganizer = userRepository.findById(request.getOrganizerId());
         if (eventOrganizer.isEmpty()) {
-            throw new UserAuthenticationException("Organizer not found", UserAuthenticationException.ErrorType.USER_NOT_FOUND);
+            throw new UserAuthenticationException("Organizer not found",
+                    UserAuthenticationException.ErrorType.USER_NOT_FOUND);
         }
-        Optional<ServiceProvider> serviceProvider=serviceProviderRepository.findByMerchandiseId(serviceId);
-        if (serviceProvider.isEmpty()) {
-            throw new UserAuthenticationException("Service provider not found", UserAuthenticationException.ErrorType.USER_NOT_FOUND);
-        }
-        emailService.sendMail(
-            "system@eventplanner.com",
-                serviceProvider.get().getUsername(),
-                "Reservation for event "+ request.getEventId(),
-                "Reservation successful"
 
+        // Fetch the service provider
+        Optional<ServiceProvider> serviceProvider = serviceProviderRepository.findByMerchandiseId(serviceId);
+        if (serviceProvider.isEmpty()) {
+            throw new UserAuthenticationException("Service provider not found",
+                    UserAuthenticationException.ErrorType.USER_NOT_FOUND);
+        }
+
+        // Prepare the address string
+        Address address = event.getAddress();
+        String formattedAddress = String.format("%s, %s, %s",
+                address.getStreet(), address.getCity(), address.getNumber());
+
+        // Styled email subject using HTML
+        String emailSubject = String.format(
+                "Reservation Confirmation for: %s",
+                event.getTitle()
         );
+
+        // Styled email content using HTML
+        String emailContentTemplate =
+                "<html>" +
+                        "<body>" +
+                        "  <h2 style='color: #4CAF50;'>Dear %s,</h2>" +
+                        "  <p>We are pleased to inform you that the reservation for the event " +
+                        "     <strong>\"%s\"</strong> has been successfully processed.</p>" +
+                        "  <h3>Event Details:</h3>" +
+                        "  <ul>" +
+                        "    <li><strong>Title:</strong> %s</li>" +
+                        "    <li><strong>Date:</strong> %s</li>" +
+                        "    <li><strong>Location:</strong> %s</li>" +
+                        "  </ul>" +
+                        "  <p>Thank you for using our services.</p>" +
+                        "  <p>Best regards,<br><strong>Event Planner Team</strong></p>" +
+                        "</body>" +
+                        "</html>";
+
+        // Prepare email content for both recipients
+        String emailContentForServiceProvider = String.format(
+                emailContentTemplate,
+                serviceProvider.get().getName(),
+                event.getTitle(),
+                event.getTitle(),
+                event.getDate().toString(),
+                formattedAddress
+        );
+
+        String emailContentForOrganizer = String.format(
+                emailContentTemplate,
+                eventOrganizer.get().getName(),
+                event.getTitle(),
+                event.getTitle(),
+                event.getDate().toString(),
+                formattedAddress
+        );
+
+        // Send email to the service provider
+        emailService.sendMail(
+                "system@eventplanner.com",
+                serviceProvider.get().getUsername(),
+                emailSubject,
+                emailContentForServiceProvider
+        );
+
+        // Send email to the event organizer
         emailService.sendMail(
                 "system@eventplanner.com",
                 eventOrganizer.get().getUsername(),
-                "Reservation for event "+ request.getEventId(),
-                "Reservation successful"
-
+                emailSubject,
+                emailContentForOrganizer
         );
     }
+
 
     private ReservationResponseDTO mapToReservationResponse(com.example.eventplanner.model.merchandise.Service service,Event event,ReservationRequestDTO request) {
         ReservationResponseDTO response = new ReservationResponseDTO();
