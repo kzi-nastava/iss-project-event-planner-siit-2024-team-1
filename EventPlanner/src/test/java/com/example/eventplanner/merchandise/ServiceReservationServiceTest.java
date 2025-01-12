@@ -4,12 +4,14 @@ import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.ReservationResponseDTO;
 import com.example.eventplanner.exceptions.ServiceReservationException;
 import com.example.eventplanner.exceptions.UserAuthenticationException;
+import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.event.Budget;
 import com.example.eventplanner.model.event.BudgetItem;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.merchandise.Service;
 import com.example.eventplanner.model.merchandise.Timeslot;
+import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.budget.BudgetItemRepository;
@@ -68,7 +70,7 @@ class ServiceReservationServiceTest {
     private Event event;
     private ReservationRequestDTO validRequest;
     private LocalDateTime eventDate;
-    private User organizer;
+    private EventOrganizer organizer;
     private ServiceProvider provider;
 
     @BeforeEach
@@ -83,16 +85,25 @@ class ServiceReservationServiceTest {
         service.setTimeslots(new ArrayList<>());
         service.setCategory(new Category());
 
-        event = new Event();
-        event.setId(1);
-        event.setDate(eventDate);
-        event.setBudget(new Budget());
-        event.getBudget().setBudgetItems(new ArrayList<>());
-
-        organizer = new User();
+        organizer = new EventOrganizer();
         organizer.setId(1);
         organizer.setUsername("organizer@test.com");
         organizer.setNotifications(new ArrayList<>());
+
+        event = new Event();
+        event.setDate(eventDate);
+        event.setTitle("Test Event");
+        event.setId(1);
+        Address address = new Address();
+        address.setCity("City");
+        address.setStreet("Street");
+        address.setNumber("1");
+        event.setAddress(address);
+        event.setBudget(new Budget());
+        event.getBudget().setBudgetItems(new ArrayList<>());
+        event.setOrganizer(organizer);
+
+
 
         provider = new ServiceProvider();
         provider.setUsername("provider@test.com");
