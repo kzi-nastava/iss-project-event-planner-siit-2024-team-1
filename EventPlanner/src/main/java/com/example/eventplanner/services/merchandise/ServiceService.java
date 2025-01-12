@@ -11,6 +11,7 @@ import com.example.eventplanner.dto.merchandise.service.create.CreateServiceRequ
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceRequestDTO;
 import com.example.eventplanner.exceptions.ServiceReservationException;
+import com.example.eventplanner.exceptions.UserAuthenticationException;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.common.Review;
 import com.example.eventplanner.model.event.BudgetItem;
@@ -32,7 +33,9 @@ import com.example.eventplanner.repositories.merchandise.ServiceRepository;
 import com.example.eventplanner.repositories.merchandise.TimeslotRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
+import com.example.eventplanner.services.clock.ReservationNotificationScheduler;
 import com.example.eventplanner.services.email.EmailService;
+import com.example.eventplanner.services.notification.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Root;
@@ -47,6 +50,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -67,6 +71,7 @@ public class ServiceService {
     private final MerchandiseRepository merchandiseRepository;
     private final BudgetItemRepository budgetItemRepository;
     private final BudgetRepository budgetRepository;
+    private final ReservationNotificationScheduler reservationNotificationScheduler;
 
     public Page<MerchandiseOverviewDTO> search(int userId, ServiceFiltersDTO serviceFiltersDTO, String search, Pageable pageable) {
         // Fetch user details
@@ -280,7 +285,6 @@ public class ServiceService {
     @Transactional
     public ReservationResponseDTO reserveService(int serviceId, ReservationRequestDTO request) {
         // Fetch the service
-        // Fetch the service
         com.example.eventplanner.model.merchandise.Service service = serviceRepository.findAvailableServiceById(serviceId)
                 .orElseThrow(() -> new ServiceReservationException(
                         "Service not found or unavailable",
@@ -319,7 +323,7 @@ public class ServiceService {
         LocalDateTime endTime = calculateEndTime(service, request);
 
         // Create and save time slot
-        Timeslot timeslot = new Timeslot(request.getStartTime(), endTime);
+        Timeslot timeslot = new Timeslot(request.getStartTime(), endTime,event);
 
         service.getTimeslots().add(timeslot);
 
@@ -351,10 +355,13 @@ public class ServiceService {
         eventRepository.save(event);
 
         // Send notifications
-        sendReservationNotifications(service, event);
-        sendReservationEmail(request,serviceId);
 
-        return mapToReservationResponse(service,event,request);
+        ReservationResponseDTO reservationResponseDTO = mapToReservationResponse(service,event,request);
+        sendReservationEmail(request,serviceId);
+        reservationNotificationScheduler.scheduleReservationNotification(service,timeslot);
+
+
+        return reservationResponseDTO;
     }
 
     private void validateReservationDate(){
@@ -367,13 +374,23 @@ public class ServiceService {
         LocalDateTime cancellationDeadline = event.getDate().minusMinutes(service.getCancellationDeadline());
 
         // Validate start time is within reservation deadline
-        if (request.getStartTime().isAfter(event.getDate()) ||
-                request.getStartTime().isBefore(reservationDeadline)) {
+        if (!isWithinValidTimeFrame(request.getStartTime(), reservationDeadline, event.getDate())) {
             throw new Exception("Reservation is outside allowed time frame");
         }
 
         // Validate duration constraints
         validateDurationConstraints(service, request);
+    }
+    private boolean isWithinValidTimeFrame(LocalDateTime startTime,
+                                           LocalDateTime reservationDeadline,
+                                           LocalDateTime eventDate) {
+        // Truncate to seconds to ignore finer units of time
+        startTime = startTime.truncatedTo(ChronoUnit.SECONDS);
+        reservationDeadline = reservationDeadline.truncatedTo(ChronoUnit.SECONDS);
+        eventDate = eventDate.truncatedTo(ChronoUnit.SECONDS);
+
+        return startTime.compareTo(reservationDeadline) >= 0 &&
+                startTime.compareTo(eventDate) <= 0;
     }
 
     private void validateDurationConstraints(com.example.eventplanner.model.merchandise.Service service, ReservationRequestDTO request) throws Exception {
@@ -397,11 +414,16 @@ public class ServiceService {
 
         // Check for overlapping time slots within the service
         boolean isTimeSlotAvailable = service.getTimeslots().stream()
-                .allMatch(existingSlot ->
-                        endTime.isBefore(existingSlot.getStartTime()) ||
-                                startTime.isAfter(existingSlot.getEndTime())
-                );
+                .allMatch(existingSlot -> {
+                    // Truncate times to seconds to ignore finer units
+                    LocalDateTime truncatedEndTime = endTime.truncatedTo(ChronoUnit.SECONDS);
+                    LocalDateTime truncatedStartTime = startTime.truncatedTo(ChronoUnit.SECONDS);
+                    LocalDateTime truncatedExistingStart = existingSlot.getStartTime().truncatedTo(ChronoUnit.SECONDS);
+                    LocalDateTime truncatedExistingEnd = existingSlot.getEndTime().truncatedTo(ChronoUnit.SECONDS);
 
+                    return truncatedEndTime.compareTo(truncatedExistingStart) <= 0 ||  // Less than or equal to start
+                            truncatedStartTime.compareTo(truncatedExistingEnd) >= 0;   // Greater than or equal to end
+                });
         if (!isTimeSlotAvailable) {
             throw new Exception("Selected time slot is already booked");
         }
@@ -427,18 +449,16 @@ public class ServiceService {
         return request.getStartTime().plusMinutes(service.getMinDuration());
     }
 
-    private void sendReservationNotifications(com.example.eventplanner.model.merchandise.Service service, Event event) {
 
-    }
 
     private void sendReservationEmail(ReservationRequestDTO request,int serviceId) {
         Optional<User> eventOrganizer=userRepository.findById(request.getOrganizerId());
         if (eventOrganizer.isEmpty()) {
-            throw new RuntimeException("Organizer not found");
+            throw new UserAuthenticationException("Organizer not found", UserAuthenticationException.ErrorType.USER_NOT_FOUND);
         }
         Optional<ServiceProvider> serviceProvider=serviceProviderRepository.findByMerchandiseId(serviceId);
         if (serviceProvider.isEmpty()) {
-            throw new RuntimeException("provider not found");
+            throw new UserAuthenticationException("Service provider not found", UserAuthenticationException.ErrorType.USER_NOT_FOUND);
         }
         emailService.sendMail(
             "system@eventplanner.com",

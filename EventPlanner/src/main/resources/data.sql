@@ -328,7 +328,7 @@ INSERT INTO merchandise (
  'Comprehensive event planning and coordination',
  'Includes venue selection, vendor coordination, and day-of management',
  2000.00, 0, true, true,
- 10, 121, 43200, 120, false, false,
+ 10, 121, 2147483647, 120, false, false,
  'Security Street',
  'Washington DC',
  901,
