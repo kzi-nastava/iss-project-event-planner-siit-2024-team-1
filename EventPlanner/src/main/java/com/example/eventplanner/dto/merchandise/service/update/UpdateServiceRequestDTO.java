@@ -20,7 +20,7 @@ public class UpdateServiceRequestDTO {
     private boolean automaticReservation;
     private boolean visible;
     private boolean available;
-    private List<MerchandisePhotoDTO> photos;
+    private List<Integer> photos;
     private int serviceProviderId;
     private AddressDTO address;
 }

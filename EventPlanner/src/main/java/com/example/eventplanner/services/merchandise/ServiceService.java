@@ -10,7 +10,9 @@ import com.example.eventplanner.dto.merchandise.service.*;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceRequestDTO;
+import com.example.eventplanner.exceptions.CreateServiceException;
 import com.example.eventplanner.exceptions.ServiceReservationException;
+import com.example.eventplanner.exceptions.UserAuthenticationException;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.common.Review;
 import com.example.eventplanner.model.event.BudgetItem;
@@ -472,8 +474,9 @@ public class ServiceService {
 
     public CreateServiceResponseDTO createService(CreateServiceRequestDTO request) {
         ServiceProvider serviceProvider = (ServiceProvider) userRepository.findById(request.getServiceProviderId())
-                .orElseThrow(() -> new RuntimeException(
-                        "Service provider with id " + request.getServiceProviderId() + " not found"));
+                .orElseThrow(() -> new UserAuthenticationException(
+                        "Service provider with id " + request.getServiceProviderId() + " not found",
+                        UserAuthenticationException.ErrorType.USER_NOT_FOUND));
 
         com.example.eventplanner.model.merchandise.Service service = new com.example.eventplanner.model.merchandise.Service();
         service.setTitle(request.getTitle());
@@ -486,25 +489,16 @@ public class ServiceService {
         service.setReservationDeadline(request.getReservationDeadline());
         service.setCancellationDeadline(request.getCancellationDeadline());
         service.setAutomaticReservation(request.isAutomaticReservation());
-
-        if(request.getMerchandisePhotos() != null) {
-            List<MerchandisePhoto> photos = request.getMerchandisePhotos().stream()
-                    .map(photo -> {
-                        MerchandisePhoto newPhoto = new MerchandisePhoto();
-                        newPhoto.setPhoto(photo.getPhoto());
-                        return newPhoto;
-                    }).collect(Collectors.toList());
-            List<MerchandisePhoto> savedPhotos = merchandisePhotoRepository.saveAll(photos);
-            service.setPhotos(savedPhotos);
-        }
+        service.setPhotos(merchandisePhotoRepository.findAllById(request.getMerchandisePhotos()));
 
         List<EventType> eventTypes = eventTypeRepository.findAllById(request.getEventTypesIds());
         service.setEventTypes(eventTypes);
 
         if(request.getCategoryId() != -1) {
             Category category = categoryRepository.findById(request.getCategoryId())
-                    .orElseThrow(() -> new RuntimeException(
-                            "Category with id " + request.getCategoryId() + " not found"));
+                    .orElseThrow(() -> new CreateServiceException(
+                            "Category with id " + request.getCategoryId() + " not found",
+                            CreateServiceException.ErrorType.CATEGORY_NOT_FOUND));
             service.setCategory(category);
             service.setState(MerchandiseState.APPROVED);
         } else {
@@ -575,7 +569,9 @@ public class ServiceService {
 
     public List<CreateServiceResponseDTO> getAllBySpId(int id) {
         ServiceProvider serviceProvider = (ServiceProvider) userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Service provider with id " + id + " not found"));
+                .orElseThrow(() -> new UserAuthenticationException(
+                        "Service provider with id " + id + " not found",
+                        UserAuthenticationException.ErrorType.USER_NOT_FOUND));
 
         return serviceProvider.getMerchandise().stream()
                 .filter(merchandise -> !merchandise.isDeleted() &&
@@ -586,6 +582,7 @@ public class ServiceService {
     private ServiceOverviewDTO maptoServiceOverviewDTO(Merchandise savedService) {
         ServiceOverviewDTO responseDTO = new ServiceOverviewDTO();
 
+        responseDTO.setId(savedService.getId());
         responseDTO.setTitle(savedService.getTitle());
         responseDTO.setDescription(savedService.getDescription());
         responseDTO.setSpecificity(savedService.getSpecificity());
@@ -593,21 +590,38 @@ public class ServiceService {
         responseDTO.setDiscount(savedService.getDiscount());
         responseDTO.setCategory(savedService.getCategory());
         responseDTO.setAvailable(savedService.isAvailable());
+        responseDTO.setVisible(savedService.isVisible());
+        responseDTO.setMinDuration(savedService.getMinDuration());
+        responseDTO.setMaxDuration(savedService.getMaxDuration());
+        responseDTO.setReservationDeadline(savedService.getReservationDeadline());
+        responseDTO.setCancellationDeadline(savedService.getCancellationDeadline());
+        responseDTO.setAutomaticReservation(savedService.isAutomaticReservation());
         responseDTO.setPhotos(savedService.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
         responseDTO.setEventTypes(savedService.getEventTypes());
+
+        AddressDTO address = new AddressDTO();
+        address.setStreet(savedService.getAddress().getStreet());
+        address.setCity(savedService.getAddress().getCity());
+        address.setNumber(savedService.getAddress().getNumber());
+        address.setLongitude(savedService.getAddress().getLongitude());
+        address.setLatitude(savedService.getAddress().getLatitude());
+        responseDTO.setAddress(address);
 
         return responseDTO;
     }
 
     public CreateServiceResponseDTO updateService(int serviceId, UpdateServiceRequestDTO request) {
         com.example.eventplanner.model.merchandise.Service serviceBeforeUpdate = serviceRepository.findById(serviceId).orElseThrow(
-                () -> new RuntimeException("Service with id " + serviceId + " not found"));
+                () -> new CreateServiceException(
+                        "Service with id " + serviceId + " not found",
+                        CreateServiceException.ErrorType.SERVICE_NOT_FOUND));
         serviceBeforeUpdate.setAvailable(false);
         com.example.eventplanner.model.merchandise.Service updatedService = new com.example.eventplanner.model.merchandise.Service();
 
         ServiceProvider serviceProvider = (ServiceProvider) userRepository.findById(request.getServiceProviderId()).orElseThrow(
-                () -> new RuntimeException("User with id " + request.getServiceProviderId() + " not found")
-        );
+                () -> new UserAuthenticationException(
+                        "User with id " + request.getServiceProviderId() + " not found",
+                        UserAuthenticationException.ErrorType.USER_NOT_FOUND));
 
         updatedService.setTitle(request.getTitle());
         updatedService.setDescription(request.getDescription());
@@ -621,16 +635,7 @@ public class ServiceService {
         updatedService.setAutomaticReservation(request.isAutomaticReservation());
         updatedService.setAvailable(request.isAvailable());
         updatedService.setVisible(request.isVisible());
-
-        if(request.getPhotos() != null) {
-            List<MerchandisePhoto> photos = request.getPhotos().stream().map(photoDto -> {
-                MerchandisePhoto newPhoto = new MerchandisePhoto();
-                newPhoto.setPhoto(photoDto.getPhoto());
-                return newPhoto;
-            }).toList();
-            List<MerchandisePhoto> savedPhotos = merchandisePhotoRepository.saveAll(photos);
-            updatedService.setPhotos(savedPhotos);
-        }
+        updatedService.setPhotos(merchandisePhotoRepository.findAllById(request.getPhotos()));
 
         List<EventType> eventTypes = eventTypeRepository.findAllById(request.getEventTypesIds());
         updatedService.setEventTypes(eventTypes);
@@ -669,8 +674,18 @@ public class ServiceService {
 
     public void deleteService(int serviceId) {
         Merchandise service = merchandiseRepository.findById(serviceId)
-                .orElseThrow(() -> new RuntimeException("Service with id " + serviceId + " not found"));
+                .orElseThrow(() -> new CreateServiceException(
+                        "Service with id " + serviceId + " not found",
+                        CreateServiceException.ErrorType.SERVICE_NOT_FOUND));
         service.setDeleted(true);
         merchandiseRepository.save(service);
+    }
+
+    public ServiceOverviewDTO getById(int serviceId) {
+        com.example.eventplanner.model.merchandise.Service service = serviceRepository.findById(serviceId)
+                .orElseThrow(() -> new CreateServiceException(
+                        "Service with id " + serviceId + " not found",
+                        CreateServiceException.ErrorType.SERVICE_NOT_FOUND));
+        return maptoServiceOverviewDTO(service);
     }
 }

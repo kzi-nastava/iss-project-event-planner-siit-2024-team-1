@@ -22,7 +22,7 @@ public class CreateServiceRequestDTO {
     private int reservationDeadline;
     private int cancellationDeadline;
     private boolean automaticReservation;
-    private List<CreateMerchandisePhotoDTO> merchandisePhotos;
+    private List<Integer> merchandisePhotos;
     private int serviceProviderId;
     private AddressDTO address;
 
