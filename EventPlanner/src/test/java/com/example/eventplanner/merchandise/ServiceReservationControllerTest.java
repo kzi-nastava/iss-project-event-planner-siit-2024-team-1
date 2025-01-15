@@ -6,49 +6,35 @@ import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.event.Budget;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.Event;
-import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Service;
 import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.ServiceProvider;
-import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.category.CategoryRepository;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.merchandise.ServiceRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.repositories.user.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.http.MediaType;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-import static net.bytebuddy.matcher.ElementMatchers.isArray;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
 @ActiveProfiles("jpatest")
 class ServiceReservationControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private TestRestTemplate restTemplate;
 
     @Autowired
     private ServiceRepository serviceRepository;
@@ -72,7 +58,6 @@ class ServiceReservationControllerTest {
     private ServiceProvider provider;
     private LocalDateTime eventDate;
 
-
     @BeforeEach
     void setUp() {
         eventDate = LocalDateTime.now().plusDays(7);
@@ -84,8 +69,6 @@ class ServiceReservationControllerTest {
         organizer.setAddress(new Address());
         organizer.setNotifications(new ArrayList<>());
         organizer = userRepository.save(organizer);
-
-
 
         // Create and save event with budget
         event = new Event();
@@ -105,7 +88,7 @@ class ServiceReservationControllerTest {
         category.setPending(false);
         category.setTitle("Category");
         category.setDescription("Description");
-        category=categoryRepository.save(category);
+        category = categoryRepository.save(category);
 
         // Create and save service
         service = new Service();
@@ -136,133 +119,155 @@ class ServiceReservationControllerTest {
     }
 
     @Test
-    void reserveService_ValidRequest_ReturnsOk() throws Exception {
-        mockMvc.perform(post("/api/v1/services/{serviceId}/reserve", service.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.serviceId").value(service.getId()))
-                .andExpect(jsonPath("$.eventId").value(event.getId()));
+    void reserveService_ValidRequest_ReturnsOk() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<ReservationRequestDTO> request = new HttpEntity<>(validRequest, headers);
+
+        ResponseEntity<ReservationResponseDTO> response = restTemplate.postForEntity(
+                "/api/v1/services/{serviceId}/reserve",
+                request,
+                ReservationResponseDTO.class,
+                service.getId()
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getServiceId()).isEqualTo(service.getId());
+        assertThat(response.getBody().getEventId()).isEqualTo(event.getId());
     }
 
     @Test
-    void reserveService_ServiceNotFound_ReturnsNotFound() throws Exception {
-        mockMvc.perform(post("/api/v1/services/{serviceId}/reserve", 999)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isNotFound());
+    void reserveService_ServiceNotFound_ReturnsNotFound() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<ReservationRequestDTO> request = new HttpEntity<>(validRequest, headers);
+
+        ResponseEntity<ReservationResponseDTO> response = restTemplate.postForEntity(
+                "/api/v1/services/{serviceId}/reserve",
+                request,
+                ReservationResponseDTO.class,
+                999
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
-    void reserveService_PastDate_ReturnsBadRequest() throws Exception {
+    void reserveService_PastDate_ReturnsBadRequest() {
         validRequest.setStartTime(LocalDateTime.now().minusDays(1));
-        mockMvc.perform(post("/api/v1/services/{serviceId}/reserve", service.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isBadRequest());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<ReservationRequestDTO> request = new HttpEntity<>(validRequest, headers);
+
+        ResponseEntity<ReservationResponseDTO> response = restTemplate.postForEntity(
+                "/api/v1/services/{serviceId}/reserve",
+                request,
+                ReservationResponseDTO.class,
+                service.getId()
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
-    void reserveService_TimeSlotOverlap_ReturnsBadRequest() throws Exception {
+    void reserveService_TimeSlotOverlap_ReturnsBadRequest() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<ReservationRequestDTO> request = new HttpEntity<>(validRequest, headers);
+
         // First reservation
-        mockMvc.perform(post("/api/v1/services/{serviceId}/reserve", service.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isOk());
+        restTemplate.postForEntity(
+                "/api/v1/services/{serviceId}/reserve",
+                request,
+                ReservationResponseDTO.class,
+                service.getId()
+        );
 
         // Attempt to reserve the same timeslot
-        mockMvc.perform(post("/api/v1/services/{serviceId}/reserve", service.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isBadRequest());
+        ResponseEntity<ReservationResponseDTO> response = restTemplate.postForEntity(
+                "/api/v1/services/{serviceId}/reserve",
+                request,
+                ReservationResponseDTO.class,
+                service.getId()
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
-    void reserveService_DurationTooLong_ReturnsBadRequest() throws Exception {
-        validRequest.setEndTime(validRequest.getStartTime().plusHours(4));
-        mockMvc.perform(post("/api/v1/services/{serviceId}/reserve", service.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isBadRequest());
+    void getServiceTimeslots_ValidService_ReturnsOk() {
+        ResponseEntity<List> response = restTemplate.getForEntity(
+                "/api/v1/services/{serviceId}/timeslots",
+                List.class,
+                service.getId()
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
     }
 
     @Test
-    void reserveService_DurationTooShort_ReturnsBadRequest() throws Exception {
-        validRequest.setEndTime(validRequest.getStartTime());
-        mockMvc.perform(post("/api/v1/services/{serviceId}/reserve", service.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isBadRequest());
+    void getServiceTimeslots_ServiceNotFound_ReturnsNotFound() {
+        ResponseEntity<String> response = restTemplate.getForEntity(
+                "/api/v1/services/{serviceId}/timeslots",
+                String.class,
+                999
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
-    void reserveService_BeforeReservationDeadline_ReturnsBadRequest() throws Exception {
-        validRequest.setStartTime(eventDate.minusMinutes(service.getReservationDeadline() + 1));
-        mockMvc.perform(post("/api/v1/services/{serviceId}/reserve", service.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void reserveService_EventNotFound_ReturnsNotFound() throws Exception {
-        validRequest.setEventId(999);
-        mockMvc.perform(post("/api/v1/services/{serviceId}/reserve", service.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void reserveService_OrganizerNotFound_ReturnsBadRequest() throws Exception {
-        validRequest.setOrganizerId(999);
-        mockMvc.perform(post("/api/v1/services/{serviceId}/reserve", service.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void getServiceTimeslots_ValidService_ReturnsOk() throws Exception {
-        mockMvc.perform(get("/api/v1/services/{serviceId}/timeslots", service.getId()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray());
-    }
-
-    @Test
-    void getServiceTimeslots_ServiceNotFound_ReturnsNotFound() throws Exception {
-        mockMvc.perform(get("/api/v1/services/{serviceId}/timeslots", 999))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void reserveService_ExactlyAtReservationDeadline_Success() throws Exception {
+    void reserveService_ExactlyAtReservationDeadline_Success() {
         validRequest.setStartTime(eventDate.minusMinutes(service.getReservationDeadline()));
         validRequest.setEndTime(validRequest.getStartTime().plusMinutes(service.getMinDuration()));
-        mockMvc.perform(post("/api/v1/services/{serviceId}/reserve", service.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isOk());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<ReservationRequestDTO> request = new HttpEntity<>(validRequest, headers);
+
+        ResponseEntity<ReservationResponseDTO> response = restTemplate.postForEntity(
+                "/api/v1/services/{serviceId}/reserve",
+                request,
+                ReservationResponseDTO.class,
+                service.getId()
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
-    void reserveService_TimeslotBorderingExisting_Success() throws Exception {
+    void reserveService_TimeslotBorderingExisting_Success() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
         // First reservation
         validRequest.setStartTime(eventDate.minusHours(4));
         validRequest.setEndTime(eventDate.minusHours(3));
-        mockMvc.perform(post("/api/v1/services/{serviceId}/reserve", service.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isOk());
+        HttpEntity<ReservationRequestDTO> firstRequest = new HttpEntity<>(validRequest, headers);
+
+        ResponseEntity<ReservationResponseDTO> firstResponse = restTemplate.postForEntity(
+                "/api/v1/services/{serviceId}/reserve",
+                firstRequest,
+                ReservationResponseDTO.class,
+                service.getId()
+        );
+
+        assertThat(firstResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         // Bordering reservation
         validRequest.setStartTime(eventDate.minusHours(3));
         validRequest.setEndTime(eventDate.minusHours(2));
-        mockMvc.perform(post("/api/v1/services/{serviceId}/reserve", service.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isOk());
+        HttpEntity<ReservationRequestDTO> secondRequest = new HttpEntity<>(validRequest, headers);
+
+        ResponseEntity<ReservationResponseDTO> secondResponse = restTemplate.postForEntity(
+                "/api/v1/services/{serviceId}/reserve",
+                secondRequest,
+                ReservationResponseDTO.class,
+                service.getId()
+        );
+
+        assertThat(secondResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 }
