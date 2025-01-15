@@ -1,6 +1,5 @@
-package com.example.eventplanner.merchandise;
+package com.example.eventplanner.merchandise.reserveservice;
 
-import com.example.eventplanner.dto.merchandise.service.ReservationResponseDTO;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.merchandise.Service;
 import com.example.eventplanner.model.merchandise.Timeslot;
@@ -29,11 +28,9 @@ import static org.mockito.Mockito.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.concurrent.ScheduledFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationNotificationSchedulerTest {

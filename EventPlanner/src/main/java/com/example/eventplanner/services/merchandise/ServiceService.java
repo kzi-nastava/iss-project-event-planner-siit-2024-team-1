@@ -536,12 +536,12 @@ public class ServiceService {
         ReservationResponseDTO response = new ReservationResponseDTO();
         response.setServiceId(service.getId());
         response.setEventId(event.getId());
-        response.setProviderId(request.getOrganizerId());
         response.setStartTime(request.getStartTime());
         response.setEndTime(request.getEndTime());
         Optional<ServiceProvider> serviceProvider=serviceProviderRepository.findByMerchandiseId(service.getId());
         if(serviceProvider.isPresent()) {
             response.setProviderEmail(serviceProvider.get().getUsername());
+            response.setProviderId(serviceProvider.get().getId());
         }
         return response;
     }

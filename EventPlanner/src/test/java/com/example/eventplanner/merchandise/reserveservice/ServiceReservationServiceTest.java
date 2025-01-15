@@ -1,4 +1,4 @@
-package com.example.eventplanner.merchandise;
+package com.example.eventplanner.merchandise.reserveservice;
 
 import com.example.eventplanner.dto.merchandise.service.ReservationRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.ReservationResponseDTO;
@@ -13,7 +13,6 @@ import com.example.eventplanner.model.merchandise.Service;
 import com.example.eventplanner.model.merchandise.Timeslot;
 import com.example.eventplanner.model.user.EventOrganizer;
 import com.example.eventplanner.model.user.ServiceProvider;
-import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.budget.BudgetItemRepository;
 import com.example.eventplanner.repositories.budget.BudgetRepository;
 import com.example.eventplanner.repositories.event.EventRepository;
@@ -24,23 +23,26 @@ import com.example.eventplanner.repositories.user.UserRepository;
 import com.example.eventplanner.services.clock.ReservationNotificationScheduler;
 import com.example.eventplanner.services.email.EmailService;
 import com.example.eventplanner.services.merchandise.ServiceService;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Optional;
-
 import com.example.eventplanner.services.notification.NotificationService;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Optional;
+
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
-import java.time.LocalDateTime;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Service Reservation Service Tests")
 class ServiceReservationServiceTest {
     @Mock
     private ServiceRepository serviceRepository;
@@ -103,8 +105,6 @@ class ServiceReservationServiceTest {
         event.getBudget().setBudgetItems(new ArrayList<>());
         event.setOrganizer(organizer);
 
-
-
         provider = new ServiceProvider();
         provider.setUsername("provider@test.com");
 
@@ -115,21 +115,36 @@ class ServiceReservationServiceTest {
     }
 
     @Test
+    @DisplayName("Should successfully reserve service with valid request")
+    @Tag("success")
     void reserveService_ValidRequest_Success() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.of(service));
         when(eventRepository.findById(1)).thenReturn(Optional.of(event));
         when(userRepository.findById(1)).thenReturn(Optional.of(organizer));
         when(serviceProviderRepository.findByMerchandiseId(1)).thenReturn(Optional.of(provider));
 
+
         ReservationResponseDTO response = reservationService.reserveService(1, validRequest);
 
-        assertNotNull(response);
+        // Verify response is not null and contains correct data
+        assertNotNull(response, "Response should not be null");
+        assertEquals(provider.getId(), response.getProviderId(), "Provider ID should match");
+        assertEquals(event.getId(), response.getEventId(), "Event ID should match");
+        assertEquals(service.getId(), response.getServiceId(), "Service ID should match");
+        assertEquals(validRequest.getStartTime(), response.getStartTime(), "Start time should match request");
+        assertEquals(validRequest.getEndTime(), response.getEndTime(), "End time should match request");
+        assertEquals(provider.getUsername(), response.getProviderEmail(), "Provider email should match");
+
+        // Verify the service and event were saved
         verify(serviceRepository).save(service);
         verify(eventRepository).save(event);
+        verify(budgetItemRepository).save(any());
+        verify(timeslotRepository).save(any(Timeslot.class));
     }
 
-
     @Test
+    @DisplayName("Should throw exception when service not found")
+    @Tag("not-found")
     void reserveService_ServiceNotFound_ThrowsException() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.empty());
 
@@ -141,6 +156,8 @@ class ServiceReservationServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when reservation is for past date")
+    @Tag("timing")
     void reserveService_PastDate_ThrowsException() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.of(service));
         when(eventRepository.findById(1)).thenReturn(Optional.of(event));
@@ -155,6 +172,8 @@ class ServiceReservationServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when timeslot overlaps")
+    @Tag("conflict")
     void reserveService_TimeSlotOverlap_ThrowsException() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.of(service));
         when(eventRepository.findById(1)).thenReturn(Optional.of(event));
@@ -174,11 +193,13 @@ class ServiceReservationServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when duration is too long")
+    @Tag("timing")
     void reserveService_DurationTooLong_ThrowsException() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.of(service));
         when(eventRepository.findById(1)).thenReturn(Optional.of(event));
 
-        validRequest.setEndTime(validRequest.getStartTime().plusHours(4)); // 240 minutes > maxDuration
+        validRequest.setEndTime(validRequest.getStartTime().plusMinutes(service.getMaxDuration()+1));
 
         ServiceReservationException exception = assertThrows(
                 ServiceReservationException.class,
@@ -188,11 +209,13 @@ class ServiceReservationServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when duration is too short")
+    @Tag("timing")
     void reserveService_DurationTooShort_ThrowsException() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.of(service));
         when(eventRepository.findById(1)).thenReturn(Optional.of(event));
 
-        validRequest.setEndTime(validRequest.getStartTime()); // 0 minutes<min duration
+        validRequest.setEndTime(validRequest.getStartTime().plusMinutes(service.getMinDuration()-1));
 
         ServiceReservationException exception = assertThrows(
                 ServiceReservationException.class,
@@ -202,6 +225,8 @@ class ServiceReservationServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when before reservation deadline")
+    @Tag("timing")
     void reserveService_BeforeReservationDeadline_ThrowsException() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.of(service));
         when(eventRepository.findById(1)).thenReturn(Optional.of(event));
@@ -216,6 +241,8 @@ class ServiceReservationServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when event not found")
+    @Tag("not-found")
     void reserveService_EventNotFound_ThrowsException() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.of(service));
         when(eventRepository.findById(1)).thenReturn(Optional.empty());
@@ -228,39 +255,64 @@ class ServiceReservationServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when organizer not found")
+    @Tag("not-found")
     void reserveService_OrganizerNotFound_ThrowsException() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.of(service));
         when(eventRepository.findById(1)).thenReturn(Optional.of(event));
         when(userRepository.findById(1)).thenReturn(Optional.empty());
 
-        assertThrows(UserAuthenticationException.class,
+        UserAuthenticationException exception= assertThrows(UserAuthenticationException.class,
                 () -> reservationService.reserveService(1, validRequest));
+        assertEquals(UserAuthenticationException.ErrorType.USER_NOT_FOUND, exception.getErrorType());
     }
 
     @Test
+    @DisplayName("Should throw exception when service provider not found")
+    @Tag("not-found")
     void reserveService_ServiceProviderNotFound_ThrowsException() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.of(service));
         when(eventRepository.findById(1)).thenReturn(Optional.of(event));
         when(userRepository.findById(1)).thenReturn(Optional.of(organizer));
         when(serviceProviderRepository.findByMerchandiseId(1)).thenReturn(Optional.empty());
 
-        assertThrows(UserAuthenticationException.class,
+        UserAuthenticationException exception=assertThrows(UserAuthenticationException.class,
                 () -> reservationService.reserveService(1, validRequest));
+        assertEquals(UserAuthenticationException.ErrorType.USER_NOT_FOUND, exception.getErrorType());
+
     }
 
     @Test
+    @DisplayName("Should successfully reserve service exactly at reservation deadline")
+    @Tag("success")
     void reserveService_ExactlyAtReservationDeadline_Success() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.of(service));
         when(eventRepository.findById(1)).thenReturn(Optional.of(event));
         when(userRepository.findById(1)).thenReturn(Optional.of(organizer));
         when(serviceProviderRepository.findByMerchandiseId(1)).thenReturn(Optional.of(provider));
 
-        validRequest.setStartTime(eventDate.minusMinutes(service.getReservationDeadline()));
 
-        assertDoesNotThrow(() -> reservationService.reserveService(1, validRequest));
+        ReservationResponseDTO response = reservationService.reserveService(1, validRequest);
+
+        // Verify response is not null and contains correct data
+        assertNotNull(response, "Response should not be null");
+        assertEquals(provider.getId(), response.getProviderId(), "Provider ID should match");
+        assertEquals(event.getId(), response.getEventId(), "Event ID should match");
+        assertEquals(service.getId(), response.getServiceId(), "Service ID should match");
+        assertEquals(validRequest.getStartTime(), response.getStartTime(), "Start time should match request");
+        assertEquals(validRequest.getEndTime(), response.getEndTime(), "End time should match request");
+        assertEquals(provider.getUsername(), response.getProviderEmail(), "Provider email should match");
+
+        // Verify the service and event were saved
+        verify(serviceRepository).save(service);
+        verify(eventRepository).save(event);
+        verify(budgetItemRepository).save(any());
+        verify(timeslotRepository).save(any(Timeslot.class));
     }
 
     @Test
+    @DisplayName("Should successfully reserve service with exact minimum duration")
+    @Tag("success")
     void reserveService_ExactMinDuration_Success() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.of(service));
         when(eventRepository.findById(1)).thenReturn(Optional.of(event));
@@ -269,10 +321,28 @@ class ServiceReservationServiceTest {
 
         validRequest.setEndTime(validRequest.getStartTime().plusMinutes(service.getMinDuration()));
 
-        assertDoesNotThrow(() -> reservationService.reserveService(1, validRequest));
+
+        ReservationResponseDTO response = reservationService.reserveService(1, validRequest);
+
+        // Verify response is not null and contains correct data
+        assertNotNull(response, "Response should not be null");
+        assertEquals(provider.getId(), response.getProviderId(), "Provider ID should match");
+        assertEquals(event.getId(), response.getEventId(), "Event ID should match");
+        assertEquals(service.getId(), response.getServiceId(), "Service ID should match");
+        assertEquals(validRequest.getStartTime(), response.getStartTime(), "Start time should match request");
+        assertEquals(validRequest.getEndTime(), response.getEndTime(), "End time should match request");
+        assertEquals(provider.getUsername(), response.getProviderEmail(), "Provider email should match");
+
+        // Verify the service and event were saved
+        verify(serviceRepository).save(service);
+        verify(eventRepository).save(event);
+        verify(budgetItemRepository).save(any());
+        verify(timeslotRepository).save(any(Timeslot.class));
     }
 
     @Test
+    @DisplayName("Should successfully reserve service with exact maximum duration")
+    @Tag("success")
     void reserveService_ExactMaxDuration_Success() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.of(service));
         when(eventRepository.findById(1)).thenReturn(Optional.of(event));
@@ -281,16 +351,33 @@ class ServiceReservationServiceTest {
 
         validRequest.setEndTime(validRequest.getStartTime().plusMinutes(service.getMaxDuration()));
 
-        assertDoesNotThrow(() -> reservationService.reserveService(1, validRequest));
+
+        ReservationResponseDTO response = reservationService.reserveService(1, validRequest);
+
+        // Verify response is not null and contains correct data
+        assertNotNull(response, "Response should not be null");
+        assertEquals(provider.getId(), response.getProviderId(), "Provider ID should match");
+        assertEquals(event.getId(), response.getEventId(), "Event ID should match");
+        assertEquals(service.getId(), response.getServiceId(), "Service ID should match");
+        assertEquals(validRequest.getStartTime(), response.getStartTime(), "Start time should match request");
+        assertEquals(validRequest.getEndTime(), response.getEndTime(), "End time should match request");
+        assertEquals(provider.getUsername(), response.getProviderEmail(), "Provider email should match");
+
+        // Verify the service and event were saved
+        verify(serviceRepository).save(service);
+        verify(eventRepository).save(event);
+        verify(budgetItemRepository).save(any());
+        verify(timeslotRepository).save(any(Timeslot.class));
     }
 
     @Test
+    @DisplayName("Should update existing budget item when present")
+    @Tag("budget")
     void reserveService_WithExistingBudgetItem_UpdatesExistingItem() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.of(service));
         when(eventRepository.findById(1)).thenReturn(Optional.of(event));
         when(userRepository.findById(1)).thenReturn(Optional.of(organizer));
         when(serviceProviderRepository.findByMerchandiseId(1)).thenReturn(Optional.of(provider));
-
 
         Category category = new Category();
         category.setId(1);
@@ -306,6 +393,8 @@ class ServiceReservationServiceTest {
     }
 
     @Test
+    @DisplayName("Should successfully reserve service with timeslot bordering existing")
+    @Tag("success")
     void reserveService_TimeslotBorderingExisting_Success() {
         when(serviceRepository.findAvailableServiceById(1)).thenReturn(Optional.of(service));
         when(eventRepository.findById(1)).thenReturn(Optional.of(event));
@@ -321,8 +410,22 @@ class ServiceReservationServiceTest {
         validRequest.setStartTime(eventDate.minusHours(3)); // Starts exactly when previous ends
         validRequest.setEndTime(eventDate.minusHours(2));
 
-        assertDoesNotThrow(() -> reservationService.reserveService(1, validRequest));
+
+        ReservationResponseDTO response = reservationService.reserveService(1, validRequest);
+
+        // Verify response is not null and contains correct data
+        assertNotNull(response, "Response should not be null");
+        assertEquals(provider.getId(), response.getProviderId(), "Provider ID should match");
+        assertEquals(event.getId(), response.getEventId(), "Event ID should match");
+        assertEquals(service.getId(), response.getServiceId(), "Service ID should match");
+        assertEquals(validRequest.getStartTime(), response.getStartTime(), "Start time should match request");
+        assertEquals(validRequest.getEndTime(), response.getEndTime(), "End time should match request");
+        assertEquals(provider.getUsername(), response.getProviderEmail(), "Provider email should match");
+
+        // Verify the service and event were saved
+        verify(serviceRepository).save(service);
+        verify(eventRepository).save(event);
+        verify(budgetItemRepository).save(any());
+        verify(timeslotRepository).save(any(Timeslot.class));
     }
-
-
 }
