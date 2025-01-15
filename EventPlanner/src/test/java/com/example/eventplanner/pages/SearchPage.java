@@ -7,8 +7,11 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 public class SearchPage {
     private final WebDriver driver;
@@ -18,27 +21,26 @@ public class SearchPage {
     @FindBy(xpath = "//span[contains(text(), 'Sort events by')]/following-sibling::p-dropdown")
     private WebElement eventSortDropdown;
 
-    @FindBy(xpath = "//span[contains(text(), 'Sort services/products by')]/following-sibling::p-dropdown")
-    private WebElement merchandiseSortDropdown;
 
     // Updated selector for Filters button
     @FindBy(css = "p-button[label='Filters'] button.p-button")
     private WebElement filtersButton;
 
     // Event cards with more specific selector
-    @FindBy(css = "app-events p-panel")
+    @FindBy(css = "app-event-card p-panel")
     private List<WebElement> eventCards;
 
-    // Merchandise cards with more specific selector
-    @FindBy(css = "app-merchandise-card p-panel")
-    private List<WebElement> merchandiseCards;
+    @FindBy(xpath = "//app-events//button[@aria-label='Next Page']")
+    private WebElement nextPageButton;
 
-    // Updated paginator selector to be more specific
-    @FindBy(css = ".p-paginator.p-component")
-    private List<WebElement> paginators;
+    @FindBy(xpath = "//app-events//button[@aria-label='Previous Page']")
+    private WebElement prevPageButton;
 
     @FindBy(css = ".p-inputtext")
     private WebElement searchInput;
+
+    @FindBy(css = "app-event-card .event-date")
+    private List<WebElement> eventDates;
 
 
     public SearchPage(WebDriver driver) {
@@ -46,6 +48,48 @@ public class SearchPage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         PageFactory.initElements(driver, this);
     }
+
+
+
+    public List<String> getSortedBy(String sortBy) {
+        List<WebElement> eventTitles=driver.findElements(By.xpath("//p[contains(@class, 'event-"+sortBy+"')]"));
+        return eventTitles.stream()
+                .map(WebElement::getText)
+                .collect(Collectors.toList());
+    }
+
+    public boolean areEventsSortedBy(String sortBy) {
+        List<String> result = getSortedBy(sortBy);
+        return isSortedAscending(result);
+    }
+
+    private <T> boolean isSortedAscending(List<T> list) {
+        if (list == null || list.size() <= 1) {
+            return true;
+        }
+
+        for (int i = 0; i < list.size() - 1; i++) {
+            T current = list.get(i);
+            T next = list.get(i + 1);
+
+            int comparison;
+            if (current instanceof String && next instanceof String) {
+                // Case-insensitive comparison for strings, with trimming
+                String currentStr = ((String) current).trim().toLowerCase();
+                String nextStr = ((String) next).trim().toLowerCase();
+                comparison = currentStr.compareTo(nextStr);
+
+            } else {
+                comparison = ((Comparable) current).compareTo(next);
+            }
+
+            if (comparison > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     public void selectEventSortOption(String option) {
         // Click dropdown to open
@@ -118,6 +162,14 @@ public class SearchPage {
         wait.until(ExpectedConditions.visibilityOfElementLocated(
                 By.cssSelector(".p-sidebar")));
         return new FilterPanel(driver);
+    }
+
+    public void nextPage() {
+        wait.until(ExpectedConditions.elementToBeClickable(nextPageButton)).click();
+    }
+
+    public void prevPage() {
+        wait.until(ExpectedConditions.elementToBeClickable(prevPageButton)).click();
     }
 
     public int getEventCount() {

@@ -5,7 +5,6 @@ import com.example.eventplanner.pages.SearchPage;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.springframework.test.context.ActiveProfiles;
 
 public class SearchTest {
     private static WebDriver driver;
@@ -24,16 +23,45 @@ public class SearchTest {
     }
 
     @Test
-    public void testEventSorting() {
-        searchPage.selectEventSortOption("date");
-        Assertions.assertTrue(searchPage.getEventCount() > 0, "Events should be displayed after sorting");
-        Helper.takeScreenshoot(driver,"sort_by_date");
+    public void testEventPagination() {
+        int initialCount = searchPage.getEventCount();
+        searchPage.nextPage();
 
-        searchPage.selectEventSortOption("title");
-        Assertions.assertTrue(searchPage.getEventCount() > 0, "Events should be displayed after changing sort");
-        Helper.takeScreenshoot(driver,"sort_by_title");
+        int nextPageCount = searchPage.getEventCount();
+        Assertions.assertTrue(nextPageCount >= 0, "Next page should display valid number of events");
+        Helper.takeScreenshoot(driver, "next_page");
 
+        searchPage.prevPage();
+        int prevPageCount = searchPage.getEventCount();
+        Assertions.assertEquals(initialCount, prevPageCount, "Previous page should return to initial state");
+        Helper.takeScreenshoot(driver, "prev_page");
     }
+
+    @Test
+    public void testEventSortingByTitle() {
+        int initialEvents = searchPage.getEventCount();
+        Assertions.assertNotEquals(0, initialEvents, "Initial events should be present");
+        searchPage.selectEventSortOption("title");
+        int titleSortedEvents = searchPage.getEventCount();
+        Assertions.assertNotEquals(0, titleSortedEvents, "Events should be present after title sorting");
+        Assertions.assertTrue(searchPage.areEventsSortedBy("title"),
+                "Events should be sorted by title in ascending order");
+        Helper.takeScreenshoot(driver, "sort_by_title");
+    }
+
+    @Test
+    public void testEventSortingByDescription() {
+        int initialEvents = searchPage.getEventCount();
+        Assertions.assertNotEquals(0, initialEvents, "Initial events should be present");
+        searchPage.selectEventSortOption("description");
+        int titleSortedEvents = searchPage.getEventCount();
+        Assertions.assertNotEquals(0, titleSortedEvents, "Events should be present after description sorting");
+        Assertions.assertTrue(searchPage.areEventsSortedBy("description"),
+                "Events should be sorted by description in ascending order");
+        Helper.takeScreenshoot(driver, "sort_by_description");
+    }
+
+
 
     @Test
     public void testEventSearchDescription() {
