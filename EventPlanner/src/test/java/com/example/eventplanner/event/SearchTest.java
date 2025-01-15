@@ -50,6 +50,25 @@ public class SearchTest {
     }
 
     @Test
+    public void testEventSortingPersistsAcrossPages() {
+        int initialEvents = searchPage.getEventCount();
+        Assertions.assertNotEquals(0, initialEvents, "Initial events should be present");
+        searchPage.selectEventSortOption("title");
+        int titleSortedEvents = searchPage.getEventCount();
+        Assertions.assertNotEquals(0, titleSortedEvents, "Events should be present after title sorting");
+        Assertions.assertTrue(searchPage.areEventsSortedBy("title"),
+                "Events should be sorted by title in ascending order");
+        Helper.takeScreenshoot(driver, "sort_by_title_page1");
+        searchPage.nextPage();
+        titleSortedEvents = searchPage.getEventCount();
+        Assertions.assertNotEquals(0, titleSortedEvents, "Events should be present after title sorting");
+        Assertions.assertTrue(searchPage.areEventsSortedBy("title"),
+                "Events should be sorted by title in ascending order");
+        Helper.takeScreenshoot(driver, "sort_by_title_page1");
+
+    }
+
+    @Test
     public void testEventSortingByDescription() {
         int initialEvents = searchPage.getEventCount();
         Assertions.assertNotEquals(0, initialEvents, "Initial events should be present");
