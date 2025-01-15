@@ -3,13 +3,10 @@ package com.example.eventplanner.controllers.merchandise;
 import com.example.eventplanner.dto.category.GetAllByCategoriesDTO;
 import com.example.eventplanner.dto.filter.ServiceFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
-import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
-import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.*;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceRequestDTO;
-import com.example.eventplanner.exceptions.ServiceReservationException;
 import com.example.eventplanner.services.merchandise.ServiceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -68,9 +63,9 @@ public class ServiceController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<GetServiceByIdResponseDTO> GetById(@PathVariable(value = "id") int id) {
-        return ResponseEntity.ok(new GetServiceByIdResponseDTO());
+    @GetMapping("/byId/{id}")
+    public ResponseEntity<ServiceOverviewDTO> getServiceById(@PathVariable(value = "id") int id) {
+        return ResponseEntity.ok(serviceService.getById(id));
     }
 
     @GetMapping("/filter")
@@ -93,7 +88,7 @@ public class ServiceController {
         return new ResponseEntity<>(createServiceResponseDTO, HttpStatus.CREATED);
     }
 
-    @PutMapping("update/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<CreateServiceResponseDTO> Update(@PathVariable int id, @RequestBody UpdateServiceRequestDTO request) {
         CreateServiceResponseDTO responseDTO = serviceService.updateService(id, request);
         return ResponseEntity.ok(responseDTO);
