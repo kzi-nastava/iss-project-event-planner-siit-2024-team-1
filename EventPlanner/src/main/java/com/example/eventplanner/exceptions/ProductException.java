@@ -4,7 +4,7 @@ public class ProductException extends RuntimeException {
     private final ProductException.ErrorType errorType;
 
     public enum ErrorType {
-
+        NOT_FOUND,
     }
 
     public ProductException(String message, ProductException.ErrorType errorType) {

@@ -6,6 +6,9 @@ import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.product.*;
 import com.example.eventplanner.dto.merchandise.service.ServiceOverviewDTO;
+import com.example.eventplanner.exceptions.EventException;
+import com.example.eventplanner.exceptions.ProductException;
+import com.example.eventplanner.exceptions.UserAuthenticationException;
 import com.example.eventplanner.model.event.*;
 import com.example.eventplanner.model.merchandise.*;
 import com.example.eventplanner.model.user.EventOrganizer;
@@ -287,7 +290,7 @@ public class ProductService {
     public CreateProductResponseDTO createProduct(CreateProductRequestDTO createProductRequestDTO) {
         // Step 1: Fetch the ServiceProvider
         ServiceProvider serviceProvider = serviceProviderRepository.findById(createProductRequestDTO.getServiceProviderId())
-                .orElseThrow(() -> new RuntimeException("Service provider not found"));
+                .orElseThrow(() -> new UserAuthenticationException("Service provider not found", UserAuthenticationException.ErrorType.USER_NOT_FOUND));
 
         // Step 2: Create a new Product (Merchandise)
         Product product = new Product();
@@ -348,7 +351,7 @@ public class ProductService {
 
     public Boolean availProduct(int id){
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ProductException("Product not found", ProductException.ErrorType.NOT_FOUND));
 
         if(product.isAvailable()){
             product.setAvailable(false);
@@ -361,7 +364,7 @@ public class ProductService {
 
     public Boolean showProduct(int id){
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ProductException("Product not found", ProductException.ErrorType.NOT_FOUND));
 
         if(product.isVisible()){
             product.setVisible(false);
@@ -382,7 +385,7 @@ public class ProductService {
 
         // Step 1: Fetch the ServiceProvider
         ServiceProvider serviceProvider = serviceProviderRepository.findById(updateProductRequestDTO.getServiceProviderId())
-                .orElseThrow(() -> new RuntimeException("Service provider not found"));
+                .orElseThrow(() -> new UserAuthenticationException("Service provider not found", UserAuthenticationException.ErrorType.USER_NOT_FOUND));
         ServiceProviderDTO serviceProviderDTO = new ServiceProviderDTO();
         serviceProviderDTO.setId(serviceProvider.getId());
         serviceProviderDTO.setName(serviceProvider.getName());
@@ -482,7 +485,7 @@ public class ProductService {
     public boolean deleteProduct(int productId) {
         // Fetch the existing event
         Merchandise product = merchandiseRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ProductException("Product not found", ProductException.ErrorType.NOT_FOUND));
 
 
         product.setDeleted(true);
@@ -492,8 +495,8 @@ public class ProductService {
     }
 
     public BuyProductResponseDTO buyProduct(int productId, int eventId) throws Exception {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
-        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventException("Event not found", EventException.ErrorType.EVENT_NOT_FOUND));
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ProductException("Product not found", ProductException.ErrorType.NOT_FOUND));
 
         BudgetItem existingBudgetItem = event.getBudget()
                                             .getBudgetItems()

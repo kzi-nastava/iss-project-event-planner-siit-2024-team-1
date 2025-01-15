@@ -111,6 +111,8 @@ public class EventPlannerExceptionHandler {
     public ResponseEntity<ErrorResponseDto> handleProductException(ProductException e) {
         HttpStatus status;
         switch (e.getErrorType()) {
+            case NOT_FOUND:
+                status = HttpStatus.NOT_FOUND;
             default:
                 status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
