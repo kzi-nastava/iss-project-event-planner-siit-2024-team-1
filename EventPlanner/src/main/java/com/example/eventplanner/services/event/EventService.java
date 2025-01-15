@@ -178,7 +178,7 @@ public class EventService {
     }
 
     public CreatedEventOverviewDTO getById(int id) {
-        return mapToCreatedEventOverviewDTO(eventRepository.findById(id).orElseThrow(), eventRepository.findById(id).orElseThrow().getType(), eventRepository.findById(id).orElseThrow().getMerchandise());
+        return mapToCreatedEventOverviewDTO(eventRepository.findById(id).orElseThrow(() -> new EventException("Event not found!", EventException.ErrorType.EVENT_NOT_FOUND)), eventRepository.findById(id).orElseThrow(() -> new EventException("Event not found!", EventException.ErrorType.EVENT_NOT_FOUND)).getType(), eventRepository.findById(id).orElseThrow(() -> new EventException("Event not found!", EventException.ErrorType.EVENT_NOT_FOUND)).getMerchandise());
     }
 
     public Page<EventOverviewDTO> getByEo(int id, Pageable pageable) {
@@ -610,7 +610,7 @@ public class EventService {
     public CreatedActivityDTO updateAgenda(int eventId, CreateActivityDTO dto) {
         // Fetch the existing event
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new EventException("Event not found", EventException.ErrorType.EVENT_NOT_FOUND));
 
         // Create a new Activity entity from the DTO
         Activity activity = new Activity();
@@ -663,7 +663,7 @@ public class EventService {
     public List<ActivityOverviewDTO> getAgenda(int eventId) {
         // Fetch the existing event
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new EventException("Event not found with id " + eventId, EventException.ErrorType.EVENT_NOT_FOUND));
 
         return event.getActivities().stream().map(this::mapToActivityOverviewDTO).toList();
     }

@@ -83,6 +83,44 @@ public class EventPlannerExceptionHandler {
         );
     }
 
+    @ExceptionHandler(EventException.class)
+    public ResponseEntity<ErrorResponseDto> handleEventException(EventException e) {
+        HttpStatus status;
+        switch (e.getErrorType()) {
+            case EVENT_NOT_FOUND:
+            case ORGANIZER_NOT_FOUND:
+            case EVENT_TYPE_NOT_FOUND:
+            case ACTIVITY_NOT_FOUND:
+                status = HttpStatus.NOT_FOUND;
+                break;
+            case INVALID_ACTIVITY_TIME:
+            case INVALID_DATE:
+                status = HttpStatus.BAD_REQUEST;
+                break;
+            default:
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(
+                new ErrorResponseDto(e.getMessage(), e.getErrorType().name()),
+                status
+        );
+    }
+
+    @ExceptionHandler(ProductException.class)
+    public ResponseEntity<ErrorResponseDto> handleProductException(ProductException e) {
+        HttpStatus status;
+        switch (e.getErrorType()) {
+            default:
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(
+                new ErrorResponseDto(e.getMessage(), e.getErrorType().name()),
+                status
+        );
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
         String message = ex.getBindingResult().getFieldErrors().stream()

@@ -1,10 +1,11 @@
-package com.example.eventplanner.repositories.event;
+package com.example.eventplanner.event;
 
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.common.Review;
 import com.example.eventplanner.model.event.Budget;
 import com.example.eventplanner.model.event.Event;
 import com.example.eventplanner.model.user.EventOrganizer;
+import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.review.ReviewRepository;
 import com.example.eventplanner.repositories.user.EventOrganizerRepository;
 import org.junit.jupiter.api.BeforeEach;

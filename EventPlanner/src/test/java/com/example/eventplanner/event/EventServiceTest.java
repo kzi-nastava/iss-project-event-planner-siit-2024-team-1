@@ -307,7 +307,7 @@ class EventServiceTest {
 
         // Call the method and verify exception
         RuntimeException exception = assertThrows(RuntimeException.class, () -> eventService.getAgenda(1));
-        assertEquals("Event not found", exception.getMessage());
+        assertEquals("Event not found with id 1", exception.getMessage());
     }
 
     @Test
