@@ -21,7 +21,6 @@ public class SearchPage {
     @FindBy(xpath = "//span[contains(text(), 'Sort events by')]/following-sibling::p-dropdown")
     private WebElement eventSortDropdown;
 
-
     // Updated selector for Filters button
     @FindBy(css = "p-button[label='Filters'] button.p-button")
     private WebElement filtersButton;
