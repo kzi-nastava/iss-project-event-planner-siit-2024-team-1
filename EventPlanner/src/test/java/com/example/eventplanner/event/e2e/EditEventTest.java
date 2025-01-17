@@ -2,8 +2,12 @@ package com.example.eventplanner.event.e2e;
 
 import com.example.eventplanner.event.Helper;
 import com.example.eventplanner.pages.event.AddEventPage;
+import com.example.eventplanner.pages.event.EditEventPage;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
@@ -12,9 +16,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
-public class AddEventTest {
+public class EditEventTest {
     private static WebDriver driver;
-    private AddEventPage addEventPage;
+    private EditEventPage editEventPage;
 
     @BeforeAll
     public static void setupClass() {
@@ -29,8 +33,8 @@ public class AddEventTest {
         // First, login before each test
         login("johndoe@gmail.com", "sifra");  // Replace with valid credentials
 
-        driver.get("http://localhost:4200/home/create-event");
-        addEventPage = new AddEventPage(driver);
+        driver.get("http://localhost:4200/home/edit-event/1");
+        editEventPage = new EditEventPage(driver);
     }
 
     private void login(String email, String password) {
@@ -56,7 +60,7 @@ public class AddEventTest {
 
     @Test
     public void testSetTitle() {
-        Assertions.assertTrue(addEventPage.isPageLoaded(), "Add Event page did not load.");
+        Assertions.assertTrue(editEventPage.isPageLoaded(), "Edit Event page did not load.");
 
         // Wait for the title input to be clickable
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -70,15 +74,16 @@ public class AddEventTest {
         actions.moveToElement(titleInput).click().perform();
 
         // Set the title
+        titleInput.clear();
         titleInput.sendKeys("Test title");
         Assertions.assertEquals("Test title", titleInput.getAttribute("value"), "Title input should have the correct value.");
 
-        Helper.takeScreenshoot(driver, "add_event_set_title");
+        Helper.takeScreenshoot(driver, "edit_event_set_title");
     }
 
     @Test
     public void testSetDescription() {
-        Assertions.assertTrue(addEventPage.isPageLoaded(), "Add Event page did not load.");
+        Assertions.assertTrue(editEventPage.isPageLoaded(), "Edit Event page did not load.");
 
         // Wait for the title input to be clickable
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -92,15 +97,16 @@ public class AddEventTest {
         actions.moveToElement(descriptionInput).click().perform();
 
         // Set the title
+        descriptionInput.clear();
         descriptionInput.sendKeys("Test Desrciption");
         Assertions.assertEquals("Test Desrciption", descriptionInput.getAttribute("value"), "Desrciption input should have the correct value.");
 
-        Helper.takeScreenshoot(driver, "add_event_set_description");
+        Helper.takeScreenshoot(driver, "edit_event_set_description");
     }
 
     @Test
     public void testMaxParticipants() {
-        Assertions.assertTrue(addEventPage.isPageLoaded(), "Add Event page did not load.");
+        Assertions.assertTrue(editEventPage.isPageLoaded(), "Edit Event page did not load.");
 
         // Wait for the title input to be clickable
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -118,7 +124,7 @@ public class AddEventTest {
         maxParticipantsInput.sendKeys("200");
         Assertions.assertEquals("200", maxParticipantsInput.getAttribute("value"), "Desrciption input should have the correct value.");
 
-        Helper.takeScreenshoot(driver, "add_event_set_max_participants");
+        Helper.takeScreenshoot(driver, "edit_event_set_max_participants");
     }
 
 
@@ -128,10 +134,11 @@ public class AddEventTest {
 
         // Ensure the page loaded correctly
         WebElement pageTitle = wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("h2")));
-        Assertions.assertEquals("Create Event", pageTitle.getText(), "Page did not load correctly.");
+        Assertions.assertEquals("Edit Event", pageTitle.getText(), "Page did not load correctly.");
 
         // Fill out the form fields
         WebElement titleInput = driver.findElement(By.cssSelector("input[formcontrolname='title']"));
+        titleInput.clear();
         titleInput.sendKeys("Test Event");
 
         WebElement descriptionTextarea = driver.findElement(By.cssSelector("textarea[formcontrolname='description']"));
@@ -142,12 +149,15 @@ public class AddEventTest {
         maxParticipantsInput.sendKeys("100");
 
         WebElement cityInput = driver.findElement(By.cssSelector("input[formcontrolname='city']"));
+        cityInput.clear();
         cityInput.sendKeys("Test City");
 
         WebElement streetInput = driver.findElement(By.cssSelector("input[formcontrolname='street']"));
+        streetInput.clear();
         streetInput.sendKeys("Test Street");
 
         WebElement numberInput = driver.findElement(By.cssSelector("input[formcontrolname='number']"));
+        numberInput.clear();
         numberInput.sendKeys("123");
 
         WebElement latitudeInput = driver.findElement(By.cssSelector("input[formcontrolname='latitude']"));
@@ -160,7 +170,7 @@ public class AddEventTest {
 
 
         // Locate the "Create Event" button
-        WebElement createButton = driver.findElement(By.xpath("//p-button//button[normalize-space()='CREATE EVENT']"));
+        WebElement createButton = driver.findElement(By.xpath("//p-button//button[normalize-space()='EDIT EVENT']"));
 
 // Click the "Create Event" button
         createButton.click();
@@ -172,12 +182,12 @@ public class AddEventTest {
         String currentUrl = driver.getCurrentUrl();
         Assertions.assertTrue(currentUrl.contains("home/my_events"), "The user was not redirected to the 'home/my_events' page.");
 
-        Helper.takeScreenshoot(driver, "add_event_submit");
+        Helper.takeScreenshoot(driver, "edit_event_submit");
     }
 
     @Test
     public void testSetAddress() {
-        Assertions.assertTrue(addEventPage.isPageLoaded(), "Add Event page did not load.");
+        Assertions.assertTrue(editEventPage.isPageLoaded(), "Edit Event page did not load.");
 
         // Wait for the city input to be clickable
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -187,6 +197,7 @@ public class AddEventTest {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", cityInput);
         Actions actions = new Actions(driver);
         actions.moveToElement(cityInput).click().perform();
+        cityInput.clear();
         cityInput.sendKeys("New York");
         Assertions.assertEquals("New York", cityInput.getAttribute("value"), "City input should have the correct value.");
 
@@ -194,6 +205,7 @@ public class AddEventTest {
         WebElement streetInput = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[formcontrolname='street']")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", streetInput);
         actions.moveToElement(streetInput).click().perform();
+        streetInput.clear();
         streetInput.sendKeys("5th Avenue");
         Assertions.assertEquals("5th Avenue", streetInput.getAttribute("value"), "Street input should have the correct value.");
 
@@ -201,6 +213,7 @@ public class AddEventTest {
         WebElement numberInput = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[formcontrolname='number']")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", numberInput);
         actions.moveToElement(numberInput).click().perform();
+        numberInput.clear();
         numberInput.sendKeys("123");
         Assertions.assertEquals("123", numberInput.getAttribute("value"), "Number input should have the correct value.");
 
@@ -220,35 +233,10 @@ public class AddEventTest {
         longitudeInput.sendKeys("-74.0060");
         Assertions.assertEquals("-74.0060", longitudeInput.getAttribute("value"), "Longitude input should have the correct value.");
 
-        Helper.takeScreenshoot(driver, "add_event_set_address");
+        Helper.takeScreenshoot(driver, "edit_event_set_address");
     }
 
-    @Test
-    public void testPublicCheckbox() {
-        Assertions.assertTrue(addEventPage.isPageLoaded(), "Add Event page did not load.");
 
-        // Wait for the Public checkbox (p-checkbox) to be clickable
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement publicCheckboxWrapper = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("p-checkbox[formControlName='public']")));
-
-        // Ensure checkbox is unchecked initially
-        WebElement input = publicCheckboxWrapper.findElement(By.cssSelector("input"));
-        Assertions.assertFalse(input.isSelected(), "Public checkbox should initially be unchecked.");
-
-        // Click the checkbox (click on the wrapper or the input directly)
-        publicCheckboxWrapper.click();
-
-        // Verify the checkbox is now checked
-        Assertions.assertTrue(input.isSelected(), "Public checkbox should be checked after clicking.");
-
-        // Click again to uncheck the checkbox
-        publicCheckboxWrapper.click();
-
-        // Verify the checkbox is now unchecked
-        Assertions.assertFalse(input.isSelected(), "Public checkbox should be unchecked after clicking again.");
-
-        Helper.takeScreenshoot(driver, "add_event_set_public_checkbox");
-    }
 
     @AfterAll
     public static void tearDown() {
