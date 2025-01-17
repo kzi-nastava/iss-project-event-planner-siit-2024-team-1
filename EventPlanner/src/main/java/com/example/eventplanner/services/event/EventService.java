@@ -10,6 +10,7 @@ import com.example.eventplanner.dto.merchandise.service.GetServiceByIdResponseDT
 import com.example.eventplanner.dto.review.ReviewDTO;
 import com.example.eventplanner.dto.user.UserOverviewDTO;
 import com.example.eventplanner.exceptions.BlockedMerchandiseException;
+import com.example.eventplanner.exceptions.EventException;
 import com.example.eventplanner.model.common.Address;
 import com.example.eventplanner.model.event.*;
 import com.example.eventplanner.model.merchandise.Merchandise;
@@ -44,6 +45,8 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -175,7 +178,7 @@ public class EventService {
     }
 
     public CreatedEventOverviewDTO getById(int id) {
-        return mapToCreatedEventOverviewDTO(eventRepository.findById(id).orElseThrow(), eventRepository.findById(id).orElseThrow().getType(), eventRepository.findById(id).orElseThrow().getMerchandise());
+        return mapToCreatedEventOverviewDTO(eventRepository.findById(id).orElseThrow(() -> new EventException("Event not found!", EventException.ErrorType.EVENT_NOT_FOUND)), eventRepository.findById(id).orElseThrow(() -> new EventException("Event not found!", EventException.ErrorType.EVENT_NOT_FOUND)).getType(), eventRepository.findById(id).orElseThrow(() -> new EventException("Event not found!", EventException.ErrorType.EVENT_NOT_FOUND)).getMerchandise());
     }
 
     public Page<EventOverviewDTO> getByEo(int id, Pageable pageable) {
@@ -430,6 +433,11 @@ public class EventService {
         event.setDescription(dto.getDescription());
         event.setMaxParticipants(dto.getMaxParticipants());
         event.setPublic(dto.isPublic());
+
+        if(dto.getDate().isBefore(LocalDateTime.now())){
+            throw new EventException("Invalid date!", EventException.ErrorType.INVALID_DATE);
+        }
+
         event.setDate(dto.getDate());
         Address address = new Address();
         address.setCity(dto.getAddress().getCity());
@@ -439,7 +447,8 @@ public class EventService {
         address.setLongitude(dto.getAddress().getLongitude());
         event.setAddress(address);
 
-        EventType eventType = eventTypeRepository.findById(dto.getEventTypeId()).orElseThrow();
+        EventType eventType = eventTypeRepository.findById(dto.getEventTypeId()).orElseThrow(() -> new EventException("Event Type not found!",
+                EventException.ErrorType.EVENT_TYPE_NOT_FOUND));
         event.setType(eventType);
 
         Budget budget = new Budget();
@@ -469,7 +478,8 @@ public class EventService {
 //
 //        event.setMerchandise(merchandise);
 
-        EventOrganizer eventOrganizer = eventOrganizerRepository.findById(dto.getOrganizerId()).orElseThrow();
+        EventOrganizer eventOrganizer = eventOrganizerRepository.findById(dto.getOrganizerId()).orElseThrow(() -> new EventException("Organizer not found!",
+                EventException.ErrorType.ORGANIZER_NOT_FOUND));
         event.setOrganizer(eventOrganizer);
 
         Event savedEvent = eventRepository.save(event);
@@ -562,7 +572,7 @@ public class EventService {
     public CreatedEventOverviewDTO updateEvent(int eventId, UpdateEventDTO dto) {
         // Fetch the existing event
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new EventException("Event not found!", EventException.ErrorType.EVENT_NOT_FOUND));
 
         event.setTitle(dto.getTitle());
         event.setDescription(dto.getDescription());
@@ -577,7 +587,7 @@ public class EventService {
         address.setLongitude(dto.getAddress().getLongitude());
         event.setAddress(address);
 
-        EventType eventType = eventTypeRepository.findById(dto.getEventTypeId()).orElseThrow();
+        EventType eventType = eventTypeRepository.findById(dto.getEventTypeId()).orElseThrow(() -> new EventException("Event type not found!", EventException.ErrorType.EVENT_TYPE_NOT_FOUND));
         event.setType(eventType);
         List<Merchandise> products = merchandiseRepository.findAllById(dto.getProductIds());
         List<Merchandise> services = merchandiseRepository.findAllById(dto.getServiceIds());
@@ -600,12 +610,17 @@ public class EventService {
     public CreatedActivityDTO updateAgenda(int eventId, CreateActivityDTO dto) {
         // Fetch the existing event
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new EventException("Event not found", EventException.ErrorType.EVENT_NOT_FOUND));
 
         // Create a new Activity entity from the DTO
         Activity activity = new Activity();
         activity.setTitle(dto.getTitle());
         activity.setDescription(dto.getDescription());
+
+        if(dto.getStartTime().isAfter(dto.getEndTime())){
+            throw new EventException("Invalid activity time!", EventException.ErrorType.INVALID_ACTIVITY_TIME);
+        }
+
         activity.setStartTime(dto.getStartTime());
         activity.setEndTime(dto.getEndTime());
 
@@ -648,13 +663,13 @@ public class EventService {
     public List<ActivityOverviewDTO> getAgenda(int eventId) {
         // Fetch the existing event
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new EventException("Event not found with id " + eventId, EventException.ErrorType.EVENT_NOT_FOUND));
 
         return event.getActivities().stream().map(this::mapToActivityOverviewDTO).toList();
     }
 
     public ActivityOverviewDTO getActivity(int eventId) {
-        return mapToActivityOverviewDTO(activityRepository.findById(eventId).orElseThrow());
+        return mapToActivityOverviewDTO(activityRepository.findById(eventId).orElseThrow(() -> new EventException("Activity not found", EventException.ErrorType.ACTIVITY_NOT_FOUND)));
     }
 
     public ActivityOverviewDTO updateActivity(int activityId, CreateActivityDTO dto) {
@@ -702,13 +717,13 @@ public class EventService {
     public List<ActivityOverviewDTO> deleteActivity(int eventId, int activityId) {
         // Fetch the existing event
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new EventException("Event not found", EventException.ErrorType.EVENT_NOT_FOUND));
 
         // Find and remove the activity from the event
         Activity activityToRemove = event.getActivities().stream()
                 .filter(activity -> activity.getId() == activityId)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Activity not found"));
+                .orElseThrow(() -> new EventException("Activity not found", EventException.ErrorType.ACTIVITY_NOT_FOUND));
 
         event.getActivities().remove(activityToRemove);
         eventRepository.save(event); // Save the updated event

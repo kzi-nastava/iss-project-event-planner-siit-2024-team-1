@@ -60,6 +60,11 @@ INSERT INTO budget_budget_items(budget_budget_id, budget_item_id) VALUES
 -- -- No separate address table needed since it's an @Embeddable
 --
 -- Insert Events with embedded addresses
+
+INSERT INTO public.activity(
+    end_time, id, latitude, longitude, start_time, city, description, "number", street, title)
+VALUES ('13:45:00', 1, 10.12345, 20.12345, '13:25:00', 'Test City', 'Test Activity description', '123', 'Test Street', 'Test Activity');
+
 INSERT INTO event (
     budget_id,
     title,
@@ -89,7 +94,7 @@ INSERT INTO event (
           'Chicago',
           123,
           -122.4194,
-          37.7749, 1
+          37.7749, 11
       ),
       (
           200,
@@ -249,7 +254,7 @@ INSERT INTO event (
       );
 
 insert into user_organizing_events(event_organizer_id,organizing_events_id) values
-                                                                                (1,1),
+                                                                                (11,1),
                                                                                 (1,2),
                                                                                 (1,3),
                                                                                 (1,4),
@@ -262,6 +267,10 @@ insert into user_organizing_events(event_organizer_id,organizing_events_id) valu
                                                                                 (54,11),
                                                                                 (54,12);
 
+
+INSERT INTO public.event_activities(
+    activity_id, event_id)
+VALUES (1, 1);
 
 INSERT INTO merchandise (
     merchandise_type,
