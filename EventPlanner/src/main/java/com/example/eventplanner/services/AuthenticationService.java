@@ -257,6 +257,7 @@ public class AuthenticationService {
         authenticatedUser.setPassword(passwordEncoder.encode(userPassword));
         authenticatedUser.setActive(true);
         authenticatedUser.setAddress(new Address());
+        authenticatedUser.setPhoto("");
         authenticatedUser.setRole(Role.AU);
         emailService.sendMail("system@eventplanner.com",email,"Generated Password","Dear user, your password has been automatically generated, please" +
                 " change it as soon as possible! <br><br>Password:<br>"+userPassword);
@@ -277,7 +278,7 @@ public class AuthenticationService {
                 "system@eventplanner.com",
                 email,
                 "Activate Your Account",
-                "Click the link to activate your account: \n\n" + activationLink +
+                "Click the link to activate your account: \n\n" + "<a href='" + activationLink + "'> Activate" + "</a>" +
                         "\n\nThe link will expire in 24 hours."
         );
     }
