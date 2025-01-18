@@ -1,5 +1,6 @@
 package com.example.eventplanner.event;
 
+import com.example.eventplanner.config.TestSecurityConfig;
 import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.event.*;
 import com.example.eventplanner.model.common.Address;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
@@ -28,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("jpatest")
+@Import(TestSecurityConfig.class)
 class EventControllerTest {
 
     @Autowired

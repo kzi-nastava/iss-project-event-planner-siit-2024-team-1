@@ -3,10 +3,13 @@ package com.example.eventplanner.services.category;
 import com.example.eventplanner.dto.category.CategoryOverviewDTO;
 import com.example.eventplanner.dto.category.CategoryRequestDTO;
 import com.example.eventplanner.model.event.Category;
+import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.MerchandiseState;
 import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.repositories.category.CategoryRepository;
+import com.example.eventplanner.repositories.event.EventRepository;
+import com.example.eventplanner.repositories.eventType.EventTypeRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
 import com.example.eventplanner.services.merchandise.MerchandiseService;
@@ -22,6 +25,8 @@ public class CategoryService {
     private final MerchandiseService merchandiseService;
     private final MerchandiseRepository merchandiseRepository;
     private final ServiceProviderRepository serviceProviderRepository;
+    private final EventRepository eventRepository;
+    private final EventTypeRepository eventTypeRepository;
 
     public List<CategoryOverviewDTO> getAllApprovedCategories() {
         List<Category> allCategories = categoryRepository.findAllApprovedCategories();
@@ -55,6 +60,13 @@ public class CategoryService {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new IllegalArgumentException("Category with id: " + categoryId + " not found"));
         category.setPending(false);
+
+        EventType eventType = eventTypeRepository.findById(1)
+                .orElseThrow(() -> new RuntimeException("Event type with id: " + 1 + " not found"));
+        List<Category> allCategories = eventType.getCategories();
+        allCategories.add(category);
+        eventType.setCategories(allCategories);
+        eventTypeRepository.save(eventType);
 
         List<Merchandise> merchandise = merchandiseRepository.findMerchandiseByCategory(categoryId);
         if(!merchandise.isEmpty()) {
