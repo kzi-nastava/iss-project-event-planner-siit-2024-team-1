@@ -6,6 +6,7 @@ import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.event.*;
 import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
 import com.example.eventplanner.dto.merchandise.product.GetProductByIdResponseDTO;
+import com.example.eventplanner.dto.merchandise.review.DetailsReviewOverviewDTO;
 import com.example.eventplanner.dto.merchandise.service.GetServiceByIdResponseDTO;
 import com.example.eventplanner.dto.review.ReviewDTO;
 import com.example.eventplanner.dto.user.UserOverviewDTO;
@@ -423,7 +424,16 @@ public class EventService {
         dto.setMaxParticipants(event.getMaxParticipants());
         dto.setPublic(event.isPublic());
         dto.setOrganizer(convertToEoDTO(event.getOrganizer()));
+        List<Review> approvedReviews = event.getReviews().stream().filter(review -> review.getStatus() == ReviewStatus.APPROVED).toList();
+        dto.setReviews(approvedReviews.stream().map(this::mapToReviewDTO).toList());
+        return dto;
+    }
 
+    private DetailsReviewOverviewDTO mapToReviewDTO(Review review) {
+        DetailsReviewOverviewDTO dto = new DetailsReviewOverviewDTO();
+        dto.setReviewersUsername(review.getReviewer().getUsername());
+        dto.setComment(review.getComment());
+        dto.setRating(review.getRating());
         return dto;
     }
 
