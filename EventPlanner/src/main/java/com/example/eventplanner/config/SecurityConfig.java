@@ -43,10 +43,10 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults()) // Add this line for CORS
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh_token/**", "/api/v1/events/top/**", "/api/v1/auth/activate/**",
-                                "/api/events/{id}/details", "/api/v1/events/search", "/api/v1/merchandise/top/**", "/api/v1/auth/fast-register/**",
-                                "/api/v1/services/search", "/api/v1/products/search", "/api/v1/events/{id}",
+                                "/api/v1/events/{id}/details/**", "/api/v1/events/search", "/api/v1/merchandise/top/**", "/api/v1/auth/fast-register/**",
+                                "/api/v1/services/search", "/api/v1/products/search", "/api/v1/events/{id}", "/api/v1/event-types/all", "/api/v1/event-types/all-wp",
                                 "/api/v1/merchandise/{id}", "/api/v1/notifications/**", "/api/v1/photos/{filename}", "/api/v1/photos/**", "/api/v1/photos/user/{id}",
-                                "/api/v1/auth/register-sp/**", "/api/v1/auth/register-eo/**" ,"/ws")
+                                "/api/v1/auth/register-sp/**", "/api/v1/auth/register-eo/**" ,"/ws", "/api/v1/events/{id}/agenda")
                         .permitAll()
                         .anyRequest()
                         .authenticated()

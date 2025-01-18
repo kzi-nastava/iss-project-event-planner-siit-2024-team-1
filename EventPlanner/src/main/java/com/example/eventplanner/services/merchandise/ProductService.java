@@ -50,6 +50,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -212,8 +213,12 @@ public class ProductService {
         dto.setDescription(product.getDescription());
         dto.setAddress(product.getAddress());
         dto.setCategory(product.getCategory().getTitle());
-        if(product.getPhotos() != null && !product.getPhotos().isEmpty())
+        if(product.getPhotos() != null && !product.getPhotos().isEmpty()) {
             dto.setPhotos(product.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
+        }
+        else{
+            dto.setPhotos(new ArrayList<>());
+        }
         dto.setRating(product.getRating());
         dto.setType(product.getClass().getSimpleName());
         dto.setPrice(product.getPrice());
