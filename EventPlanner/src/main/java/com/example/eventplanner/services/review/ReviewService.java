@@ -3,10 +3,14 @@ package com.example.eventplanner.services.review;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseRequestDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponseDTO;
 import com.example.eventplanner.dto.merchandise.review.ReviewOverviewDTO;
+import com.example.eventplanner.exceptions.LeaveReviewException;
 import com.example.eventplanner.model.common.Review;
+import com.example.eventplanner.model.common.ReviewType;
 import com.example.eventplanner.model.merchandise.*;
 import com.example.eventplanner.model.event.Event;
 
+import com.example.eventplanner.model.user.EventOrganizer;
+import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.model.user.User;
 import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
@@ -109,7 +113,8 @@ public class ReviewService {
     }
 
     public ReviewMerchandiseResponseDTO leaveMerchandiseReview(int id, ReviewMerchandiseRequestDTO request) {
-        User reviewer = userRepository.findById(request.getReviewerId()).orElseThrow(() -> new RuntimeException("User not found"));
+        User reviewer = userRepository.findById(request.getReviewerId()).orElseThrow(
+                () -> new LeaveReviewException("User not found", LeaveReviewException.ErrorType.USER_NOT_FOUND));
         Review review = new Review();
 
         review.setRating(request.getRating());
@@ -121,15 +126,27 @@ public class ReviewService {
         Review savedReview = reviewRepository.save(review);
 
         if(request.getType().equals("merchandise")) {
-            Merchandise reviewedMerchandise = merchandiseRepository.findById(id).orElseThrow(() -> new RuntimeException("Merchandise not found"));
+            Merchandise reviewedMerchandise = merchandiseRepository.findById(id).orElseThrow(
+                    () -> new LeaveReviewException("Merchandise not found", LeaveReviewException.ErrorType.MERCHANDISE_NOT_FOUND)
+            );
+
+            if(reviewedMerchandise.getReviews().stream().anyMatch(review1 -> review1.getReviewer().getId() == reviewer.getId())) {
+                throw new LeaveReviewException("User already left review", LeaveReviewException.ErrorType.REVIEW_ALREADY_EXISTS);
+            }
             reviewedMerchandise.getReviews().add(review);
             merchandiseRepository.save(reviewedMerchandise);
         }else if(request.getType().equals("event")) {
-            Event reviewedEvent = eventRepository.findById(id).orElseThrow(() -> new RuntimeException("Event not found"));
+            Event reviewedEvent = eventRepository.findById(id).orElseThrow(
+                    () -> new LeaveReviewException("Event not found", LeaveReviewException.ErrorType.EVENT_NOT_FOUND)
+            );
+
+            if(reviewedEvent.getReviews().stream().anyMatch(review1 -> review1.getReviewer().getId() == reviewer.getId())) {
+                throw new LeaveReviewException("User already left review", LeaveReviewException.ErrorType.REVIEW_ALREADY_EXISTS);
+            }
             reviewedEvent.getReviews().add(review);
             eventRepository.save(reviewedEvent);
         }else {
-            throw new RuntimeException("Unsupported type");
+            throw new LeaveReviewException("Unsupported type", LeaveReviewException.ErrorType.UNSUPORTED_TYPE);
         }
 
         return mapToReviewResponseDTO(savedReview);
@@ -144,5 +161,76 @@ public class ReviewService {
         responseDTO.setStatus(review.getStatus());
 
         return responseDTO;
+    }
+    //function declares whether the user is allowed to leave a review
+    public Boolean isEligibleForReview(int userId, int id, ReviewType reviewType) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new LeaveReviewException("User not found", LeaveReviewException.ErrorType.USER_NOT_FOUND)
+        );
+        if(reviewType == ReviewType.MERCHANDISE_REVIEW) {
+            //event organizer can leave review for merchandise he bought for his event or event he attended
+            if(user instanceof EventOrganizer eo) {
+                checkIfMerchandiseReviewExists(user, id);
+                return findMatchInOrganizedEvents(eo, id) || findMatchInAttendedEventsMerchandise(user, id);
+            }
+            //all other users can leave review for merchandise if only they attended event that included merchandise
+            else {
+                checkIfMerchandiseReviewExists(user, id);
+                return findMatchInAttendedEventsMerchandise(user, id);
+            }
+        }
+        //if it is review for event
+        else if(reviewType == ReviewType.EVENT_REVIEW) {
+            checkIfEventReviewExists(user, id);
+            return findMatchInAttendedEvents(user, id);
+        }
+        //there is only review for event or merchandise
+        else {
+            throw new LeaveReviewException("Unsupported review type", LeaveReviewException.ErrorType.UNSUPORTED_TYPE);
+        }
+    }
+    //checking if eo bought merchandise for any of his organized events
+    private boolean findMatchInOrganizedEvents(EventOrganizer eo, int merchandiseId) {
+        return eo.getOrganizingEvents().stream().anyMatch(
+                event -> event.getBudget()
+                        .getBudgetItems()
+                        .stream()
+                        .anyMatch(budgetItem ->
+                                budgetItem.getMerchandise() != null && budgetItem.getMerchandise().getId() == merchandiseId)
+        );
+    }
+    //checking if user attended any event that included selected merchandise
+    private boolean findMatchInAttendedEventsMerchandise(User user, int merchandiseId) {
+        return user.getAttendedEvents().stream().anyMatch(
+                event -> event.getBudget()
+                        .getBudgetItems()
+                        .stream()
+                        .anyMatch(budgetItem ->
+                                budgetItem.getMerchandise() != null && budgetItem.getMerchandise().getId() == merchandiseId)
+        );
+    }
+    //checking if user already left review for merchandise
+    private void checkIfMerchandiseReviewExists(User user, int merchandiseId) {
+        //checking if user already left review
+        Merchandise reviewedMerchandise = merchandiseRepository.findById(merchandiseId).orElseThrow(
+                () -> new LeaveReviewException("Merchandise not found", LeaveReviewException.ErrorType.MERCHANDISE_NOT_FOUND)
+        );
+        if(reviewedMerchandise.getReviews().stream().anyMatch(review1 -> review1.getReviewer().getId() == user.getId())) {
+            throw new LeaveReviewException("User already left review", LeaveReviewException.ErrorType.REVIEW_ALREADY_EXISTS);
+        }
+    }
+    //checking if user already left review for event
+    private void checkIfEventReviewExists(User user, int eventId) {
+        Event reviewedEvent = eventRepository.findById(eventId).orElseThrow(
+                () -> new LeaveReviewException("Event not found", LeaveReviewException.ErrorType.EVENT_NOT_FOUND)
+        );
+
+        if(reviewedEvent.getReviews().stream().anyMatch(review1 -> review1.getReviewer().getId() == user.getId())) {
+            throw new LeaveReviewException("User already left review", LeaveReviewException.ErrorType.REVIEW_ALREADY_EXISTS);
+        }
+    }
+
+    private boolean findMatchInAttendedEvents(User user, int eventId) {
+        return user.getAttendedEvents().stream().anyMatch(event -> event != null && event.getId() == eventId);
     }
 }
