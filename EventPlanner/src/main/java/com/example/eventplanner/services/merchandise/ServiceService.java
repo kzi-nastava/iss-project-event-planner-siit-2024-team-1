@@ -244,8 +244,12 @@ public class ServiceService {
         dto.setDescription(service.getDescription());
         dto.setAddress(service.getAddress());
         dto.setCategory(service.getCategory().getTitle());
-        if(service.getPhotos() != null && !service.getPhotos().isEmpty())
+        if(service.getPhotos() != null && !service.getPhotos().isEmpty()) {
             dto.setPhotos(service.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
+        }
+        else{
+            dto.setPhotos(new ArrayList<>());
+        }
         dto.setRating(service.getRating());
         dto.setType(service.getClass().getSimpleName());
         dto.setPrice(service.getPrice());

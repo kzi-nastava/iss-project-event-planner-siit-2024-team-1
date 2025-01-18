@@ -25,6 +25,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -103,8 +104,12 @@ public class MerchandiseService {
         dto.setDescription(merchandise.getDescription());
         dto.setAddress(merchandise.getAddress());
         dto.setCategory(merchandise.getCategory().getTitle());
-        if(merchandise.getPhotos() != null && !merchandise.getPhotos().isEmpty())
+        if(merchandise.getPhotos() != null && !merchandise.getPhotos().isEmpty()){
             dto.setPhotos(merchandise.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
+        }
+        else{
+            dto.setPhotos(new ArrayList<>());
+        }
         dto.setRating(merchandise.getRating());
         dto.setType(merchandise.getClass().getSimpleName());
         dto.setPrice(merchandise.getPrice());
