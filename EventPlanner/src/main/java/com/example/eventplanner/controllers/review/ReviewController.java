@@ -5,6 +5,7 @@ import com.example.eventplanner.dto.merchandise.review.ReviewMerchandiseResponse
 import com.example.eventplanner.dto.merchandise.review.ReviewOverviewDTO;
 import com.example.eventplanner.dto.review.ReviewDTO;
 import com.example.eventplanner.dto.review.ReviewUpdateResponseDTO;
+import com.example.eventplanner.model.common.ReviewType;
 import com.example.eventplanner.services.review.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -41,5 +42,13 @@ public class ReviewController {
                                                                                @RequestBody ReviewMerchandiseRequestDTO request) {
         ReviewMerchandiseResponseDTO responseDTO = reviewService.leaveMerchandiseReview(id, request);
         return ResponseEntity.ok(new ReviewMerchandiseResponseDTO());
+    }
+
+    @GetMapping("/display-review/{id}/{user_id}")
+    public ResponseEntity<Boolean> isEligibleForReview(@PathVariable(value = "id") int id,
+                                                       @PathVariable(value = "user_id") int userId,
+                                                       @RequestParam ReviewType reviewType) {
+        boolean eligible = reviewService.isEligibleForReview(userId, id, reviewType);
+        return ResponseEntity.ok(eligible);
     }
 }

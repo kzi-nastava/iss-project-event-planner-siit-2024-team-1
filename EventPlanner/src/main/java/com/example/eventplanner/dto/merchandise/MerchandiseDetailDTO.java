@@ -3,7 +3,7 @@ package com.example.eventplanner.dto.merchandise;
 import com.example.eventplanner.dto.category.CategoryOverviewDTO;
 import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
-import com.example.eventplanner.dto.merchandise.review.MerchandiseReviewOverviewDTO;
+import com.example.eventplanner.dto.merchandise.review.DetailsReviewOverviewDTO;
 import lombok.Data;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class MerchandiseDetailDTO {
     private int reservationDeadline;
     private int cancellationDeadline;
     private List<MerchandisePhotoDTO> merchandisePhotos;
-    private List<MerchandiseReviewOverviewDTO> reviews;
+    private List<DetailsReviewOverviewDTO> reviews;
     private AddressDTO address;
     private CategoryOverviewDTO category;
     private List<EventTypeOverviewDTO> eventTypes;

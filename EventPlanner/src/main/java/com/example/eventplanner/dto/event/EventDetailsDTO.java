@@ -2,14 +2,13 @@ package com.example.eventplanner.dto.event;
 
 import com.example.eventplanner.dto.common.AddressDTO;
 import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
-import com.example.eventplanner.model.common.Address;
+import com.example.eventplanner.dto.merchandise.review.DetailsReviewOverviewDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -24,4 +23,6 @@ public class  EventDetailsDTO {
     @JsonProperty("isPublic")
     private boolean isPublic;
     private EventOrganizerDTO organizer;
+
+    private List<DetailsReviewOverviewDTO> reviews;
 }

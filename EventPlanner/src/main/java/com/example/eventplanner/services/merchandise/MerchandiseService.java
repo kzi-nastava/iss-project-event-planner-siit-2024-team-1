@@ -7,7 +7,8 @@ import com.example.eventplanner.dto.eventType.EventTypeOverviewDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseDetailDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.MerchandisePhotoDTO;
-import com.example.eventplanner.dto.merchandise.review.MerchandiseReviewOverviewDTO;
+import com.example.eventplanner.dto.merchandise.review.DetailsReviewOverviewDTO;
+import com.example.eventplanner.dto.merchandise.review.ReviewOverviewDTO;
 import com.example.eventplanner.exceptions.BlockedMerchandiseException;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.EventType;
@@ -209,8 +210,8 @@ public class MerchandiseService {
         return dto;
     }
 
-    private MerchandiseReviewOverviewDTO mapToMerchandiseReviewDTO(Review review) {
-        MerchandiseReviewOverviewDTO dto = new MerchandiseReviewOverviewDTO();
+    private DetailsReviewOverviewDTO mapToMerchandiseReviewDTO(Review review) {
+        DetailsReviewOverviewDTO dto = new DetailsReviewOverviewDTO();
         dto.setReviewersUsername(review.getReviewer().getUsername());
         dto.setComment(review.getComment());
         dto.setRating(review.getRating());
