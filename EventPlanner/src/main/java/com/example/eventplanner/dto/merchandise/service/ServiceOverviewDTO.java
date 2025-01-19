@@ -23,7 +23,7 @@ public class ServiceOverviewDTO {
     private int reservationDeadline;
     private int cancellationDeadline;
     private boolean automaticReservation;
-    private List<MerchandisePhotoDTO> photos;
+    private List<MerchandisePhotoDTO> merchandisePhotos;
     private List<EventType> eventTypes;
     private AddressDTO address;
     private Category category;

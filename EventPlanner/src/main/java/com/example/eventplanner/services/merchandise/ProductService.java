@@ -503,6 +503,10 @@ public class ProductService {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventException("Event not found", EventException.ErrorType.EVENT_NOT_FOUND));
         Product product = productRepository.findById(productId).orElseThrow(() -> new ProductException("Product not found", ProductException.ErrorType.NOT_FOUND));
 
+        if(isProductAlreadyBought(productId, event)) {
+            throw new ProductException("Product is already bought!", ProductException.ErrorType.PRODUCT_BOUGHT);
+        }
+
         BudgetItem existingBudgetItem = event.getBudget()
                                             .getBudgetItems()
                                             .stream()
@@ -525,5 +529,13 @@ public class ProductService {
 
         budgetRepository.save(event.getBudget());
         return new BuyProductResponseDTO();
+    }
+
+    private boolean isProductAlreadyBought(int productId, Event event) {
+        return event.getBudget()
+                .getBudgetItems()
+                .stream()
+                .anyMatch(budgetItem ->
+                        budgetItem.getMerchandise() != null && budgetItem.getMerchandise().getId() == productId);
     }
 }

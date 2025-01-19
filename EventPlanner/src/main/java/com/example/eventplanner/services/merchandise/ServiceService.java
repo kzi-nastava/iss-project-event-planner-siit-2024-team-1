@@ -264,7 +264,7 @@ public class ServiceService {
         dto.setAddress(convertToAddressDTO(service.getAddress()));
         dto.setCategory(service.getCategory());
         if(service.getPhotos() != null && !service.getPhotos().isEmpty())
-            dto.setPhotos(service.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
+            dto.setMerchandisePhotos(service.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
         dto.setPrice(service.getPrice());
         return dto;
     }
@@ -675,7 +675,7 @@ public class ServiceService {
         responseDTO.setReservationDeadline(savedService.getReservationDeadline());
         responseDTO.setCancellationDeadline(savedService.getCancellationDeadline());
         responseDTO.setAutomaticReservation(savedService.isAutomaticReservation());
-        responseDTO.setPhotos(savedService.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
+        responseDTO.setMerchandisePhotos(savedService.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
         responseDTO.setEventTypes(savedService.getEventTypes());
 
         AddressDTO address = new AddressDTO();
@@ -714,7 +714,12 @@ public class ServiceService {
         updatedService.setAutomaticReservation(request.isAutomaticReservation());
         updatedService.setAvailable(request.isAvailable());
         updatedService.setVisible(request.isVisible());
-        updatedService.setPhotos(merchandisePhotoRepository.findAllById(request.getPhotos()));
+        updatedService.setState(MerchandiseState.APPROVED);
+
+//        List<MerchandisePhoto> photos = serviceBeforeUpdate.getPhotos();
+//        photos.addAll(merchandisePhotoRepository.findAllById(request.getPhotos()));
+//        updatedService.setPhotos(photos);
+        updatedService.setPhotos(merchandisePhotoRepository.findAllById(request.getMerchandisePhotos()));
 
         List<EventType> eventTypes = eventTypeRepository.findAllById(request.getEventTypesIds());
         updatedService.setEventTypes(eventTypes);
@@ -744,8 +749,12 @@ public class ServiceService {
         com.example.eventplanner.model.merchandise.Service savedService = merchandiseRepository.save(updatedService);
 
         if(serviceProvider.getMerchandise() != null) {
-            serviceProvider.getMerchandise().remove(serviceBeforeUpdate);
             serviceProvider.getMerchandise().add(savedService);
+            userRepository.save(serviceProvider);
+        } else {
+            List<Merchandise> merchandise = new ArrayList<>();
+            merchandise.add(savedService);
+            serviceProvider.setMerchandise(merchandise);
             userRepository.save(serviceProvider);
         }
         return mapToCreateServiceResponseDTO(updatedService, serviceProvider.getId());
