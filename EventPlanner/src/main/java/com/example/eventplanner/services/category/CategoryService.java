@@ -2,6 +2,7 @@ package com.example.eventplanner.services.category;
 
 import com.example.eventplanner.dto.category.CategoryOverviewDTO;
 import com.example.eventplanner.dto.category.CategoryRequestDTO;
+import com.example.eventplanner.exceptions.CategoryException;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
@@ -47,22 +48,22 @@ public class CategoryService {
         return allCategories.stream().map(this::mapToCategoryOverviewDTO).toList();
     }
 
-    public List<CategoryOverviewDTO> createCategory(CategoryRequestDTO request) {
+    public CategoryOverviewDTO createCategory(CategoryRequestDTO request) {
         Category category = new Category();
         category.setTitle(request.getTitle());
         category.setDescription(request.getDescription());
         category.setPending(request.isPending());
-        categoryRepository.save(category);
-        return categoryRepository.findAll().stream().map(this::mapToCategoryOverviewDTO).toList();
+        Category savedCategory = categoryRepository.save(category);
+        return mapToCategoryOverviewDTO(savedCategory);
     }
 
-    public List<CategoryOverviewDTO> approveCategory(int categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Category with id: " + categoryId + " not found"));
+    public CategoryOverviewDTO approveCategory(int categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() ->
+                new CategoryException("Category with id: " + categoryId + " not found", CategoryException.ErrorType.CATEGORY_NOT_FOUND));
         category.setPending(false);
-
-        EventType eventType = eventTypeRepository.findById(1)
-                .orElseThrow(() -> new RuntimeException("Event type with id: " + 1 + " not found"));
+        //event type with id 1 is option 'all' and it has all categories connected to it
+        EventType eventType = eventTypeRepository.findById(1).orElseThrow(() ->
+                new CategoryException("Event type with id: " + 1 + " not found", CategoryException.ErrorType.EVENT_NOT_FOUND));
         List<Category> allCategories = eventType.getCategories();
         allCategories.add(category);
         eventType.setCategories(allCategories);
@@ -78,13 +79,13 @@ public class CategoryService {
             }
         }
 
-        categoryRepository.save(category);
-        return getAllApprovedCategories();
+        Category savedCategory = categoryRepository.save(category);
+        return mapToCategoryOverviewDTO(savedCategory);
     }
 
-    public List<CategoryOverviewDTO> updateCategory(int categoryId, CategoryRequestDTO request) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Category with id: " + categoryId + " not found"));
+    public CategoryOverviewDTO updateCategory(int categoryId, CategoryRequestDTO request) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() ->
+                new CategoryException("Category with id: " + categoryId + " not found", CategoryException.ErrorType.CATEGORY_NOT_FOUND));
         category.setTitle(request.getTitle());
         category.setDescription(request.getDescription());
         category.setPending(false);
@@ -99,30 +100,28 @@ public class CategoryService {
             }
         }
 
-        categoryRepository.save(category);
-        return getAllApprovedCategories();
+        Category savedCategory = categoryRepository.save(category);
+        return mapToCategoryOverviewDTO(savedCategory);
     }
 
-    public List<CategoryOverviewDTO> deleteCategory(int categoryId) throws Exception {
+    public void deleteCategory(int categoryId) throws Exception {
             boolean exists = categoryRepository.existsById(categoryId);
             if(!exists) {
-                throw new IllegalArgumentException("Category with id: " + categoryId + " not found");
+                throw new CategoryException("Category with id: " + categoryId + " not found", CategoryException.ErrorType.CATEGORY_NOT_FOUND);
             }
 
-            List<Merchandise> merchandise = merchandiseRepository.findMerchandiseByCategory(categoryId);
-            if(merchandise.isEmpty()) {
-                categoryRepository.deleteById(categoryId);
-            }else {
-                for(Merchandise merc : merchandise){
-                    if(merc.getState() == MerchandiseState.PENDING) {
-                        ServiceProvider sp = serviceProviderRepository.findByMerchandiseId(merc.getId()).get();
-                        sp.getMerchandise().remove(merc);
-                        serviceProviderRepository.save(sp);
-                        merchandiseRepository.deleteById(merc.getId());
-                    }
+        List<Merchandise> merchandise = merchandiseRepository.findMerchandiseByCategory(categoryId);
+        if(merchandise.isEmpty()) {
+            categoryRepository.deleteById(categoryId);
+        }else {
+            for(Merchandise merc : merchandise){
+                if(merc.getState() == MerchandiseState.PENDING) {
+                    ServiceProvider sp = serviceProviderRepository.findByMerchandiseId(merc.getId()).get();
+                    sp.getMerchandise().remove(merc);
+                    serviceProviderRepository.save(sp);
+                    merchandiseRepository.deleteById(merc.getId());
                 }
             }
-
-        return getAllApprovedCategories();
+        }
     }
 }
