@@ -573,19 +573,14 @@ public class ServiceService {
         List<EventType> eventTypes = eventTypeRepository.findAllById(request.getEventTypesIds());
         service.setEventTypes(eventTypes);
 
-        if(request.getCategoryId() != -1) {
-            Category category = categoryRepository.findById(request.getCategoryId())
-                    .orElseThrow(() -> new CreateServiceException(
-                            "Category with id " + request.getCategoryId() + " not found",
-                            CreateServiceException.ErrorType.CATEGORY_NOT_FOUND));
-            service.setCategory(category);
-            service.setState(MerchandiseState.APPROVED);
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new CreateServiceException(
+                        "Category with id " + request.getCategoryId() + " not found",
+                        CreateServiceException.ErrorType.CATEGORY_NOT_FOUND));
+        service.setCategory(category);
+        if(category.isPending()) {
+            service.setState(MerchandiseState.PENDING);
         } else {
-            Category category = new Category();
-            category.setTitle(request.getCategory().getTitle());
-            category.setDescription(request.getCategory().getDescription());
-            category.setPending(true);
-            service.setCategory(categoryRepository.save(category));
             service.setState(MerchandiseState.PENDING);
         }
 
@@ -716,9 +711,6 @@ public class ServiceService {
         updatedService.setVisible(request.isVisible());
         updatedService.setState(MerchandiseState.APPROVED);
 
-//        List<MerchandisePhoto> photos = serviceBeforeUpdate.getPhotos();
-//        photos.addAll(merchandisePhotoRepository.findAllById(request.getPhotos()));
-//        updatedService.setPhotos(photos);
         updatedService.setPhotos(merchandisePhotoRepository.findAllById(request.getMerchandisePhotos()));
 
         List<EventType> eventTypes = eventTypeRepository.findAllById(request.getEventTypesIds());

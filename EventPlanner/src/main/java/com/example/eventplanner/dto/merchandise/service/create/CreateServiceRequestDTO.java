@@ -1,8 +1,7 @@
 package com.example.eventplanner.dto.merchandise.service.create;
 
 import com.example.eventplanner.dto.common.AddressDTO;
-import com.example.eventplanner.dto.merchandise.CreateMerchandisePhotoDTO;
-import com.example.eventplanner.dto.merchandise.product.CreateCategoryDTO;
+
 import lombok.Data;
 
 import java.util.List;
@@ -15,7 +14,6 @@ public class CreateServiceRequestDTO {
     private double price;
     private int discount;
     private int categoryId;
-    private CreateCategoryDTO category;
     private List<Integer> eventTypesIds;
     private int minDuration;
     private int maxDuration;
