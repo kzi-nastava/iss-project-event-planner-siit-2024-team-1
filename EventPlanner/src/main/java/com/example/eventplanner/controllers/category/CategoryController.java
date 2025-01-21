@@ -2,10 +2,12 @@ package com.example.eventplanner.controllers.category;
 
 import com.example.eventplanner.dto.category.CategoryOverviewDTO;
 import com.example.eventplanner.dto.category.CategoryRequestDTO;
+import com.example.eventplanner.exceptions.CategoryException;
 import com.example.eventplanner.services.category.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -56,6 +58,18 @@ public class CategoryController {
             categoryService.deleteCategory(categoryId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
+    @PutMapping("/replace/{categoryId}/{replacedCategoryId}")
+    public ResponseEntity<?> replaceCategory(@PathVariable(name = "categoryId") int categoryId, @PathVariable(name = "replacedCategoryId") int replacedCategoryId) {
+        try {
+            categoryService.replaceCategory(categoryId, replacedCategoryId);
+            return ResponseEntity.ok().build();
+        }catch(CategoryException e) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);

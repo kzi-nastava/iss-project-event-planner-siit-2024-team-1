@@ -3,30 +3,35 @@ package com.example.eventplanner.services.category;
 import com.example.eventplanner.dto.category.CategoryOverviewDTO;
 import com.example.eventplanner.dto.category.CategoryRequestDTO;
 import com.example.eventplanner.exceptions.CategoryException;
+import com.example.eventplanner.model.common.NotificationType;
 import com.example.eventplanner.model.event.BudgetItem;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.MerchandiseState;
+import com.example.eventplanner.model.merchandise.Product;
 import com.example.eventplanner.model.user.ServiceProvider;
 import com.example.eventplanner.repositories.budget.BudgetItemRepository;
 import com.example.eventplanner.repositories.category.CategoryRepository;
 import com.example.eventplanner.repositories.eventType.EventTypeRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
+import com.example.eventplanner.services.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final MerchandiseRepository merchandiseRepository;
-    private final ServiceProviderRepository serviceProviderRepository;
     private final EventTypeRepository eventTypeRepository;
     private final BudgetItemRepository budgetItemRepository;
+    private final ServiceProviderRepository serviceProviderRepository;
+    private final NotificationService notificationService;
 
     public List<CategoryOverviewDTO> getAllApprovedCategories() {
         List<Category> allCategories = categoryRepository.findAllApprovedCategories();
@@ -82,6 +87,37 @@ public class CategoryService {
         return mapToCategoryOverviewDTO(savedCategory);
     }
 
+    public void replaceCategory(int categoryId, int replacedCategoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() ->
+                new CategoryException("Category with id: " + categoryId + " not found", CategoryException.ErrorType.CATEGORY_NOT_FOUND));
+        boolean categoryFound = categoryRepository.existsById(replacedCategoryId);
+        if(!categoryFound) {
+            throw new CategoryException("Category with id: " + replacedCategoryId + " not found", CategoryException.ErrorType.CATEGORY_NOT_FOUND);
+        }
+        List<Merchandise> merchandises = merchandiseRepository.findMerchandiseByCategory(replacedCategoryId);
+        if(!merchandises.isEmpty()) {
+            for(Merchandise merc : merchandises) {
+                merc.setCategory(category);
+                merchandiseRepository.save(merc);
+                notifyServiceProvider(merc, "Admin has updated Category from one of your Merchandises");
+            }
+        } else {
+            throw new CategoryException("No merchandise associated with category: " + replacedCategoryId, CategoryException.ErrorType.MERCHANDISE_NOT_FOUND);
+        }
+    }
+
+    private void notifyServiceProvider(Merchandise merc, String message) {
+        Optional<ServiceProvider> optionalServiceProvider = serviceProviderRepository.findByMerchandiseId(merc.getId());
+        if(optionalServiceProvider.isPresent()) {
+            ServiceProvider serviceProvider = optionalServiceProvider.get();
+            if(merc instanceof Product) {
+                notificationService.sendNotificationToUser(serviceProvider, message, NotificationType.PRODUCT, merc.getId());
+            }else {
+                notificationService.sendNotificationToUser(serviceProvider, message, NotificationType.SERVICE, merc.getId());
+            }
+        }
+    }
+
     public CategoryOverviewDTO updateCategory(int categoryId, CategoryRequestDTO request) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() ->
                 new CategoryException("Category with id: " + categoryId + " not found", CategoryException.ErrorType.CATEGORY_NOT_FOUND));
@@ -92,10 +128,7 @@ public class CategoryService {
         List<Merchandise> merchandise = merchandiseRepository.findMerchandiseByCategory(categoryId);
         if(!merchandise.isEmpty()) {
             for(Merchandise merc : merchandise){
-                if(merc.getState() == MerchandiseState.PENDING) {
-                    merc.setState(MerchandiseState.APPROVED);
-                    merchandiseRepository.save(merc);
-                }
+                notifyServiceProvider(merc, "Admin has updated Category from one of your Merchandises");
             }
         }
 
