@@ -3,17 +3,17 @@ package com.example.eventplanner.services.category;
 import com.example.eventplanner.dto.category.CategoryOverviewDTO;
 import com.example.eventplanner.dto.category.CategoryRequestDTO;
 import com.example.eventplanner.exceptions.CategoryException;
+import com.example.eventplanner.model.event.BudgetItem;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.model.event.EventType;
 import com.example.eventplanner.model.merchandise.Merchandise;
 import com.example.eventplanner.model.merchandise.MerchandiseState;
 import com.example.eventplanner.model.user.ServiceProvider;
+import com.example.eventplanner.repositories.budget.BudgetItemRepository;
 import com.example.eventplanner.repositories.category.CategoryRepository;
-import com.example.eventplanner.repositories.event.EventRepository;
 import com.example.eventplanner.repositories.eventType.EventTypeRepository;
 import com.example.eventplanner.repositories.merchandise.MerchandiseRepository;
 import com.example.eventplanner.repositories.user.ServiceProviderRepository;
-import com.example.eventplanner.services.merchandise.MerchandiseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +23,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
-    private final MerchandiseService merchandiseService;
     private final MerchandiseRepository merchandiseRepository;
     private final ServiceProviderRepository serviceProviderRepository;
-    private final EventRepository eventRepository;
     private final EventTypeRepository eventTypeRepository;
+    private final BudgetItemRepository budgetItemRepository;
 
     public List<CategoryOverviewDTO> getAllApprovedCategories() {
         List<Category> allCategories = categoryRepository.findAllApprovedCategories();
@@ -89,7 +88,7 @@ public class CategoryService {
         category.setTitle(request.getTitle());
         category.setDescription(request.getDescription());
         category.setPending(false);
-
+        
         List<Merchandise> merchandise = merchandiseRepository.findMerchandiseByCategory(categoryId);
         if(!merchandise.isEmpty()) {
             for(Merchandise merc : merchandise){
@@ -109,19 +108,12 @@ public class CategoryService {
             if(!exists) {
                 throw new CategoryException("Category with id: " + categoryId + " not found", CategoryException.ErrorType.CATEGORY_NOT_FOUND);
             }
-
+        List<BudgetItem> budgetItems = budgetItemRepository.findByCategoryId(categoryId);
         List<Merchandise> merchandise = merchandiseRepository.findMerchandiseByCategory(categoryId);
-        if(merchandise.isEmpty()) {
+        if(merchandise.isEmpty() && budgetItems.isEmpty()) {
             categoryRepository.deleteById(categoryId);
         }else {
-            for(Merchandise merc : merchandise){
-                if(merc.getState() == MerchandiseState.PENDING) {
-                    ServiceProvider sp = serviceProviderRepository.findByMerchandiseId(merc.getId()).get();
-                    sp.getMerchandise().remove(merc);
-                    serviceProviderRepository.save(sp);
-                    merchandiseRepository.deleteById(merc.getId());
-                }
-            }
+            throw new CategoryException("Category with id: " + categoryId + " is already in use", CategoryException.ErrorType.CATEGORY_IN_USE);
         }
     }
 }
