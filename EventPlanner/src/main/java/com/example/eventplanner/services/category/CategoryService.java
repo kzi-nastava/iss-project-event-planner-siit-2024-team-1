@@ -137,10 +137,16 @@ public class CategoryService {
     }
 
     public void deleteCategory(int categoryId) throws Exception {
-            boolean exists = categoryRepository.existsById(categoryId);
-            if(!exists) {
-                throw new CategoryException("Category with id: " + categoryId + " not found", CategoryException.ErrorType.CATEGORY_NOT_FOUND);
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() ->
+                new CategoryException("Category with id: " + categoryId + " not found", CategoryException.ErrorType.CATEGORY_NOT_FOUND)
+                );
+        List<EventType> eventTypes = eventTypeRepository.findEventTypesByCategoryId(categoryId);
+        if(!eventTypes.isEmpty()) {
+            for(EventType eventType : eventTypes) {
+                eventType.getCategories().remove(category);
+                eventTypeRepository.save(eventType);
             }
+        }
         List<BudgetItem> budgetItems = budgetItemRepository.findByCategoryId(categoryId);
         List<Merchandise> merchandise = merchandiseRepository.findMerchandiseByCategory(categoryId);
         if(merchandise.isEmpty() && budgetItems.isEmpty()) {
