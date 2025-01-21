@@ -75,4 +75,10 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
+
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<CategoryOverviewDTO> getById(@PathVariable (value = "categoryId") int categoryId) {
+        CategoryOverviewDTO category = categoryService.getById(categoryId);
+        return ResponseEntity.ok(category);
+    }
 }

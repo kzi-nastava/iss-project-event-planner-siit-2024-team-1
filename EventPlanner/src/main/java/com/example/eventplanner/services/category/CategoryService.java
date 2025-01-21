@@ -78,6 +78,7 @@ public class CategoryService {
             for(Merchandise merc : merchandise){
                 if(merc.getState() == MerchandiseState.PENDING) {
                     merc.setState(MerchandiseState.APPROVED);
+                    merc.setAvailable(true);
                     merchandiseRepository.save(merc);
                 }
             }
@@ -98,8 +99,11 @@ public class CategoryService {
         if(!merchandises.isEmpty()) {
             for(Merchandise merc : merchandises) {
                 merc.setCategory(category);
+                merc.setState(MerchandiseState.APPROVED);
+                merc.setAvailable(true);
                 merchandiseRepository.save(merc);
                 notifyServiceProvider(merc, "Admin has updated Category from one of your Merchandises");
+                categoryRepository.deleteById(replacedCategoryId);
             }
         } else {
             throw new CategoryException("No merchandise associated with category: " + replacedCategoryId, CategoryException.ErrorType.MERCHANDISE_NOT_FOUND);
@@ -138,8 +142,7 @@ public class CategoryService {
 
     public void deleteCategory(int categoryId) throws Exception {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() ->
-                new CategoryException("Category with id: " + categoryId + " not found", CategoryException.ErrorType.CATEGORY_NOT_FOUND)
-                );
+                new CategoryException("Category with id: " + categoryId + " not found", CategoryException.ErrorType.CATEGORY_NOT_FOUND));
         List<EventType> eventTypes = eventTypeRepository.findEventTypesByCategoryId(categoryId);
         if(!eventTypes.isEmpty()) {
             for(EventType eventType : eventTypes) {
@@ -154,5 +157,11 @@ public class CategoryService {
         }else {
             throw new CategoryException("Category with id: " + categoryId + " is already in use", CategoryException.ErrorType.CATEGORY_IN_USE);
         }
+    }
+
+    public CategoryOverviewDTO getById(int categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() ->
+                new CategoryException("Category with id: " + categoryId + " not found", CategoryException.ErrorType.CATEGORY_NOT_FOUND));
+        return mapToCategoryOverviewDTO(category);
     }
 }

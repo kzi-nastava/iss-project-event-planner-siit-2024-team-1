@@ -24,7 +24,10 @@ INSERT INTO event_type (title, description, is_active) VALUES
 INSERT INTO category (title,description,pending) VALUES ('Entertainment','Entertainment description',false),
                                                         ('Funerality','Entertainment description',false),
                                                         ('Suicidabiliyu','Entertainment description',false),
-                                                        ('Protest','Entertainment description',false);
+                                                        ('Protest','Entertainment description',false),
+                                                        ('Food', 'Food description', true),
+                                                        ('Drinks', 'Drinks description', true),
+                                                        ('Ceremonial Space', 'Ceremonial space description', true);
 
 INSERT INTO eventtype_category(category_id,eventtype_id) VALUES
                                                              (1,1),
