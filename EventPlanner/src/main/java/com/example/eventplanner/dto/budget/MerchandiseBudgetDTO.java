@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MerchandiseBudgetDTO {
     private int id;
+    private String type;
     private String title;
     private String description;
     private BudgetItemCategoryDTO category;
