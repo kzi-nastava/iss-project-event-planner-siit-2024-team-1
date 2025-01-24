@@ -53,6 +53,7 @@ public class BudgetService {
         if(budgetItem.getMerchandise() != null) {
             MerchandiseBudgetDTO merchandiseDTO = new MerchandiseBudgetDTO();
             merchandiseDTO.setId(budgetItem.getMerchandise().getId());
+            merchandiseDTO.setType(budgetItem.getMerchandise().getClass().getSimpleName());
             merchandiseDTO.setTitle(budgetItem.getMerchandise().getTitle());
             merchandiseDTO.setDescription(budgetItem.getMerchandise().getDescription());
             merchandiseDTO.setRating(budgetItem.getMerchandise().getRating());
