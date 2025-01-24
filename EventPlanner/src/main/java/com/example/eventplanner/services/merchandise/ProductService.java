@@ -517,12 +517,14 @@ public class ProductService {
                                             .orElse(null);
         if(existingBudgetItem != null) {
             existingBudgetItem.setMerchandise(product);
+            existingBudgetItem.setAmountSpent(product.getPrice() - (product.getPrice() * product.getDiscount())/100);
         }
         else {
             BudgetItem budgetItem = new BudgetItem();
             budgetItem.setMerchandise(product);
             budgetItem.setCategory(product.getCategory());
             budgetItem.setMaxAmount(0);
+            budgetItem.setAmountSpent(product.getPrice() - (product.getPrice() * product.getDiscount())/100);
             BudgetItem savedBudgetItem = budgetItemRepository.save(budgetItem);
             event.getBudget().getBudgetItems().add(savedBudgetItem);
         }
