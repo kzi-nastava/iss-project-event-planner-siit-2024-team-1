@@ -134,4 +134,113 @@ public class EventPlannerExceptionHandler {
                 HttpStatus.BAD_REQUEST
         );
     }
+
+    @ExceptionHandler(BudgetException.class)
+    public ResponseEntity<ErrorResponseDto> handleBudgetException(BudgetException e) {
+        HttpStatus status;
+        switch (e.getErrorType()) {
+            case EVENT_NOT_FOUND:
+            case BUDGET_NOT_FOUND:
+            case BUDGET_ITEM_NOT_FOUND:
+            case CATEGORY_NOT_FOUND:
+                status = HttpStatus.NOT_FOUND;
+                break;
+            case MERCHANDISE_EXISTS:
+                status = HttpStatus.CONFLICT;
+                break;
+            default:
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(
+                new ErrorResponseDto(e.getMessage(), e.getErrorType().name()),
+                status
+        );
+    }
+
+    @ExceptionHandler(CreateServiceException.class)
+    public ResponseEntity<ErrorResponseDto> handleCreateServiceException(CreateServiceException e) {
+        HttpStatus status;
+        switch (e.getErrorType()) {
+            case SERVICE_NOT_FOUND:
+            case CATEGORY_NOT_FOUND:
+                status = HttpStatus.NOT_FOUND;
+                break;
+            case SERVICE_ALREADY_EXISTS:
+                status = HttpStatus.CONFLICT;
+                break;
+            default:
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(
+                new ErrorResponseDto(e.getMessage(), e.getErrorType().name()),
+                status
+        );
+    }
+
+    @ExceptionHandler(CategoryException.class)
+    public ResponseEntity<ErrorResponseDto> handleCategoryException(CategoryException e) {
+        HttpStatus status;
+        switch (e.getErrorType()) {
+            case CATEGORY_NOT_FOUND:
+            case EVENT_NOT_FOUND:
+            case MERCHANDISE_NOT_FOUND:
+                status = HttpStatus.NOT_FOUND;
+                break;
+            case CATEGORY_IN_USE:
+                status = HttpStatus.CONFLICT;
+                break;
+            default:
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(
+                new ErrorResponseDto(e.getMessage(), e.getErrorType().name()),
+                status
+        );
+    }
+
+    @ExceptionHandler(LeaveReviewException.class)
+    public ResponseEntity<ErrorResponseDto> handleLeaveReviewException(LeaveReviewException e) {
+        HttpStatus status;
+        switch (e.getErrorType()) {
+            case USER_NOT_FOUND:
+            case EVENT_NOT_FOUND:
+            case MERCHANDISE_NOT_FOUND:
+                status = HttpStatus.NOT_FOUND;
+                break;
+            case REVIEW_ALREADY_EXISTS:
+                status = HttpStatus.CONFLICT;
+                break;
+            case UNSUPORTED_TYPE:
+                status = HttpStatus.BAD_REQUEST;
+                break;
+            default:
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(
+                new ErrorResponseDto(e.getMessage(), e.getErrorType().name()),
+                status
+        );
+    }
+
+    @ExceptionHandler(PriceListException.class)
+    public ResponseEntity<ErrorResponseDto> handlePriceListException(PriceListException e) {
+        HttpStatus status;
+        switch (e.getErrorType()) {
+            case SERVICE_PROVIDER_NOT_FOUND:
+            case MERCHANDISE_NOT_FOUND:
+                status = HttpStatus.NOT_FOUND;
+                break;
+            default:
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(
+                new ErrorResponseDto(e.getMessage(), e.getErrorType().name()),
+                status
+        );
+    }
 }

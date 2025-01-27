@@ -1,5 +1,7 @@
 package com.example.eventplanner.exceptions;
 
+import lombok.Getter;
+
 public class CategoryException extends RuntimeException {
   public enum ErrorType {
     CATEGORY_NOT_FOUND,
@@ -7,6 +9,8 @@ public class CategoryException extends RuntimeException {
     MERCHANDISE_NOT_FOUND,
     CATEGORY_IN_USE
   }
+
+  @Getter
   private ErrorType errorType;
 
   public CategoryException(String message, ErrorType errorType) {
