@@ -148,6 +148,8 @@ public class EventPlannerExceptionHandler {
             case MERCHANDISE_EXISTS:
                 status = HttpStatus.CONFLICT;
                 break;
+            case PRICE_ILLEGAL_VALUE:
+                status = HttpStatus.BAD_REQUEST;
             default:
                 status = HttpStatus.INTERNAL_SERVER_ERROR;
         }

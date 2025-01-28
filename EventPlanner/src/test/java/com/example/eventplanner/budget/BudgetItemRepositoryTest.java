@@ -1,6 +1,5 @@
 package com.example.eventplanner.budget;
 
-import com.example.eventplanner.model.event.Budget;
 import com.example.eventplanner.model.event.BudgetItem;
 import com.example.eventplanner.model.event.Category;
 import com.example.eventplanner.repositories.budget.BudgetItemRepository;
@@ -19,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @ActiveProfiles("jpatest")
-public class BudgetRepositoryTest {
+public class BudgetItemRepositoryTest {
     @Autowired
     private BudgetItemRepository budgetItemRepository;
     @Autowired

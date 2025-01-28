@@ -7,6 +7,7 @@ public class BudgetException extends RuntimeException {
       MERCHANDISE_EXISTS,
       BUDGET_ITEM_NOT_FOUND,
       CATEGORY_NOT_FOUND,
+      PRICE_ILLEGAL_VALUE
   }
 
   private ErrorType errorType;

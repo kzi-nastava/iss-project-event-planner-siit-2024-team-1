@@ -118,6 +118,9 @@ public class BudgetService {
                 .filter(budgetItem1 -> budgetItem1.getId() == budgetItemId)
                 .findFirst()
                 .orElse(null);
+        if(price < 0) {
+            throw new BudgetException("Price cannot be less than 0", BudgetException.ErrorType.PRICE_ILLEGAL_VALUE);
+        }
         if(budgetItem != null) {
             if(budgetItem.getMerchandise() != null) {
                 throw new BudgetException("Cannot update budget item because it already has merchandise",
@@ -138,6 +141,9 @@ public class BudgetService {
         Budget budget = budgetRepository.findById(budgetId).orElseThrow(() ->
                 new BudgetException("Cannot find budget with id " + budgetId,
                         BudgetException.ErrorType.BUDGET_NOT_FOUND));
+        if(createBudgetRequestDTO.getMaxAmount() < 0) {
+            throw new BudgetException("Price cannot be less than 0", BudgetException.ErrorType.PRICE_ILLEGAL_VALUE);
+        }
         BudgetItem budgetItem = new BudgetItem();
         budgetItem.setAmountSpent(0.0);
         budgetItem.setMaxAmount(createBudgetRequestDTO.getMaxAmount());
