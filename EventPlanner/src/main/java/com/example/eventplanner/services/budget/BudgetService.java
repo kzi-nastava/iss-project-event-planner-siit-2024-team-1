@@ -2,7 +2,7 @@ package com.example.eventplanner.services.budget;
 
 import com.example.eventplanner.dto.budget.*;
 import com.example.eventplanner.dto.common.AddressDTO;
-import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
+import com.example.eventplanner.exceptions.BudgetException;
 import com.example.eventplanner.model.event.Budget;
 import com.example.eventplanner.model.event.BudgetItem;
 import com.example.eventplanner.model.event.Category;
@@ -24,7 +24,8 @@ public class BudgetService {
 
     public BudgetDTO getBudgetByEvent(int eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() ->
-            new RuntimeException("Cannot find event with id " + eventId)
+            new BudgetException("Cannot find event with id " + eventId,
+                    BudgetException.ErrorType.EVENT_NOT_FOUND)
         );
 
         return mapToBudgetDTO(event.getBudget());
@@ -85,7 +86,8 @@ public class BudgetService {
 
     public BudgetDTO deleteBudgetItem(int budgetId, int budgetItemId) {
         Budget budget = budgetRepository.findById(budgetId).orElseThrow(() ->
-                new RuntimeException("Cannot find budget with id " + budgetId));
+                new BudgetException("Cannot find budget with id " + budgetId,
+                        BudgetException.ErrorType.BUDGET_NOT_FOUND));
         BudgetItem budgetItem = budget.getBudgetItems()
                 .stream()
                 .filter(budgetItem1 -> budgetItem1.getId() == budgetItemId)
@@ -93,13 +95,15 @@ public class BudgetService {
                 .orElse(null);
         if(budgetItem != null) {
             if(budgetItem.getMerchandise() != null) {
-                throw new RuntimeException("Cannot delete budget item because it already has merchandise");
+                throw new BudgetException("Cannot delete budget item because it already has merchandise",
+                        BudgetException.ErrorType.MERCHANDISE_EXISTS);
             }else {
                 budget.getBudgetItems().remove(budgetItem);
                 budgetRepository.save(budget);
             }
         }else {
-            throw new RuntimeException("Cannot find budget item with id " + budgetItemId);
+            throw new BudgetException("Cannot find budget item with id " + budgetItemId,
+                    BudgetException.ErrorType.BUDGET_ITEM_NOT_FOUND);
         }
 
         return mapToBudgetDTO(budget);
@@ -107,21 +111,27 @@ public class BudgetService {
 
     public BudgetDTO updateBudgetItem(int budgetId, int budgetItemId, double price) {
         Budget budget = budgetRepository.findById(budgetId).orElseThrow(() ->
-                new RuntimeException("Cannot find budget with id " + budgetId));
+                new BudgetException("Cannot find budget with id " + budgetId,
+                        BudgetException.ErrorType.BUDGET_NOT_FOUND));
         BudgetItem budgetItem = budget.getBudgetItems()
                 .stream()
                 .filter(budgetItem1 -> budgetItem1.getId() == budgetItemId)
                 .findFirst()
                 .orElse(null);
+        if(price < 0) {
+            throw new BudgetException("Price cannot be less than 0", BudgetException.ErrorType.PRICE_ILLEGAL_VALUE);
+        }
         if(budgetItem != null) {
             if(budgetItem.getMerchandise() != null) {
-                throw new RuntimeException("Cannot update budget item because it already has merchandise");
+                throw new BudgetException("Cannot update budget item because it already has merchandise",
+                        BudgetException.ErrorType.MERCHANDISE_EXISTS);
             }else {
                 budgetItem.setMaxAmount(price);
                 budgetRepository.save(budget);
             }
         }else {
-            throw new RuntimeException("Cannot find budget item with id " + budgetItemId);
+            throw new BudgetException("Cannot find budget item with id " + budgetItemId,
+                    BudgetException.ErrorType.BUDGET_ITEM_NOT_FOUND);
         }
 
         return mapToBudgetDTO(budget);
@@ -129,7 +139,11 @@ public class BudgetService {
 
     public BudgetDTO createBudgetItem(int budgetId, CreateBudgetRequestDTO createBudgetRequestDTO) {
         Budget budget = budgetRepository.findById(budgetId).orElseThrow(() ->
-                new RuntimeException("Cannot find budget with id " + budgetId));
+                new BudgetException("Cannot find budget with id " + budgetId,
+                        BudgetException.ErrorType.BUDGET_NOT_FOUND));
+        if(createBudgetRequestDTO.getMaxAmount() < 0) {
+            throw new BudgetException("Price cannot be less than 0", BudgetException.ErrorType.PRICE_ILLEGAL_VALUE);
+        }
         BudgetItem budgetItem = new BudgetItem();
         budgetItem.setAmountSpent(0.0);
         budgetItem.setMaxAmount(createBudgetRequestDTO.getMaxAmount());
@@ -137,7 +151,8 @@ public class BudgetService {
         if(category != null) {
             budgetItem.setCategory(category);
         }else {
-            throw new RuntimeException("Cannot find category with id " + createBudgetRequestDTO.getCategoryId());
+            throw new BudgetException("Cannot find category with id " + createBudgetRequestDTO.getCategoryId(),
+                    BudgetException.ErrorType.CATEGORY_NOT_FOUND);
         }
         BudgetItem savedBudgetItem = budgetItemRepository.save(budgetItem);
         budget.getBudgetItems().add(savedBudgetItem);
