@@ -10,6 +10,7 @@ import com.example.eventplanner.dto.merchandise.service.*;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceRequestDTO;
 import com.example.eventplanner.dto.merchandise.service.create.CreateServiceResponseDTO;
 import com.example.eventplanner.dto.merchandise.service.update.UpdateServiceRequestDTO;
+import com.example.eventplanner.exceptions.BudgetException;
 import com.example.eventplanner.exceptions.CreateServiceException;
 import com.example.eventplanner.exceptions.ServiceReservationException;
 import com.example.eventplanner.exceptions.UserAuthenticationException;
@@ -323,6 +324,12 @@ public class ServiceService {
             );
         }
 
+        try {
+            saveToBudget(service, event);
+        } catch (Exception e) {
+            throw new BudgetException(e.getMessage(), BudgetException.ErrorType.PRICE_ILLEGAL_VALUE);
+        }
+
 
         // Calculate end time if not provided
         LocalDateTime endTime = calculateEndTime(service, request);
@@ -331,28 +338,6 @@ public class ServiceService {
         Timeslot timeslot = new Timeslot(request.getStartTime(), endTime,event);
 
         service.getTimeslots().add(timeslot);
-
-        BudgetItem existingBudgetItem = event.getBudget()
-                .getBudgetItems()
-                .stream()
-                .filter(item ->
-                        item.getCategory().getId() == service.getCategory().getId() &&
-                                item.getMerchandise() == null)
-                .findFirst()
-                .orElse(null);
-        if(existingBudgetItem != null) {
-            existingBudgetItem.setMerchandise(service);
-        }
-        else {
-            BudgetItem budgetItem = new BudgetItem();
-            budgetItem.setMerchandise(service);
-            budgetItem.setCategory(service.getCategory());
-            budgetItem.setMaxAmount(0);
-            BudgetItem savedBudgetItem = budgetItemRepository.save(budgetItem);
-            event.getBudget().getBudgetItems().add(savedBudgetItem);
-        }
-
-        budgetRepository.save(event.getBudget());
 
         // Save changes
         timeslotRepository.save(timeslot);
@@ -454,7 +439,34 @@ public class ServiceService {
         return request.getStartTime().plusMinutes(service.getMinDuration());
     }
 
+    private void saveToBudget(com.example.eventplanner.model.merchandise.Service service, Event event) throws Exception {
+        BudgetItem existingBudgetItem = event.getBudget()
+                .getBudgetItems()
+                .stream()
+                .filter(item ->
+                        item.getCategory().getId() == service.getCategory().getId() &&
+                                item.getMerchandise() == null)
+                .findFirst()
+                .orElse(null);
+        if(existingBudgetItem != null) {
+            double totalPrice = service.getPrice() - (service.getPrice() * service.getDiscount())/100;
+            if(existingBudgetItem.getMaxAmount() < totalPrice) {
+                throw new Exception("Service is too expensive for budget");
+            }
+            existingBudgetItem.setMerchandise(service);
+            existingBudgetItem.setAmountSpent(totalPrice);
+        }
+        else {
+            BudgetItem budgetItem = new BudgetItem();
+            budgetItem.setMerchandise(service);
+            budgetItem.setCategory(service.getCategory());
+            budgetItem.setMaxAmount(0);
+            BudgetItem savedBudgetItem = budgetItemRepository.save(budgetItem);
+            event.getBudget().getBudgetItems().add(savedBudgetItem);
+        }
 
+        budgetRepository.save(event.getBudget());
+    }
 
     private void sendReservationEmail(ReservationRequestDTO request, Event event, int serviceId) {
         // Fetch the event organizer

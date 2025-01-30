@@ -6,6 +6,7 @@ import com.example.eventplanner.dto.filter.ProductFiltersDTO;
 import com.example.eventplanner.dto.merchandise.MerchandiseOverviewDTO;
 import com.example.eventplanner.dto.merchandise.product.*;
 import com.example.eventplanner.dto.merchandise.service.ServiceOverviewDTO;
+import com.example.eventplanner.exceptions.BudgetException;
 import com.example.eventplanner.exceptions.EventException;
 import com.example.eventplanner.exceptions.ProductException;
 import com.example.eventplanner.exceptions.UserAuthenticationException;
@@ -516,8 +517,13 @@ public class ProductService {
                                             .findFirst()
                                             .orElse(null);
         if(existingBudgetItem != null) {
+            double totalPrice = product.getPrice() - (product.getPrice() * product.getDiscount())/100;
+            if(existingBudgetItem.getMaxAmount() < totalPrice) {
+                throw new BudgetException("Product is too expensive for budget", BudgetException.ErrorType.PRICE_ILLEGAL_VALUE);
+            }
+
             existingBudgetItem.setMerchandise(product);
-            existingBudgetItem.setAmountSpent(product.getPrice() - (product.getPrice() * product.getDiscount())/100);
+            existingBudgetItem.setAmountSpent(totalPrice);
         }
         else {
             BudgetItem budgetItem = new BudgetItem();
