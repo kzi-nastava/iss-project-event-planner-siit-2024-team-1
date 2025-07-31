@@ -635,7 +635,7 @@ public class ServiceService {
         response.setReservationDeadline(savedService.getReservationDeadline());
         response.setCancellationDeadline(savedService.getCancellationDeadline());
         response.setAutomaticReservation(savedService.isAutomaticReservation());
-        response.setPhotos(savedService.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
+        response.setMerchandisePhotos(savedService.getPhotos().stream().map(this::mapToMerchandisePhotoDTO).toList());
         response.setEventTypes(savedService.getEventTypes());
         response.setCategory(savedService.getCategory());
         response.setVisible(savedService.isVisible());
